@@ -1,0 +1,920 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Studio Odontoiatrico Basile Ciccarone - Magazzino Materiali</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;background:#f5f8fb;color:#2c3e50;line-height:1.6}
+    .container{max-width:1200px;margin:0 auto;padding:24px}
+    h1{color:#003d7a;margin-bottom:8px;font-size:28px;font-weight:600}
+    .subtitle{color:#7f8c8d;margin-bottom:24px;font-size:14px}
+    #alerts{margin-bottom:20px}
+    .alert{padding:12px 16px;border-radius:8px;margin-bottom:8px;font-size:14px;border-left:4px solid}
+    .alert.info{background:#e6f0ff;border-color:#0066cc;color:#003d7a}
+    .alert.warn{background:#fff3e6;border-color:#ff9800;color:#e65100}
+    
+    form{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:24px;background:#fff;padding:20px;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.08)}
+    .form-group{display:flex;flex-direction:column}
+    .form-group label{font-size:12px;font-weight:600;color:#003d7a;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px}
+    input,select{padding:10px 12px;font-size:14px;border:1px solid #d0dce6;border-radius:6px;background:#fff;color:#2c3e50;transition:border-color 0.2s}
+    input:focus,select:focus{outline:none;border-color:#0066cc;box-shadow:0 0 0 3px rgba(0,102,204,0.1)}
+    button{padding:10px 16px;font-size:14px;border:none;border-radius:6px;cursor:pointer;font-weight:500;transition:all 0.2s}
+    form button{background:#0066cc;color:#fff}
+    form button:hover{background:#0052a3}
+    
+    table{width:100%;border-collapse:collapse;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.08)}
+    thead{background:#003d7a;color:#fff}
+    th{padding:14px 12px;text-align:left;font-weight:600;font-size:13px;text-transform:uppercase;letter-spacing:0.5px}
+    td{padding:12px;border-bottom:1px solid #e8ecf1;font-size:14px}
+    tbody tr:hover{background:#f9fbfd}
+    
+    .badge{display:inline-block;padding:6px 10px;border-radius:6px;color:#fff;font-weight:600;font-size:12px}
+    .expired{background:#d32f2f}
+    .soon{background:#f57c00}
+    .ok{background:#388e3c}
+    .low{background:#d32f2f}
+    
+    .controls{display:flex;gap:6px}
+    .controls button{padding:6px 10px;font-size:12px;background:#e6f0ff;color:#0066cc;border:1px solid #0066cc}
+    .controls button:hover{background:#0066cc;color:#fff}
+    .controls button.del{background:#fff3e6;color:#ff9800;border-color:#ff9800}
+    .controls button.del:hover{background:#ff9800;color:#fff}
+    
+    .action-buttons{display:flex;gap:10px;margin-bottom:20px;justify-content:flex-end}
+    .action-buttons button{padding:10px 16px;font-size:14px;border:none;border-radius:6px;cursor:pointer;font-weight:500;transition:all 0.2s;background:#0066cc;color:#fff}
+    .action-buttons button:hover{background:#0052a3}
+    .action-buttons button.export{background:#388e3c}
+    .action-buttons button.export:hover{background:#2e7d32}
+    
+    #loginScreen{position:fixed;top:0;left:0;width:100%;height:100%;background:linear-gradient(135deg,#003d7a 0%,#0066cc 100%);display:flex;align-items:center;justify-content:center;z-index:9999}
+    #loginScreen.hidden{display:none}
+    .login-box{background:#fff;padding:40px;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,0.2);text-align:center;max-width:320px}
+    .login-box h2{color:#003d7a;margin-bottom:24px;font-size:24px}
+    .login-box input{width:100%;padding:12px;margin-bottom:16px;border:1px solid #d0dce6;border-radius:6px;font-size:14px}
+    .login-box input:focus{outline:none;border-color:#0066cc;box-shadow:0 0 0 3px rgba(0,102,204,0.1)}
+    .login-box button{width:100%;padding:12px;background:#0066cc;color:#fff;border:none;border-radius:6px;font-size:14px;font-weight:600;cursor:pointer;transition:background 0.2s}
+    .login-box button:hover{background:#0052a3}
+    .login-error{color:#d32f2f;font-size:13px;margin-bottom:12px}
+    
+    .category-filters{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:24px}
+    .category-btn{padding:12px 16px;border:2px solid #d0dce6;border-radius:8px;background:#fff;color:#2c3e50;cursor:pointer;font-weight:500;font-size:14px;transition:all 0.2s;text-align:center}
+    .category-btn:hover{border-color:#0066cc;color:#0066cc}
+    .category-btn.active{background:#0066cc;color:#fff;border-color:#0066cc}
+    
+    .header-wrapper{display:flex;align-items:center;gap:16px;margin-bottom:24px}
+    .logo-circle{width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#003d7a 0%,#0066cc 100%);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:24px;flex-shrink:0;box-shadow:0 2px 8px rgba(0,61,122,0.25)}
+    .header-content h1{margin:0;padding:0;font-size:32px}
+    .header-content .studio-name{font-size:14px;color:#7f8c8d;font-weight:400}
+  </style>
+</head>
+<body>
+  <!-- Login disabilitato temporaneamente -->
+  <div style="display:none"></div>
+
+  <div class="container" id="mainContent" style="display:block">
+    <div class="header-wrapper">
+      <div class="logo-circle">BC</div>
+      <div class="header-content">
+        <h1>Studio Odontoiatrico Basile Ciccarone</h1>
+        <p class="studio-name">Gestione Magazzino Materiali di Consumo</p>
+      </div>
+    </div>
+    <div id="alerts"></div>
+    <div class="alert info" style="margin-bottom:18px;">
+      <strong>Nota sulle notifiche:</strong> Riceverai un avviso automatico quando:
+      <ul style="margin:8px 0 0 18px; font-size:13px; color:#003d7a;">
+        <li>Un materiale è scaduto o sta per scadere tra 30 giorni</li>
+        <li>La quantità del materiale raggiunge il valore soglia impostato</li>
+      </ul>
+      Le notifiche compaiono in alto nella pagina ogni volta che si verifica una di queste condizioni.
+    </div>
+
+    <form id="addForm">
+      <div class="form-group"><label>Nome materiale</label><input id="name" placeholder="Es. Cemento composito" required /></div>
+      <div class="form-group"><label>📅 Data Ordine</label><input id="orderDate" type="date" required /></div>
+      <div class="form-group"><label>⏰ Data Scadenza</label><input id="expiry" type="date" required /></div>
+      <div class="form-group"><label>Prezzo (€)</label><input id="price" type="number" step="0.01" placeholder="0.00" /></div>
+      <div class="form-group"><label>Quantità</label><input id="quantity" type="number" min="0" value="1" required /></div>
+      <div class="form-group"><label>📦 Categoria</label><select id="category" required><option value="">-- Seleziona --</option><option value="Strumentario">Strumentario</option><option value="Consumabili Generici">Consumabili Generici</option><option value="Monouso">Monouso</option><option value="Disinfezione e Sterilizzazione">Disinfezione e Sterilizzazione</option><option value="Implantologia e Chirurgia">Implantologia e Chirurgia</option><option value="Endodonzia">Endodonzia</option><option value="Conservativa e Protesi">Conservativa e Protesi</option><option value="Frese e Lucidatura">Frese e Lucidatura</option><option value="Anestesia e Farmaci">Anestesia e Farmaci</option><option value="Impronte e Laboratorio">Impronte e Laboratorio</option><option value="Radiografia e Fotografia">Radiografia e Fotografia</option><option value="Profilassi e Igiene Orale">Profilassi e Igiene Orale</option><option value="Ortodonzia">Ortodonzia</option></select></div>
+      <div class="form-group"><label>Distributore</label>
+        <select id="distributorSelect" required>
+          <option value="">-- Seleziona --</option>
+          <option value="Dental Leader">Dental Leader</option>
+          <option value="Gherò">Gherò</option>
+          <option value="Revello">Revello</option>
+          <option value="Dentitalia">Dentitalia</option>
+          <option value="Dental Trey">Dental Trey</option>
+          <option value="Umbra">Umbra</option>
+          <option value="Eli Dent">Eli Dent</option>
+          <option value="Non disponibile">Non disponibile</option>
+          <option value="Other">Altro...</option>
+        </select>
+        <input id="distributor" placeholder="Distributore personalizzato" style="display:none;margin-top:6px" />
+      </div>
+      <div class="form-group"><label>Azienda</label>
+        <select id="companySelect">
+          <option value="">-- Seleziona --</option>
+          <option value="3M">3M</option>
+          <option value="Ivoclar">Ivoclar</option>
+          <option value="GC">GC</option>
+          <option value="Dentsply Sirona">Dentsply Sirona</option>
+          <option value="Coltene">Coltene</option>
+          <option value="Kerr">Kerr</option>
+          <option value="Voco">Voco</option>
+          <option value="Septodont">Septodont</option>
+          <option value="Zhermack">Zhermack</option>
+          <option value="DMG">DMG</option>
+          <option value="VOCO">VOCO</option>
+          <option value="Other">Altro...</option>
+        </select>
+        <input id="company" placeholder="Azienda personalizzata" style="display:none;margin-top:6px" />
+      </div>
+      <div class="form-group"><label>Soglia quantità bassa</label>
+        <select id="lowStockThreshold">
+          <option value="1">1</option>
+          <option value="2">2 (default)</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+          <option value="Other">Altro...</option>
+        </select>
+        <input id="lowStockThresholdCustom" type="number" min="1" step="1" placeholder="Personalizzato" style="display:none;margin-top:6px" />
+      </div>
+      <button type="submit" style="grid-column:span 1;align-self:flex-end">Aggiungi materiale</button>
+    </form>
+    
+    <div id="categoryFilters" class="category-filters"></div>
+
+    <div class="action-buttons">
+      <button class="export" onclick="downloadPDF()">📥 Scarica PDF</button>
+    </div>
+
+    <div style="margin-bottom:12px;display:flex;gap:18px;align-items:center;flex-wrap:wrap;">
+            <div>
+              <label for="expiryFilterSelect" style="font-weight:600;color:#003d7a;font-size:14px;margin-right:8px;">Filtra per scadenza:</label>
+              <select id="expiryFilterSelect" style="padding:8px 12px;font-size:14px;border-radius:6px;border:1px solid #d0dce6;min-width:180px;">
+                <option value="Tutte">Tutte</option>
+                <option value="Rosso">Rosso (entro 3 mesi)</option>
+                <option value="Giallo">Giallo (entro 6 mesi)</option>
+                <option value="Verde">Verde (oltre 6 mesi)</option>
+              </select>
+            </div>
+            <div>
+              <label for="quantityFilterSelect" style="font-weight:600;color:#003d7a;font-size:14px;margin-right:8px;">Filtra per quantità:</label>
+              <select id="quantityFilterSelect" style="padding:8px 12px;font-size:14px;border-radius:6px;border:1px solid #d0dce6;min-width:180px;">
+                <option value="Tutte">Tutte</option>
+                <option value="Rosso">Rosso (sotto soglia)</option>
+                <option value="Giallo">Giallo (uguale soglia)</option>
+                <option value="Verde">Verde (sopra soglia)</option>
+              </select>
+            </div>
+      <div>
+        <label for="companyFilterSelect" style="font-weight:600;color:#003d7a;font-size:14px;margin-right:8px;">Filtra per azienda:</label>
+        <select id="companyFilterSelect" style="padding:8px 12px;font-size:14px;border-radius:6px;border:1px solid #d0dce6;min-width:180px;">
+          <option value="Tutte">Tutte</option>
+        </select>
+      </div>
+      <div>
+        <label for="distributorFilterSelect" style="font-weight:600;color:#003d7a;font-size:14px;margin-right:8px;">Filtra per distributore:</label>
+        <select id="distributorFilterSelect" style="padding:8px 12px;font-size:14px;border-radius:6px;border:1px solid #d0dce6;min-width:180px;">
+          <option value="Tutti">Tutti</option>
+        </select>
+      </div>
+    </div>
+    <table>
+      <thead>
+        <tr><th>Nome</th><th>Data ordine</th><th>Scadenza</th><th>Prezzo</th><th>Quantità</th><th>Distributore</th><th>Azienda</th><th>Stato</th><th>Azioni</th></tr>
+      </thead>
+      <tbody id="list"></tbody>
+    </table>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script>
+    // --- Firebase Configuration ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyAZeB8P2osUIN2YHa5qg4eAZdRH8js2cW0",
+      authDomain: "gestione-materiali-di-consumo.firebaseapp.com",
+      projectId: "gestione-materiali-di-consumo",
+      storageBucket: "gestione-materiali-di-consumo.firebasestorage.app",
+      messagingSenderId: "831456435798",
+      appId: "1:831456435798:web:af967c6986c06dde8d65f7",
+      measurementId: "G-CEGE8B5LGZ"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+    let firebaseReady = true;
+    if (db && typeof db.enablePersistence === 'function') {
+      db.enablePersistence({ synchronizeTabs: true }).catch(err => {
+        console.warn('Persistenza offline Firebase non attiva:', err && err.message ? err.message : err);
+      });
+    }
+
+    // Login anonimo automatico
+    auth.onAuthStateChanged(user => {
+      if (!user) {
+        auth.signInAnonymously().catch(err => {
+          console.warn('Errore login anonimo:', err.message);
+        });
+      } else {
+        console.log('Login anonimo riuscito:', user.uid);
+      }
+    });
+
+    const addForm = document.getElementById('addForm');
+    const listEl = document.getElementById('list');
+    const alertsEl = document.getElementById('alerts');
+    const categoryFiltersEl = document.getElementById('categoryFilters');
+    const companyFilterSelect = document.getElementById('companyFilterSelect');
+    const distributorFilterSelect = document.getElementById('distributorFilterSelect');
+
+    const CATEGORIES = ['Tutti', 'Strumentario', 'Consumabili Generici', 'Monouso', 'Disinfezione e Sterilizzazione', 'Implantologia e Chirurgia', 'Endodonzia', 'Conservativa e Protesi', 'Frese e Lucidatura', 'Anestesia e Farmaci', 'Impronte e Laboratorio', 'Radiografia e Fotografia', 'Profilassi e Igiene Orale', 'Ortodonzia'];
+    let currentFilter = 'Tutti';
+    let currentCompanyFilter = 'Tutte';
+    let currentDistributorFilter = 'Tutti';
+    let currentExpiryFilter = 'Tutte';
+    let currentQuantityFilter = 'Tutte';
+    let allDocs = []; // store all docs for filtering
+
+    let notified = new Map(); // track notifications per doc
+
+    // --- LOCAL STORAGE FUNCTIONS ---
+    function saveToLocalStorage(docs){
+      // Se docs non è un array o vuoto, niente da salvare
+      if (!Array.isArray(docs) || docs.length === 0) return;
+      // Estrai dati dai doc Firestore
+      const fbData = docs[0] && typeof docs[0].data === 'function'
+        ? docs.map(doc=>{
+            const d = doc.data();
+            const order = d.orderDate && d.orderDate.toDate ? d.orderDate.toDate().toISOString() : (d.orderDate ? new Date(d.orderDate).toISOString() : null);
+            const exp = d.expiry && d.expiry.toDate ? d.expiry.toDate().toISOString() : (d.expiry ? new Date(d.expiry).toISOString() : null);
+            const created = d.createdAt && d.createdAt.toDate ? d.createdAt.toDate().toISOString() : (d.createdAt ? new Date(d.createdAt).toISOString() : null);
+            return {id: doc.id, ...d, orderDate: order, expiry: exp, createdAt: created};
+          })
+        : docs;
+      // Carica materiali esistenti in localStorage e unisci (prefers Firebase data, mantiene elementi locali non ancora sincronizzati)
+      try {
+        const existing = loadFromLocalStorage();
+        const map = new Map();
+        // prima aggiungi esistenti locali
+        existing.forEach(it => map.set(it.id, it));
+        // poi sovrascrivi/aggiungi con dati da Firebase
+        fbData.forEach(it => map.set(it.id, it));
+        const merged = Array.from(map.values());
+        localStorage.setItem('magazzino_materials', JSON.stringify(merged));
+      } catch (e) {
+        // fallback semplice
+        localStorage.setItem('magazzino_materials', JSON.stringify(fbData));
+      }
+    }
+
+    function loadFromLocalStorage(){
+      const saved = localStorage.getItem('magazzino_materials');
+      return saved ? JSON.parse(saved) : [];
+    }
+
+    function addToLocalStorage(item){
+      const materials = loadFromLocalStorage();
+      const newItem = {...item, id: item.id || (window.crypto && window.crypto.randomUUID ? window.crypto.randomUUID() : '_local_'+Date.now())};
+      // Convert dates to ISO strings for JSON serialization
+      if(newItem.orderDate instanceof Date) newItem.orderDate = newItem.orderDate.toISOString();
+      if(newItem.expiry instanceof Date) newItem.expiry = newItem.expiry.toISOString();
+      if(newItem.createdAt instanceof Date) newItem.createdAt = newItem.createdAt.toISOString();
+      const idx = materials.findIndex(m => m.id === newItem.id);
+      if (idx >= 0) {
+        materials[idx] = {...materials[idx], ...newItem};
+      } else {
+        materials.push(newItem);
+      }
+      localStorage.setItem('magazzino_materials', JSON.stringify(materials));
+      return newItem.id;
+    }
+
+    function deleteFromLocalStorage(id){
+      const materials = loadFromLocalStorage();
+      const filtered = materials.filter(m=>m.id !== id);
+      localStorage.setItem('magazzino_materials', JSON.stringify(filtered));
+    }
+
+    function updateQuantityLocalStorage(id, delta){
+      const materials = loadFromLocalStorage();
+      const item = materials.find(m=>m.id === id);
+      if(item){
+        item.quantity = (item.quantity || 0) + delta;
+        localStorage.setItem('magazzino_materials', JSON.stringify(materials));
+      }
+    }
+
+    // Request browser notification permission (optional)
+    if ('Notification' in window){
+      Notification.requestPermission().catch(()=>{});
+    }
+
+    function showAlert(text, type='info'){
+      const d = document.createElement('div');
+      d.className = 'alert ' + (type==='warn'?'warn':'info');
+      d.textContent = text;
+      alertsEl.appendChild(d);
+      setTimeout(()=>d.remove(), 8000);
+    }
+
+    function notify(title, body){
+      // Browser notification
+      if (window.Notification && Notification.permission === 'granted'){
+        new Notification(title, {body});
+      }
+      // in-app alert
+      showAlert(title + ' — ' + body, 'warn');
+    }
+
+    function daysBetween(a,b){
+      const ms = 24*60*60*1000;
+      return Math.ceil((b-a)/ms);
+    }
+
+    function initCategoryFilters(){
+      categoryFiltersEl.innerHTML = '';
+      CATEGORIES.forEach(cat=>{
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'category-btn' + (cat === currentFilter ? ' active' : '');
+        btn.textContent = cat;
+        btn.addEventListener('click', ()=>{
+          currentFilter = cat;
+          updateCategoryFilters();
+          renderFilteredMaterials();
+        });
+        categoryFiltersEl.appendChild(btn);
+      });
+      // Filtro aziende: menu a tendina
+      if (companyFilterSelect) {
+        const companies = Array.from(new Set(allDocs.map(doc => (doc.data().company || '').trim()).filter(c => c))).sort();
+        companyFilterSelect.innerHTML = '<option value="Tutte">Tutte</option>';
+        companies.forEach(comp => {
+          if(comp) {
+            const opt = document.createElement('option');
+            opt.value = comp;
+            opt.textContent = comp;
+            companyFilterSelect.appendChild(opt);
+          }
+        });
+        companyFilterSelect.value = currentCompanyFilter;
+      }
+      // Filtro distributori: menu a tendina
+      if (distributorFilterSelect) {
+        const distributors = Array.from(new Set(allDocs.map(doc => (doc.data().distributor || '').trim()).filter(c => c))).sort();
+        distributorFilterSelect.innerHTML = '<option value="Tutti">Tutti</option>';
+        distributors.forEach(dist => {
+          if(dist) {
+            const opt = document.createElement('option');
+            opt.value = dist;
+            opt.textContent = dist;
+            distributorFilterSelect.appendChild(opt);
+          }
+        });
+        distributorFilterSelect.value = currentDistributorFilter;
+      }
+    }
+
+    function updateCategoryFilters(){
+      const btns = categoryFiltersEl.querySelectorAll('.category-btn');
+      btns.forEach(btn=>{
+        if(btn.textContent === currentFilter){
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+    }
+    // Rimosso updateCompanyFilters: non serve più con il select
+
+    function loadMaterialsFromStorage(){
+      const localData = loadFromLocalStorage();
+      allDocs = localData.map(d=>({id: d.id, data: ()=>d}));
+      initCategoryFilters();
+      renderFilteredMaterials();
+      checkAndNotify(allDocs);
+    }
+
+    function renderFilteredMaterials(){
+      listEl.innerHTML = '';
+      let filtered = currentFilter === 'Tutti' 
+        ? allDocs 
+        : allDocs.filter(doc=>doc.data().category === currentFilter);
+      if(currentCompanyFilter !== 'Tutte'){
+        filtered = filtered.filter(doc => (doc.data().company || '') === currentCompanyFilter);
+      }
+      if(currentDistributorFilter !== 'Tutti'){
+        filtered = filtered.filter(doc => (doc.data().distributor || '') === currentDistributorFilter);
+      }
+      // Filtro scadenza semaforo
+      if(currentExpiryFilter !== 'Tutte'){
+        const now = new Date();
+        filtered = filtered.filter(doc => {
+          const data = doc.data();
+          if(!data.expiry) return false;
+          const expiry = data.expiry && data.expiry.toDate ? data.expiry.toDate() : new Date(data.expiry);
+          const days = Math.ceil((expiry - now) / (1000*60*60*24));
+          const mesi = days / 30.44;
+          if(days < 0) return currentExpiryFilter === 'Rosso';
+          if(mesi < 3) return currentExpiryFilter === 'Rosso';
+          if(mesi < 6) return currentExpiryFilter === 'Giallo';
+          return currentExpiryFilter === 'Verde';
+        });
+      }
+      // Filtro quantità semaforo
+      if(currentQuantityFilter !== 'Tutte'){
+        filtered = filtered.filter(doc => {
+          const data = doc.data();
+          const soglia = data.lowStockThreshold || 2;
+          if(currentQuantityFilter === 'Rosso') return (data.quantity||0) < soglia;
+          if(currentQuantityFilter === 'Giallo') return (data.quantity||0) == soglia;
+          if(currentQuantityFilter === 'Verde') return (data.quantity||0) > soglia;
+          return true;
+        });
+      }
+      filtered.forEach(doc=>{
+        const tr = renderItem(doc);
+        listEl.appendChild(tr);
+      });
+            // Gestione filtro quantità da select
+            const quantityFilterSelect = document.getElementById('quantityFilterSelect');
+            if (quantityFilterSelect) {
+              quantityFilterSelect.addEventListener('change', function() {
+                currentQuantityFilter = this.value;
+                renderFilteredMaterials();
+              });
+            }
+        // Gestione filtro scadenza da select
+        const expiryFilterSelect = document.getElementById('expiryFilterSelect');
+        if (expiryFilterSelect) {
+          expiryFilterSelect.addEventListener('change', function() {
+            currentExpiryFilter = this.value;
+            renderFilteredMaterials();
+          });
+        }
+    }
+
+    addForm.addEventListener('submit', async e=>{
+      e.preventDefault();
+      console.log('Form submitted');
+      
+      const name = document.getElementById('name').value.trim();
+      const orderDate = document.getElementById('orderDate').value;
+      const expiry = document.getElementById('expiry').value;
+      const price = parseFloat(document.getElementById('price').value) || 0;
+      const quantity = parseInt(document.getElementById('quantity').value,10) || 0;
+      const category = document.getElementById('category').value.trim();
+        let distributor = document.getElementById('distributorSelect').value;
+        if(distributor === 'Other') {
+          distributor = document.getElementById('distributor').value.trim();
+        }
+        let company = document.getElementById('companySelect').value;
+        if(company === 'Other') {
+          company = document.getElementById('company').value.trim();
+        }
+      const notifyDays = 30;
+      let lowStockThreshold = document.getElementById('lowStockThreshold').value;
+      if(lowStockThreshold === 'Other') {
+        lowStockThreshold = parseInt(document.getElementById('lowStockThresholdCustom').value,10) || 2;
+      } else {
+        lowStockThreshold = parseInt(lowStockThreshold,10) || 2;
+      }
+          // Gestione visibilità input soglia personalizzata
+          document.getElementById('lowStockThreshold').addEventListener('change', function() {
+            if(this.value === 'Other') {
+              document.getElementById('lowStockThresholdCustom').style.display = '';
+            } else {
+              document.getElementById('lowStockThresholdCustom').style.display = 'none';
+            }
+          });
+      
+      if(!name || !orderDate || !expiry || !category) {
+        console.log('Missing fields:', {name, orderDate, expiry, category});
+        return;
+      }
+      
+      const newData = {
+        name, 
+        orderDate: new Date(orderDate), 
+        expiry: new Date(expiry), 
+        price, 
+        quantity, 
+        category, 
+          distributor, 
+          company,
+        notifyDays, 
+        lowStockThreshold,
+        createdAt: new Date()
+      };
+      
+      console.log('Saving material:', name);
+      
+      // ID unico condiviso tra locale e Firebase
+      const materialId = window.crypto && window.crypto.randomUUID
+        ? window.crypto.randomUUID()
+        : ('m_' + Date.now() + '_' + Math.floor(Math.random()*100000));
+
+      // Save to local storage
+      const itemId = addToLocalStorage({id: materialId, ...newData});
+      console.log('Saved with ID:', itemId);
+      
+      // Try Firebase sync (optional)
+      if(firebaseReady && typeof db !== 'undefined'){
+        try {
+          await db.collection('materials').doc(materialId).set(newData);
+        } catch(err) {
+          console.warn('Firebase unavailable:', err.message);
+          showAlert('Materiale salvato in locale. Firebase non raggiungibile.', 'warn');
+        }
+      }
+      
+      // Reset and reload
+      addForm.reset();
+      document.getElementById('quantity').value = 1;
+      showAlert('✓ ' + name + ' aggiunto', 'info');
+      
+      // Reload immediately
+      setTimeout(loadMaterialsFromStorage, 100);
+    });
+
+    function renderItem(doc){
+      const data = doc.data();
+      const tr = document.createElement('tr');
+      const now = new Date();
+      const orderDate = data.orderDate ? (data.orderDate.toDate ? data.orderDate.toDate() : new Date(data.orderDate)) : null;
+      const expiry = data.expiry ? (data.expiry.toDate ? data.expiry.toDate() : new Date(data.expiry)) : null;
+      let statusHtml = '';
+      if(!expiry){
+        statusHtml = '<span class="badge ok">Senza scadenza</span>';
+      } else {
+        const days = daysBetween(now, expiry);
+        const mesi = days / 30.44;
+        if(days < 0) {
+          statusHtml = '<span class="badge expired">Scaduto</span>';
+        } else if(days <= 30) {
+          statusHtml = '<span class="badge soon" style="background:#fbc02d">Scade tra ' + days + ' giorni</span>';
+        } else if(mesi < 3) {
+          statusHtml = '<span class="badge low" style="background:#d32f2f">Rosso: Scade tra ' + days + ' giorni</span>';
+        } else if(mesi < 6) {
+          statusHtml = '<span class="badge soon" style="background:#fbc02d">Giallo: Scade tra ' + days + ' giorni</span>';
+        } else {
+          statusHtml = '<span class="badge ok" style="background:#388e3c">Verde: Scade tra ' + days + ' giorni</span>';
+        }
+      }
+      // Badge semaforo quantità
+      let lowBadge = '';
+      const soglia = data.lowStockThreshold || 2;
+      if (data.quantity < soglia) {
+        lowBadge = ' <span class="badge low" style="background:#d32f2f">Rosso: '+data.quantity+'</span>';
+      } else if (data.quantity == soglia) {
+        lowBadge = ' <span class="badge soon" style="background:#fbc02d">Giallo: '+data.quantity+'</span>';
+      } else {
+        lowBadge = ' <span class="badge ok" style="background:#388e3c">Verde: '+data.quantity+'</span>';
+      }
+      tr.innerHTML = `
+        <td><span class="editable-name" style="cursor:pointer;text-decoration:underline;">${escapeHtml(data.name)}</span></td>
+        <td>${orderDate ? orderDate.toLocaleDateString() : '-'}</td>
+        <td>${expiry ? expiry.toLocaleDateString() : '-'}</td>
+        <td>€ ${Number(data.price).toFixed(2)}</td>
+        <td>${data.quantity}</td>
+        <td><span class="editable-distributor" style="cursor:pointer;text-decoration:underline;">${escapeHtml(data.distributor||'-')}</span></td>
+        <td><span class="editable-company" style="cursor:pointer;text-decoration:underline;">${escapeHtml(data.company||'-')}</span></td>
+        <td>${statusHtml}${lowBadge}</td>
+        <td class="controls">
+          <button data-id="${doc.id}" class="inc">+1</button>
+          <button data-id="${doc.id}" class="dec">-1</button>
+          <button data-id="${doc.id}" class="del">Elimina</button>
+        </td>
+      `;
+      // attach actions
+      tr.querySelector('.inc').addEventListener('click', (e)=>{e.preventDefault(); changeQuantity(doc.id, 1)});
+      tr.querySelector('.dec').addEventListener('click', (e)=>{e.preventDefault(); changeQuantity(doc.id, -1)});
+      tr.querySelector('.del').addEventListener('click', (e)=>{e.preventDefault(); deleteItem(doc.id)});
+      // Permetti modifica distributore
+      tr.querySelector('.editable-distributor').addEventListener('click', () => {
+        const distributori = [
+          '', 'Dental Leader', 'Gherò', 'Revello', 'Dentitalia', 'Dental Trey', 'Umbra', 'Eli Dent', 'Non disponibile'
+        ];
+        let current = data.distributor || '';
+        let sel = prompt('Modifica distributore (scegli o scrivi):\n' + distributori.map(a => a ? '- ' + a : '').join('\n') + '\nOppure scrivi un nome personalizzato:', current);
+        if(sel !== null) {
+          sel = sel.trim();
+          if(sel.length === 0) sel = '';
+          data.distributor = sel;
+          // Aggiorna localStorage
+          const materials = loadFromLocalStorage();
+          const item = materials.find(m=>m.id === doc.id);
+          if(item) {
+            item.distributor = sel;
+            localStorage.setItem('magazzino_materials', JSON.stringify(materials));
+            loadMaterialsFromStorage();
+          }
+        }
+      });
+      tr.querySelector('.editable-name').addEventListener('click', () => {
+        const newName = prompt('Modifica nome materiale:', data.name);
+        if(newName && newName.trim() && newName !== data.name) {
+          data.name = newName.trim();
+          // Aggiorna localStorage
+          const materials = loadFromLocalStorage();
+          const item = materials.find(m=>m.id === doc.id);
+          if(item) {
+            item.name = newName.trim();
+            localStorage.setItem('magazzino_materials', JSON.stringify(materials));
+            loadMaterialsFromStorage();
+          }
+        }
+      });
+      // Permetti modifica azienda
+      tr.querySelector('.editable-company').addEventListener('click', () => {
+        // Lista aziende principali
+        const aziende = [
+          '', '3M', 'Ivoclar', 'GC', 'Dentsply Sirona', 'Coltene', 'Kerr', 'Voco', 'Septodont', 'Zhermack', 'DMG', 'VOCO'
+        ];
+        let current = data.company || '';
+        let sel = prompt('Modifica azienda (scegli o scrivi):\n' + aziende.map(a => a ? '- ' + a : '').join('\n') + '\nOppure scrivi un nome personalizzato:', current);
+        if(sel !== null) {
+          sel = sel.trim();
+          if(sel.length === 0) sel = '';
+          data.company = sel;
+          // Aggiorna localStorage
+          const materials = loadFromLocalStorage();
+          const item = materials.find(m=>m.id === doc.id);
+          if(item) {
+            item.company = sel;
+            localStorage.setItem('magazzino_materials', JSON.stringify(materials));
+            loadMaterialsFromStorage();
+          }
+        }
+      });
+      return tr;
+    }
+
+    function escapeHtml(s){ if(!s) return ''; return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[c])); }
+
+    function changeQuantity(id, delta){
+      updateQuantityLocalStorage(id, delta);
+      loadMaterialsFromStorage(); // aggiorna subito la UI
+      // Prova a sincronizzare su Firebase (opzionale)
+      if(firebaseReady && typeof db !== 'undefined'){
+        const ref = db.collection('materials').doc(id);
+        db.runTransaction(async tx=>{
+          const doc = await tx.get(ref);
+          if(!doc.exists) return;
+          const q = (doc.data().quantity||0) + delta;
+          tx.update(ref,{quantity: q});
+        }).catch(()=>{});
+      }
+    }
+
+    function deleteItem(id){
+      if(!confirm('Eliminare questo elemento?')) return;
+      deleteFromLocalStorage(id);
+      loadMaterialsFromStorage(); // aggiorna subito la UI
+      // Prova a sincronizzare su Firebase (opzionale)
+      if(firebaseReady && typeof db !== 'undefined'){
+        db.collection('materials').doc(id).delete().catch(()=>{});
+      }
+    }
+
+    // Listen realtime with Firebase fallback to localStorage
+    try {
+      db.collection('materials').orderBy('name').onSnapshot(
+        snapshot => {
+          const fbDocs = snapshot.docs.map(doc=>({id: doc.id, data: ()=>doc.data()}));
+          saveToLocalStorage(snapshot.docs);
+          allDocs = fbDocs.length > 0 ? fbDocs : loadFromLocalStorage().map(d=>({id: d.id, data: ()=>d}));
+          initCategoryFilters();
+          renderFilteredMaterials();
+          checkAndNotify(allDocs);
+        },
+        error => {
+          console.warn('Firebase error, usando localStorage:', error);
+          loadMaterialsFromStorage();
+        }
+      );
+    } catch(err) {
+      firebaseReady = false;
+      console.warn('Firebase init error, usando localStorage:', err);
+      loadMaterialsFromStorage();
+    }
+    
+    // Gestione visibilità input azienda e distributore personalizzati
+    document.getElementById('companySelect').addEventListener('change', function() {
+      if(this.value === 'Other') {
+        document.getElementById('company').style.display = '';
+      } else {
+        document.getElementById('company').style.display = 'none';
+      }
+    });
+    document.getElementById('distributorSelect').addEventListener('change', function() {
+      if(this.value === 'Other') {
+        document.getElementById('distributor').style.display = '';
+      } else {
+        document.getElementById('distributor').style.display = 'none';
+      }
+    });
+
+    // Gestione filtro azienda da select
+    if (companyFilterSelect) {
+      companyFilterSelect.addEventListener('change', function() {
+        currentCompanyFilter = this.value;
+        renderFilteredMaterials();
+      });
+    }
+    // Gestione filtro distributore da select
+    if (distributorFilterSelect) {
+      distributorFilterSelect.addEventListener('change', function() {
+        currentDistributorFilter = this.value;
+        renderFilteredMaterials();
+      });
+    }
+
+    // Load initial data from localStorage on page load
+    window.addEventListener('load', ()=>{
+      loadMaterialsFromStorage();
+    });
+
+    function checkAndNotify(docs){
+      const now = new Date();
+      docs.forEach(doc=>{
+        const data = doc.data();
+        const expiry = data.expiry ? (data.expiry.toDate ? data.expiry.toDate() : new Date(data.expiry)) : null;
+        // expiry notifications
+        if(expiry){
+          const days = daysBetween(now, expiry);
+          const key = doc.id + ':expiry';
+          if(days < 0){
+            if(!notified.get(key)){
+              notify('Materiale scaduto: '+data.name, 'Scaduto il '+expiry.toLocaleDateString());
+              notified.set(key, true);
+            }
+          } else if(days <= 30){
+            if(!notified.get(key)){
+              notify('Scadenza prossima: '+data.name, 'Scade tra '+days+' giorni ('+expiry.toLocaleDateString()+')');
+              notified.set(key, true);
+            }
+          } else {
+            notified.delete(key);
+          }
+        }
+        // low stock notifications
+        const key2 = doc.id + ':low';
+        const soglia = data.lowStockThreshold || 2;
+        if((data.quantity||0) < soglia){
+          if(!notified.get(key2)){
+            notify('Quantità bassa: '+data.name, 'Quantità = '+(data.quantity||0));
+            notified.set(key2, true);
+          }
+        } else notified.delete(key2);
+      });
+    }
+
+    // periodic check (every 5 minutes)
+    setInterval(async ()=>{
+      if(!firebaseReady || typeof db === 'undefined') {
+        checkAndNotify(allDocs);
+        return;
+      }
+      try {
+        const snap = await db.collection('materials').get();
+        checkAndNotify(snap.docs);
+      } catch {
+        checkAndNotify(allDocs);
+      }
+    }, 5*60*1000);
+
+    let allMaterials = []; // store materials for PDF export
+
+    // listen to materials and keep allMaterials updated
+    if(firebaseReady && typeof db !== 'undefined') {
+      db.collection('materials').orderBy('name').onSnapshot(snapshot=>{
+        allMaterials = snapshot.docs.map(doc=>({id: doc.id, ...doc.data()}));
+      }, ()=>{
+        allMaterials = loadFromLocalStorage();
+      });
+    } else {
+      allMaterials = loadFromLocalStorage();
+    }
+
+    async function downloadPDF(){
+      if(allMaterials.length === 0){
+        showAlert('Nessun materiale da esportare', 'warn');
+        return;
+      }
+
+      const element = document.createElement('div');
+      element.style.padding = '20px';
+      element.style.fontFamily = 'Arial, sans-serif';
+      element.style.backgroundColor = '#fff';
+
+      // Header
+      const header = document.createElement('div');
+      header.style.marginBottom = '20px';
+      header.style.textAlign = 'center';
+      header.innerHTML = `
+        <h1 style="color:#003d7a;margin:0 0 10px 0;font-size:24px">Studio Dentistico - Magazzino Materiali</h1>
+        <p style="color:#7f8c8d;margin:0;font-size:12px">Esportazione del: ${new Date().toLocaleDateString()}</p>
+      `;
+      element.appendChild(header);
+
+      // Table
+      const table = document.createElement('table');
+      table.style.width = '100%';
+      table.style.borderCollapse = 'collapse';
+      table.style.marginTop = '20px';
+
+      // Table header
+      const thead = document.createElement('thead');
+      const headerRow = document.createElement('tr');
+      headerRow.style.backgroundColor = '#003d7a';
+      headerRow.style.color = '#fff';
+      const headers = ['Nome', 'Data Ordine', 'Scadenza', 'Prezzo (€)', 'Quantità', 'Distributore', 'Stato'];
+      headers.forEach(h=>{
+        const th = document.createElement('th');
+        th.textContent = h;
+        th.style.border = '1px solid #ddd';
+        th.style.padding = '10px';
+        th.style.textAlign = 'left';
+        th.style.fontWeight = 'bold';
+        th.style.fontSize = '11px';
+        headerRow.appendChild(th);
+      });
+      thead.appendChild(headerRow);
+      table.appendChild(thead);
+
+      // Table body
+      const tbody = document.createElement('tbody');
+      const now = new Date();
+      allMaterials.forEach(data=>{
+        const tr = document.createElement('tr');
+        tr.style.borderBottom = '1px solid #ddd';
+
+        const orderDate = data.orderDate ? (data.orderDate.toDate ? data.orderDate.toDate() : new Date(data.orderDate)) : null;
+        const expiry = data.expiry ? (data.expiry.toDate ? data.expiry.toDate() : new Date(data.expiry)) : null;
+
+        let statusText = '';
+        if(!expiry){ statusText = 'Senza scadenza'; }
+        else{
+          const days = daysBetween(now, expiry);
+          if(days < 0) statusText = 'Scaduto';
+          else if(days <= (data.notifyDays||7)) statusText = 'Scade tra ' + days + ' giorni';
+          else statusText = 'OK (' + days + 'g)';
+        }
+        if(data.quantity <= 2) statusText += ' | Poche: ' + data.quantity;
+
+        const cells = [
+          data.name || '-',
+          orderDate ? orderDate.toLocaleDateString() : '-',
+          expiry ? expiry.toLocaleDateString() : '-',
+          '€ ' + Number(data.price || 0).toFixed(2),
+          data.quantity || 0,
+          data.distributor || '-',
+          statusText
+        ];
+
+        cells.forEach(cell=>{
+          const td = document.createElement('td');
+          td.textContent = cell;
+          td.style.border = '1px solid #ddd';
+          td.style.padding = '8px';
+          td.style.fontSize = '10px';
+          tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+      });
+      table.appendChild(tbody);
+      element.appendChild(table);
+
+      // Summary
+      const summary = document.createElement('div');
+      summary.style.marginTop = '20px';
+      summary.style.fontSize = '11px';
+      summary.style.color = '#7f8c8d';
+      summary.innerHTML = `
+        <p style="margin:5px 0"><strong>Totale materiali:</strong> ${allMaterials.length}</p>
+        <p style="margin:5px 0"><strong>Valore totale:</strong> € ${allMaterials.reduce((sum, m)=>(sum + (parseFloat(m.price)||0) * (m.quantity||0)), 0).toFixed(2)}</p>
+      `;
+      element.appendChild(summary);
+
+      // Generate PDF
+      const opt = {
+        margin: 10,
+        filename: 'magazzino_' + new Date().toISOString().split('T')[0] + '.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { orientation: 'landscape', unit: 'mm', format: 'a4' }
+      };
+      html2pdf().set(opt).from(element).save();
+      showAlert('✓ PDF scaricato con successo', 'info');
+    }
+  </script>
+</body>
+</html>
