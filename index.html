@@ -703,20 +703,20 @@
       const expiry = data.expiry ? (data.expiry.toDate ? data.expiry.toDate() : new Date(data.expiry)) : null;
       let statusHtml = '';
       if(!expiry){
-        statusHtml = '<span class="badge ok">Senza scadenza</span>';
+        statusHtml = '<span class="badge ok" title="Nessuna scadenza">Senza scadenza</span>';
       } else {
         const days = daysBetween(now, expiry);
         const mesi = days / 30.44;
         if(days < 0) {
-          statusHtml = '<span class="badge expired">Scaduto</span>';
+          statusHtml = '<span class="badge expired" title="Scaduto il ' + expiry.toLocaleDateString() + '">●</span>';
         } else if(days <= 30) {
-          statusHtml = '<span class="badge soon" style="background:#fbc02d">Scade tra ' + days + ' giorni</span>';
+          statusHtml = '<span class="badge soon" style="background:#fbc02d" title="Scade tra ' + days + ' giorni (' + expiry.toLocaleDateString() + ')">●</span>';
         } else if(mesi < 3) {
-          statusHtml = '<span class="badge low" style="background:#d32f2f">Rosso: Scade tra ' + days + ' giorni</span>';
+          statusHtml = '<span class="badge low" style="background:#d32f2f" title="Scade tra ' + days + ' giorni (' + expiry.toLocaleDateString() + ')">●</span>';
         } else if(mesi < 6) {
-          statusHtml = '<span class="badge soon" style="background:#fbc02d">Giallo: Scade tra ' + days + ' giorni</span>';
+          statusHtml = '<span class="badge soon" style="background:#fbc02d" title="Scade tra ' + days + ' giorni (' + expiry.toLocaleDateString() + ')">●</span>';
         } else {
-          statusHtml = '<span class="badge ok" style="background:#388e3c">Verde: Scade tra ' + days + ' giorni</span>';
+          statusHtml = '<span class="badge ok" style="background:#388e3c" title="Scade tra ' + days + ' giorni (' + expiry.toLocaleDateString() + ')">●</span>';
         }
       }
       // Badge semaforo quantità
