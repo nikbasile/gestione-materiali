@@ -188,7 +188,7 @@
     </div>
     <table>
       <thead>
-        <tr><th>Nome</th><th>Data ordine</th><th>Scadenza</th><th>Prezzo</th><th>Quantità</th><th>Distributore</th><th>Azienda</th><th>Azioni</th></tr>
+        <tr><th>Nome</th><th>Data ordine</th><th style="text-align:center;">Scadenza</th><th>Prezzo</th><th style="text-align:center;">Quantità</th><th>Distributore</th><th>Azienda</th><th>Azioni</th></tr>
       </thead>
       <tbody id="list"></tbody>
     </table>
@@ -625,9 +625,9 @@
       tr.innerHTML = `
         <td><span class="editable-name" style="cursor:pointer;text-decoration:underline;">${escapeHtml(data.name)}</span></td>
         <td>${orderDate ? orderDate.toLocaleDateString() : '-'}</td>
-        <td style="white-space:nowrap;">${statusHtml}</td>
+        <td style="text-align:center;white-space:nowrap;">${statusHtml}</td>
         <td>€ ${Number(data.price).toFixed(2)}</td>
-        <td>${lowBadge}</td>
+        <td style="text-align:center;">${lowBadge}</td>
         <td><span class="editable-distributor" style="cursor:pointer;text-decoration:underline;">${escapeHtml(data.distributor||'-')}</span></td>
         <td><span class="editable-company" style="cursor:pointer;text-decoration:underline;">${escapeHtml(data.company||'-')}</span></td>
         <td style="white-space:nowrap;padding:8px;">
