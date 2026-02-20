@@ -186,7 +186,7 @@
     </div>
     <table>
       <thead>
-        <tr><th>Nome</th><th>Data ordine</th><th>Scadenza</th><th>Prezzo</th><th>Quantità</th><th>Distributore</th><th>Azienda</th><th>Stato</th><th>Azioni</th></tr>
+        <tr><th>Nome</th><th>Data ordine</th><th>Scadenza</th><th>Prezzo</th><th>Quantità</th><th>Distributore</th><th>Azienda</th><th>Azioni</th></tr>
       </thead>
       <tbody id="list"></tbody>
     </table>
@@ -594,50 +594,40 @@
       const expiry = data.expiry ? (data.expiry.toDate ? data.expiry.toDate() : new Date(data.expiry)) : null;
       let statusHtml = '';
       if(!expiry){
-        statusHtml = '<span title="Nessuna scadenza" style="font-size:20px;cursor:help">⚪</span>';
+        statusHtml = '<span style="font-size:16px;">⚪</span> <span style="font-size:13px;color:#666;">Nessuna scadenza</span>';
       } else {
         const days = daysBetween(now, expiry);
         const mesi = days / 30.44;
         if(days < 0) {
-          statusHtml = '<span title="Scaduto il ' + expiry.toLocaleDateString() + '" style="font-size:20px;cursor:help">🔴</span>';
+          statusHtml = '<span style="font-size:16px;">🔴</span> <span style="font-size:13px;color:#d32f2f;font-weight:600;">Scaduto</span>';
         } else if(days <= 30) {
-          statusHtml = '<span title="Scade tra ' + days + ' giorni (' + expiry.toLocaleDateString() + ')" style="font-size:20px;cursor:help">🟡</span>';
+          statusHtml = '<span style="font-size:16px;">🟡</span> <span style="font-size:13px;color:#f57c00;font-weight:500;">Scade tra ' + days + ' giorni</span>';
         } else if(mesi < 3) {
-          statusHtml = '<span title="Scade tra ' + days + ' giorni (' + expiry.toLocaleDateString() + ')" style="font-size:20px;cursor:help">🔴</span>';
+          statusHtml = '<span style="font-size:16px;">🔴</span> <span style="font-size:13px;color:#d32f2f;font-weight:500;">Scade tra ' + days + ' giorni</span>';
         } else if(mesi < 6) {
-          statusHtml = '<span title="Scade tra ' + days + ' giorni (' + expiry.toLocaleDateString() + ')" style="font-size:20px;cursor:help">🟡</span>';
+          statusHtml = '<span style="font-size:16px;">🟡</span> <span style="font-size:13px;color:#f57c00;font-weight:500;">Scade tra ' + days + ' giorni</span>';
         } else {
-          statusHtml = '<span title="Scade tra ' + days + ' giorni (' + expiry.toLocaleDateString() + ')" style="font-size:20px;cursor:help">🟢</span>';
+          statusHtml = '<span style="font-size:16px;">🟢</span> <span style="font-size:13px;color:#388e3c;font-weight:500;">Scade tra ' + days + ' giorni</span>';
         }
       }
       // Badge semaforo quantità
       let lowBadge = '';
       const soglia = data.lowStockThreshold || 2;
       if (data.quantity < soglia) {
-        lowBadge = '<span class="badge low" style="background:#d32f2f;font-size:12px;padding:4px 8px;">'+data.quantity+'</span>';
+        lowBadge = '<span class="badge low" style="background:#d32f2f;color:#fff;font-size:14px;padding:6px 12px;border-radius:6px;font-weight:600;">'+data.quantity+'</span>';
       } else if (data.quantity == soglia) {
-        lowBadge = '<span class="badge soon" style="background:#fbc02d;font-size:12px;padding:4px 8px;">'+data.quantity+'</span>';
+        lowBadge = '<span class="badge soon" style="background:#fbc02d;color:#fff;font-size:14px;padding:6px 12px;border-radius:6px;font-weight:600;">'+data.quantity+'</span>';
       } else {
-        lowBadge = '<span class="badge ok" style="background:#388e3c;font-size:12px;padding:4px 8px;">'+data.quantity+'</span>';
+        lowBadge = '<span class="badge ok" style="background:#388e3c;color:#fff;font-size:14px;padding:6px 12px;border-radius:6px;font-weight:600;">'+data.quantity+'</span>';
       }
       tr.innerHTML = `
         <td><span class="editable-name" style="cursor:pointer;text-decoration:underline;">${escapeHtml(data.name)}</span></td>
         <td>${orderDate ? orderDate.toLocaleDateString() : '-'}</td>
-        <td>${expiry ? expiry.toLocaleDateString() : '-'}</td>
+        <td style="white-space:nowrap;">${statusHtml}</td>
         <td>€ ${Number(data.price).toFixed(2)}</td>
-        <td>${data.quantity}</td>
+        <td>${lowBadge}</td>
         <td><span class="editable-distributor" style="cursor:pointer;text-decoration:underline;">${escapeHtml(data.distributor||'-')}</span></td>
         <td><span class="editable-company" style="cursor:pointer;text-decoration:underline;">${escapeHtml(data.company||'-')}</span></td>
-        <td style="white-space:nowrap;">
-          <div style="display:inline-block;text-align:center;margin-right:8px;">
-            <div style="font-size:10px;color:#666;font-weight:600;line-height:1;">Scad.</div>
-            ${statusHtml}
-          </div>
-          <div style="display:inline-block;text-align:center;">
-            <div style="font-size:10px;color:#666;font-weight:600;line-height:1;">Qtà</div>
-            ${lowBadge}
-          </div>
-        </td>
         <td class="controls">
           <button data-id="${doc.id}" class="inc">+1</button>
           <button data-id="${doc.id}" class="dec">-1</button>
