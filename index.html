@@ -265,17 +265,15 @@
             return {id: doc.id, ...d, orderDate: order, expiry: exp, createdAt: created};
           })
         : docs;
-      // Carica materiali esistenti in localStorage e unisci (prefers Firebase data, mantiene elementi locali non ancora sincronizzati)
+      // Carica materiali esistenti in localStorage e unisci (Firebase ha priorità, localStorage è solo backup offline)
       try {
         const existing = loadFromLocalStorage();
         const map = new Map();
-        // prima aggiungi esistenti locali
+        // Prima aggiungi i dati locali
         existing.forEach(it => map.set(it.id, it));
-        // merge local-first: aggiungi solo i record remoti mancanti
+        // Poi sovrascrivi con i dati di Firebase (priorità a Firebase)
         fbData.forEach(it => {
-          if(!map.has(it.id)){
-            map.set(it.id, it);
-          }
+          map.set(it.id, it);
         });
         const merged = Array.from(map.values());
         localStorage.setItem('magazzino_materials', JSON.stringify(merged));
