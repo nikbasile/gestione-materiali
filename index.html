@@ -628,16 +628,14 @@
         <td>${data.quantity}</td>
         <td><span class="editable-distributor" style="cursor:pointer;text-decoration:underline;">${escapeHtml(data.distributor||'-')}</span></td>
         <td><span class="editable-company" style="cursor:pointer;text-decoration:underline;">${escapeHtml(data.company||'-')}</span></td>
-        <td>
-          <div style="display:inline-flex;gap:12px;align-items:center;">
-            <div style="text-align:center;">
-              <div style="font-size:10px;color:#666;font-weight:600;margin-bottom:2px;">Scad.</div>
-              ${statusHtml}
-            </div>
-            <div style="text-align:center;">
-              <div style="font-size:10px;color:#666;font-weight:600;margin-bottom:2px;">Qtà</div>
-              ${lowBadge}
-            </div>
+        <td style="white-space:nowrap;">
+          <div style="display:inline-block;text-align:center;margin-right:8px;">
+            <div style="font-size:10px;color:#666;font-weight:600;line-height:1;">Scad.</div>
+            ${statusHtml}
+          </div>
+          <div style="display:inline-block;text-align:center;">
+            <div style="font-size:10px;color:#666;font-weight:600;line-height:1;">Qtà</div>
+            ${lowBadge}
           </div>
         </td>
         <td class="controls">
