@@ -594,31 +594,31 @@
       const expiry = data.expiry ? (data.expiry.toDate ? data.expiry.toDate() : new Date(data.expiry)) : null;
       let statusHtml = '';
       if(!expiry){
-        statusHtml = '<span class="badge ok">Senza scadenza</span>';
+        statusHtml = '<span title="Nessuna scadenza" style="font-size:20px;cursor:help">⚪</span>';
       } else {
         const days = daysBetween(now, expiry);
         const mesi = days / 30.44;
         if(days < 0) {
-          statusHtml = '<span class="badge expired">Scaduto</span>';
+          statusHtml = '<span title="Scaduto il ' + expiry.toLocaleDateString() + '" style="font-size:20px;cursor:help">🔴</span>';
         } else if(days <= 30) {
-          statusHtml = '<span class="badge soon" style="background:#fbc02d">Scade tra ' + days + ' giorni</span>';
+          statusHtml = '<span title="Scade tra ' + days + ' giorni (' + expiry.toLocaleDateString() + ')" style="font-size:20px;cursor:help">🟡</span>';
         } else if(mesi < 3) {
-          statusHtml = '<span class="badge low" style="background:#d32f2f">Rosso: Scade tra ' + days + ' giorni</span>';
+          statusHtml = '<span title="Scade tra ' + days + ' giorni (' + expiry.toLocaleDateString() + ')" style="font-size:20px;cursor:help">🔴</span>';
         } else if(mesi < 6) {
-          statusHtml = '<span class="badge soon" style="background:#fbc02d">Giallo: Scade tra ' + days + ' giorni</span>';
+          statusHtml = '<span title="Scade tra ' + days + ' giorni (' + expiry.toLocaleDateString() + ')" style="font-size:20px;cursor:help">🟡</span>';
         } else {
-          statusHtml = '<span class="badge ok" style="background:#388e3c">Verde: Scade tra ' + days + ' giorni</span>';
+          statusHtml = '<span title="Scade tra ' + days + ' giorni (' + expiry.toLocaleDateString() + ')" style="font-size:20px;cursor:help">🟢</span>';
         }
       }
       // Badge semaforo quantità
       let lowBadge = '';
       const soglia = data.lowStockThreshold || 2;
       if (data.quantity < soglia) {
-        lowBadge = ' <span class="badge low" style="background:#d32f2f">Rosso: '+data.quantity+'</span>';
+        lowBadge = '<span class="badge low" style="background:#d32f2f;font-size:12px;padding:4px 8px;">'+data.quantity+'</span>';
       } else if (data.quantity == soglia) {
-        lowBadge = ' <span class="badge soon" style="background:#fbc02d">Giallo: '+data.quantity+'</span>';
+        lowBadge = '<span class="badge soon" style="background:#fbc02d;font-size:12px;padding:4px 8px;">'+data.quantity+'</span>';
       } else {
-        lowBadge = ' <span class="badge ok" style="background:#388e3c">Verde: '+data.quantity+'</span>';
+        lowBadge = '<span class="badge ok" style="background:#388e3c;font-size:12px;padding:4px 8px;">'+data.quantity+'</span>';
       }
       tr.innerHTML = `
         <td><span class="editable-name" style="cursor:pointer;text-decoration:underline;">${escapeHtml(data.name)}</span></td>
@@ -628,7 +628,18 @@
         <td>${data.quantity}</td>
         <td><span class="editable-distributor" style="cursor:pointer;text-decoration:underline;">${escapeHtml(data.distributor||'-')}</span></td>
         <td><span class="editable-company" style="cursor:pointer;text-decoration:underline;">${escapeHtml(data.company||'-')}</span></td>
-        <td style="line-height:1.4;">Scad. ${statusHtml}<br>Qtà ${lowBadge}</td>
+        <td>
+          <div style="display:inline-flex;gap:12px;align-items:center;">
+            <div style="text-align:center;">
+              <div style="font-size:10px;color:#666;font-weight:600;margin-bottom:2px;">Scad.</div>
+              ${statusHtml}
+            </div>
+            <div style="text-align:center;">
+              <div style="font-size:10px;color:#666;font-weight:600;margin-bottom:2px;">Qtà</div>
+              ${lowBadge}
+            </div>
+          </div>
+        </td>
         <td class="controls">
           <button data-id="${doc.id}" class="inc">+1</button>
           <button data-id="${doc.id}" class="dec">-1</button>
