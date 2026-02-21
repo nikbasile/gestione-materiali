@@ -69,6 +69,67 @@
     .logo-circle{width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#003d7a 0%,#0066cc 100%);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:24px;flex-shrink:0;box-shadow:0 2px 8px rgba(0,61,122,0.25)}
     .header-content h1{margin:0;padding:0;font-size:32px}
     .header-content .studio-name{font-size:14px;color:#7f8c8d;font-weight:400}
+    .table-wrapper{overflow-x:auto;-webkit-overflow-scrolling:touch}
+    .filters-row{margin-bottom:12px;display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+    .filter-label{font-weight:600;color:#003d7a;font-size:14px;margin-right:8px}
+    .filter-select{padding:8px 12px;font-size:14px;border-radius:6px;border:1px solid #d0dce6;min-width:180px}
+    .header-content{min-width:0}
+
+    @media (max-width:900px){
+      .container{padding:16px}
+      .header-content h1{font-size:24px;line-height:1.2}
+      .action-buttons{justify-content:stretch}
+      .action-buttons button{width:100%}
+      .filters-row{gap:12px}
+      .filters-row > div{flex:1 1 220px}
+    }
+
+    @media (max-width:700px){
+      body{font-size:14px}
+      .container{padding:12px}
+      .header-wrapper{align-items:flex-start;gap:12px}
+      .logo-circle{width:48px;height:48px;font-size:18px}
+      .header-content h1{font-size:20px}
+      .header-content .studio-name{font-size:13px}
+      .subtitle{font-size:13px}
+      form{grid-template-columns:1fr;padding:14px;gap:10px}
+      .category-filters{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+      .category-btn{padding:10px 8px;font-size:13px}
+      .action-buttons{margin-bottom:14px}
+      .action-buttons button{font-size:13px;padding:10px 12px}
+      .filters-row{display:grid;grid-template-columns:1fr;gap:10px}
+      .filters-row > div{min-width:0}
+      .filter-label{display:block;margin-right:0;margin-bottom:6px;font-size:13px}
+      .filter-select{display:block;width:100%;min-width:0;font-size:13px;padding:9px 10px}
+
+      table{border:none;box-shadow:none;background:transparent}
+      thead{display:none}
+      tbody{display:block}
+      tbody tr{display:block;background:#fff;border:1px solid #e8ecf1;border-radius:8px;margin-bottom:10px;padding:8px;box-shadow:0 1px 3px rgba(0,0,0,0.06)}
+      td{display:flex;justify-content:space-between;align-items:center;gap:12px;border-bottom:1px solid #eef2f6;padding:9px 8px;font-size:13px;text-align:right}
+      td::before{content:attr(data-label);font-weight:600;color:#003d7a;text-align:left}
+      td:last-child{border-bottom:none}
+      td[data-label="Azioni"]{justify-content:flex-end}
+      td[data-label="Azioni"]::before{margin-right:auto}
+      .btn-action{width:34px;height:34px}
+    }
+
+    @media (max-width:420px){
+      .category-filters{grid-template-columns:1fr}
+    }
+
+    @media (max-width:360px){
+      .container{padding:10px}
+      .header-wrapper{gap:10px}
+      .logo-circle{width:42px;height:42px;font-size:16px}
+      .header-content h1{font-size:18px}
+      .header-content .studio-name{font-size:12px}
+      form{padding:12px}
+      .category-btn{font-size:12px;padding:9px 8px}
+      .filter-label{font-size:12px}
+      .filter-select{font-size:12px;padding:8px 9px}
+      .alert{padding:10px 12px;font-size:13px}
+    }
   </style>
 </head>
 <body>
@@ -99,9 +160,9 @@
       <div class="form-group"><label>⏰ Data Scadenza</label><input id="expiry" type="date" required /></div>
       <div class="form-group"><label>Prezzo (€)</label><input id="price" type="number" step="0.01" placeholder="0.00" /></div>
       <div class="form-group"><label>Quantità</label><input id="quantity" type="number" min="0" value="1" required /></div>
-      <div class="form-group"><label>🦷 Categoria</label><select id="category" required><option value="">-- Seleziona --</option><option value="Strumentario">Strumentario</option><option value="Consumabili Generici">Consumabili Generici</option><option value="Monouso">Monouso</option><option value="Disinfezione e Sterilizzazione">Disinfezione e Sterilizzazione</option><option value="Implantologia e Chirurgia">Implantologia e Chirurgia</option><option value="Endodonzia">Endodonzia</option><option value="Conservativa e Protesi">Conservativa e Protesi</option><option value="Frese e Lucidatura">Frese e Lucidatura</option><option value="Anestesia e Farmaci">Anestesia e Farmaci</option><option value="Impronte e Laboratorio">Impronte e Laboratorio</option><option value="Radiografia e Fotografia">Radiografia e Fotografia</option><option value="Profilassi e Igiene Orale">Profilassi e Igiene Orale</option><option value="Ortodonzia">Ortodonzia</option></select></div>
+      <div class="form-group"><label>🗂️ Categoria</label><select id="category" required><option value="">-- Seleziona --</option><option value="Strumentario">Strumentario</option><option value="Consumabili Generici">Consumabili Generici</option><option value="Monouso">Monouso</option><option value="Disinfezione e Sterilizzazione">Disinfezione e Sterilizzazione</option><option value="Implantologia e Chirurgia">Implantologia e Chirurgia</option><option value="Endodonzia">Endodonzia</option><option value="Conservativa e Protesi">Conservativa e Protesi</option><option value="Frese e Lucidatura">Frese e Lucidatura</option><option value="Anestesia e Farmaci">Anestesia e Farmaci</option><option value="Impronte e Laboratorio">Impronte e Laboratorio</option><option value="Radiografia e Fotografia">Radiografia e Fotografia</option><option value="Profilassi e Igiene Orale">Profilassi e Igiene Orale</option><option value="Ortodonzia">Ortodonzia</option></select></div>
 
-      <div class="form-group"><label>Distributore</label>
+      <div class="form-group"><label>🚚 Distributore</label>
         <select id="distributorSelect" required>
           <option value="">-- Seleziona --</option>
           <option value="Dental Leader">Dental Leader</option>
@@ -116,7 +177,7 @@
         </select>
         <input id="distributor" placeholder="Distributore personalizzato" style="display:none;margin-top:6px" />
       </div>
-      <div class="form-group"><label>Azienda</label>
+      <div class="form-group"><label>🏢 Azienda</label>
         <select id="companySelect">
           <option value="">-- Seleziona --</option>
           <option value="3M">3M</option>
@@ -154,10 +215,10 @@
       <button class="export" onclick="downloadPDF()">📥 Scarica PDF</button>
     </div>
 
-    <div style="margin-bottom:12px;display:flex;gap:18px;align-items:center;flex-wrap:wrap;">
+    <div class="filters-row">
             <div>
-              <label for="expiryFilterSelect" style="font-weight:600;color:#003d7a;font-size:14px;margin-right:8px;">Filtra per scadenza:</label>
-              <select id="expiryFilterSelect" style="padding:8px 12px;font-size:14px;border-radius:6px;border:1px solid #d0dce6;min-width:180px;">
+              <label for="expiryFilterSelect" class="filter-label">Filtra per scadenza:</label>
+              <select id="expiryFilterSelect" class="filter-select">
                 <option value="Tutte">Tutte</option>
                 <option value="Rosso">Rosso (entro 3 mesi)</option>
                 <option value="Giallo">Giallo (entro 6 mesi)</option>
@@ -165,8 +226,8 @@
               </select>
             </div>
             <div>
-              <label for="quantityFilterSelect" style="font-weight:600;color:#003d7a;font-size:14px;margin-right:8px;">Filtra per quantità:</label>
-              <select id="quantityFilterSelect" style="padding:8px 12px;font-size:14px;border-radius:6px;border:1px solid #d0dce6;min-width:180px;">
+              <label for="quantityFilterSelect" class="filter-label">Filtra per quantità:</label>
+              <select id="quantityFilterSelect" class="filter-select">
                 <option value="Tutte">Tutte</option>
                 <option value="Rosso">Rosso (sotto soglia)</option>
                 <option value="Giallo">Giallo (uguale soglia)</option>
@@ -174,24 +235,26 @@
               </select>
             </div>
       <div>
-        <label for="companyFilterSelect" style="font-weight:600;color:#003d7a;font-size:14px;margin-right:8px;">Filtra per azienda:</label>
-        <select id="companyFilterSelect" style="padding:8px 12px;font-size:14px;border-radius:6px;border:1px solid #d0dce6;min-width:180px;">
+        <label for="companyFilterSelect" class="filter-label">Filtra per azienda:</label>
+        <select id="companyFilterSelect" class="filter-select">
           <option value="Tutte">Tutte</option>
         </select>
       </div>
       <div>
-        <label for="distributorFilterSelect" style="font-weight:600;color:#003d7a;font-size:14px;margin-right:8px;">Filtra per distributore:</label>
-        <select id="distributorFilterSelect" style="padding:8px 12px;font-size:14px;border-radius:6px;border:1px solid #d0dce6;min-width:180px;">
+        <label for="distributorFilterSelect" class="filter-label">Filtra per distributore:</label>
+        <select id="distributorFilterSelect" class="filter-select">
           <option value="Tutti">Tutti</option>
         </select>
       </div>
     </div>
-    <table>
-      <thead>
-        <tr><th>Nome</th><th>Data ordine</th><th style="text-align:center;">Scadenza</th><th>Prezzo</th><th style="text-align:center;">Quantità</th><th>Distributore</th><th>Azienda</th><th>Azioni</th></tr>
-      </thead>
-      <tbody id="list"></tbody>
-    </table>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr><th>Nome</th><th>Data ordine</th><th style="text-align:center;">Scadenza</th><th>Prezzo</th><th style="text-align:center;">Quantità</th><th>Distributore</th><th>Azienda</th><th>Azioni</th></tr>
+        </thead>
+        <tbody id="list"></tbody>
+      </table>
+    </div>
   </div>
 
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
@@ -621,14 +684,14 @@
         lowBadge = '<span class="badge ok" style="background:#388e3c;color:#fff;font-size:14px;padding:6px 12px;border-radius:6px;font-weight:600;">'+data.quantity+'</span>';
       }
       tr.innerHTML = `
-        <td><span class="editable-name" style="cursor:pointer;text-decoration:underline;">${escapeHtml(data.name)}</span></td>
-        <td>${orderDate ? orderDate.toLocaleDateString() : '-'}</td>
-        <td style="text-align:center;white-space:nowrap;">${statusHtml}</td>
-        <td>€ ${Number(data.price).toFixed(2)}</td>
-        <td style="text-align:center;">${lowBadge}</td>
-        <td><span class="editable-distributor" style="cursor:pointer;text-decoration:underline;">${escapeHtml(data.distributor||'-')}</span></td>
-        <td><span class="editable-company" style="cursor:pointer;text-decoration:underline;">${escapeHtml(data.company||'-')}</span></td>
-        <td style="white-space:nowrap;padding:8px;">
+        <td data-label="Nome"><span class="editable-name" style="cursor:pointer;text-decoration:underline;">${escapeHtml(data.name)}</span></td>
+        <td data-label="Data ordine">${orderDate ? orderDate.toLocaleDateString() : '-'}</td>
+        <td data-label="Scadenza" style="text-align:center;white-space:nowrap;">${statusHtml}</td>
+        <td data-label="Prezzo">€ ${Number(data.price).toFixed(2)}</td>
+        <td data-label="Quantità" style="text-align:center;">${lowBadge}</td>
+        <td data-label="Distributore"><span class="editable-distributor" style="cursor:pointer;text-decoration:underline;">${escapeHtml(data.distributor||'-')}</span></td>
+        <td data-label="Azienda"><span class="editable-company" style="cursor:pointer;text-decoration:underline;">${escapeHtml(data.company||'-')}</span></td>
+        <td data-label="Azioni" style="white-space:nowrap;padding:8px;">
           <button data-id="${doc.id}" class="btn-action btn-inc" title="Aggiungi 1">+</button>
           <button data-id="${doc.id}" class="btn-action btn-dec" title="Rimuovi 1">−</button>
           <button data-id="${doc.id}" class="btn-action btn-del" title="Elimina">×</button>
