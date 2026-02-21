@@ -1504,48 +1504,25 @@
     }
 
     async function downloadMaterialsPDF(){
-      // Applica ESATTAMENTE gli stessi filtri della tabella
-      let filtered = currentFilter === 'Tutti' 
-        ? allDocs 
-        : allDocs.filter(doc=>doc.data().category === currentFilter);
-      
-      if(currentCompanyFilter !== 'Tutte'){
-        filtered = filtered.filter(doc => (doc.data().company || '') === currentCompanyFilter);
-      }
-      if(currentDistributorFilter !== 'Tutti'){
-        filtered = filtered.filter(doc => (doc.data().distributor || '') === currentDistributorFilter);
-      }
-      // Filtro scadenza semaforo
-      if(currentExpiryFilter !== 'Tutte'){
-        const now = new Date();
-        filtered = filtered.filter(doc => {
-          const data = doc.data();
-          if(!data.expiry) return false;
-          const expiry = data.expiry && data.expiry.toDate ? data.expiry.toDate() : new Date(data.expiry);
-          const days = Math.ceil((expiry - now) / (1000*60*60*24));
-          const mesi = days / 30.44;
-          if(days < 0) return currentExpiryFilter === 'Rosso';
-          if(mesi < 3) return currentExpiryFilter === 'Rosso';
-          if(mesi < 6) return currentExpiryFilter === 'Giallo';
-          return currentExpiryFilter === 'Verde';
-        });
-      }
-      // Filtro quantità semaforo
-      if(currentQuantityFilter !== 'Tutte'){
-        filtered = filtered.filter(doc => {
-          const data = doc.data();
-          const soglia = data.lowStockThreshold || 2;
-          if(currentQuantityFilter === 'Rosso') return (data.quantity||0) < soglia;
-          if(currentQuantityFilter === 'Giallo') return (data.quantity||0) == soglia;
-          if(currentQuantityFilter === 'Verde') return (data.quantity||0) > soglia;
-          return true;
-        });
-      }
-
-      const allMaterials = filtered.map(d=>d.data());
+      const visibleRows = Array.from(document.querySelectorAll('#list tr'));
+      const allMaterials = visibleRows.map(row => {
+        const cells = row.querySelectorAll('td');
+        const qtyText = (cells[6]?.textContent || '0').replace(/[^\d-]/g, '');
+        const priceRaw = (cells[3]?.textContent || '0').replace(/[^\d,.-]/g, '').replace(',', '.');
+        return {
+          name: (cells[0]?.textContent || '-').trim(),
+          orderDate: (cells[1]?.textContent || '-').trim(),
+          expiryStatus: (cells[2]?.textContent || '-').trim(),
+          priceText: (cells[3]?.textContent || '€ 0.00').trim(),
+          distributor: (cells[4]?.textContent || '-').trim(),
+          company: (cells[5]?.textContent || '-').trim(),
+          quantity: parseInt(qtyText || '0', 10) || 0,
+          priceValue: parseFloat(priceRaw || '0') || 0
+        };
+      });
 
       if(allMaterials.length === 0){
-        showAlert('Nessun materiale da esportare con i filtri selezionati', 'warn');
+        showAlert('Nessun materiale visibile da esportare', 'warn');
         return;
       }
 
@@ -1557,7 +1534,7 @@
       // Header
       const header = document.createElement('div');
       header.style.marginBottom = '20px';
-      header.style.textAlign = 'center';
+      header.style.textAlign = 'left';
       header.innerHTML = `
         <h1 style="color:#003d7a;margin:0 0 10px 0;font-size:24px">Studio Dentistico - Magazzino Materiali</h1>
         <p style="color:#7f8c8d;margin:0;font-size:12px">Esportazione del: ${new Date().toLocaleDateString()}</p>
@@ -1575,7 +1552,7 @@
       const headerRow = document.createElement('tr');
       headerRow.style.backgroundColor = '#003d7a';
       headerRow.style.color = '#fff';
-      const headers = ['Nome', 'Data Ordine', 'Scadenza', 'Prezzo (€)', 'Quantità', 'Distributore', 'Stato'];
+      const headers = ['Nome', 'Data Ordine', 'Scadenza', 'Prezzo (€)', 'Distributore', 'Azienda', 'Quantità'];
       headers.forEach(h=>{
         const th = document.createElement('th');
         th.textContent = h;
@@ -1591,32 +1568,18 @@
 
       // Table body
       const tbody = document.createElement('tbody');
-      const now = new Date();
       allMaterials.forEach(data=>{
         const tr = document.createElement('tr');
         tr.style.borderBottom = '1px solid #ddd';
 
-        const orderDate = data.orderDate ? (data.orderDate.toDate ? data.orderDate.toDate() : new Date(data.orderDate)) : null;
-        const expiry = data.expiry ? (data.expiry.toDate ? data.expiry.toDate() : new Date(data.expiry)) : null;
-
-        let statusText = '';
-        if(!expiry){ statusText = 'Senza scadenza'; }
-        else{
-          const days = daysBetween(now, expiry);
-          if(days < 0) statusText = 'Scaduto';
-          else if(days <= (data.notifyDays||7)) statusText = 'Scade tra ' + days + ' giorni';
-          else statusText = 'OK (' + days + 'g)';
-        }
-        if(data.quantity <= 2) statusText += ' | Poche: ' + data.quantity;
-
         const cells = [
           data.name || '-',
-          orderDate ? orderDate.toLocaleDateString() : '-',
-          expiry ? expiry.toLocaleDateString() : '-',
-          '€ ' + Number(data.price || 0).toFixed(2),
-          data.quantity || 0,
+          data.orderDate || '-',
+          data.expiryStatus || '-',
+          data.priceText || '€ 0.00',
           data.distributor || '-',
-          statusText
+          data.company || '-',
+          data.quantity || 0
         ];
 
         cells.forEach(cell=>{
@@ -1639,7 +1602,7 @@
       summary.style.color = '#7f8c8d';
       summary.innerHTML = `
         <p style="margin:5px 0"><strong>Totale materiali:</strong> ${allMaterials.length}</p>
-        <p style="margin:5px 0"><strong>Valore totale:</strong> € ${allMaterials.reduce((sum, m)=>(sum + (parseFloat(m.price)||0) * (m.quantity||0)), 0).toFixed(2)}</p>
+        <p style="margin:5px 0"><strong>Valore totale:</strong> € ${allMaterials.reduce((sum, m)=>(sum + (m.priceValue||0) * (m.quantity||0)), 0).toFixed(2)}</p>
       `;
       element.appendChild(summary);
 
