@@ -1503,6 +1503,105 @@
       allMaterials = loadFromLocalStorage();
     }
 
+    function generateTablePDF(title, filename, headers, rows, summaryLines){
+      const JsPdfCtor = window.jspdf && window.jspdf.jsPDF ? window.jspdf.jsPDF : null;
+      if(!JsPdfCtor){
+        showAlert('Libreria PDF non disponibile', 'warn');
+        return;
+      }
+
+      const doc = new JsPdfCtor({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      const margin = 10;
+      const tableWidth = pageWidth - (margin * 2);
+      const colCount = headers.length;
+      const colWidth = tableWidth / colCount;
+      const rowHeight = 6;
+      let y = margin;
+
+      function fitText(value, maxWidth){
+        const original = value === null || value === undefined ? '' : String(value);
+        let text = original;
+        while(text.length > 0 && doc.getTextWidth(text) > maxWidth){
+          text = text.slice(0, -1);
+        }
+        if(text !== original){
+          text = text.slice(0, Math.max(0, text.length - 1)) + '…';
+        }
+        return text;
+      }
+
+      function drawHeaderBlock(){
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(14);
+        doc.setTextColor(0, 61, 122);
+        doc.text(title, margin, y);
+        y += 6;
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(9);
+        doc.setTextColor(80, 80, 80);
+        doc.text('Esportazione del: ' + new Date().toLocaleDateString(), margin, y);
+        y += 6;
+      }
+
+      function drawTableHeader(){
+        doc.setFillColor(0, 61, 122);
+        doc.setTextColor(255, 255, 255);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(8);
+        headers.forEach((header, index) => {
+          const x = margin + (index * colWidth);
+          doc.rect(x, y, colWidth, rowHeight, 'F');
+          doc.text(fitText(header, colWidth - 2), x + 1, y + 4);
+        });
+        y += rowHeight;
+      }
+
+      function ensureSpace(required){
+        if(y + required > pageHeight - margin){
+          doc.addPage();
+          y = margin;
+          drawHeaderBlock();
+          drawTableHeader();
+        }
+      }
+
+      drawHeaderBlock();
+      drawTableHeader();
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8);
+      doc.setTextColor(20, 20, 20);
+      rows.forEach((row, rowIndex) => {
+        ensureSpace(rowHeight);
+        const fill = rowIndex % 2 === 0 ? 252 : 245;
+        row.forEach((cell, index) => {
+          const x = margin + (index * colWidth);
+          doc.setFillColor(fill, fill, fill);
+          doc.rect(x, y, colWidth, rowHeight, 'F');
+          doc.setDrawColor(220, 220, 220);
+          doc.rect(x, y, colWidth, rowHeight);
+          doc.text(fitText(cell, colWidth - 2), x + 1, y + 4);
+        });
+        y += rowHeight;
+      });
+
+      if(Array.isArray(summaryLines) && summaryLines.length){
+        ensureSpace((summaryLines.length * 5) + 4);
+        y += 3;
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(9);
+        doc.setTextColor(80, 80, 80);
+        summaryLines.forEach(line => {
+          doc.text(line, margin, y);
+          y += 5;
+        });
+      }
+
+      doc.save(filename);
+    }
+
     async function downloadMaterialsPDF(){
       const visibleRows = Array.from(document.querySelectorAll('#list tr'));
       const allMaterials = visibleRows.map(row => {
@@ -1525,113 +1624,28 @@
         showAlert('Nessun materiale visibile da esportare', 'warn');
         return;
       }
-
-      const element = document.createElement('div');
-      element.style.padding = '20px';
-      element.style.fontFamily = 'Arial, sans-serif';
-      element.style.backgroundColor = '#fff';
-      element.style.width = '1100px';
-      element.style.position = 'fixed';
-      element.style.left = '0';
-      element.style.top = '0';
-      element.style.zIndex = '99999';
-
-      // Header
-      const header = document.createElement('div');
-      header.style.marginBottom = '20px';
-      header.style.textAlign = 'left';
-      header.innerHTML = `
-        <h1 style="color:#003d7a;margin:0 0 10px 0;font-size:24px">Studio Dentistico - Magazzino Materiali</h1>
-        <p style="color:#7f8c8d;margin:0;font-size:12px">Esportazione del: ${new Date().toLocaleDateString()}</p>
-      `;
-      element.appendChild(header);
-
-      // Table
-      const table = document.createElement('table');
-      table.style.width = '100%';
-      table.style.borderCollapse = 'collapse';
-      table.style.marginTop = '20px';
-
-      // Table header
-      const thead = document.createElement('thead');
-      const headerRow = document.createElement('tr');
-      headerRow.style.backgroundColor = '#003d7a';
-      headerRow.style.color = '#fff';
       const headers = ['Nome', 'Data Ordine', 'Scadenza', 'Prezzo (€)', 'Distributore', 'Azienda', 'Quantità'];
-      headers.forEach(h=>{
-        const th = document.createElement('th');
-        th.textContent = h;
-        th.style.border = '1px solid #ddd';
-        th.style.padding = '10px';
-        th.style.textAlign = 'left';
-        th.style.fontWeight = 'bold';
-        th.style.fontSize = '11px';
-        headerRow.appendChild(th);
-      });
-      thead.appendChild(headerRow);
-      table.appendChild(thead);
-
-      // Table body
-      const tbody = document.createElement('tbody');
-      allMaterials.forEach(data=>{
-        const tr = document.createElement('tr');
-        tr.style.borderBottom = '1px solid #ddd';
-
-        const cells = [
-          data.name || '-',
-          data.orderDate || '-',
-          data.expiryStatus || '-',
-          data.priceText || '€ 0.00',
-          data.distributor || '-',
-          data.company || '-',
-          data.quantity || 0
-        ];
-
-        cells.forEach(cell=>{
-          const td = document.createElement('td');
-          td.textContent = cell;
-          td.style.border = '1px solid #ddd';
-          td.style.padding = '8px';
-          td.style.fontSize = '10px';
-          tr.appendChild(td);
-        });
-        tbody.appendChild(tr);
-      });
-      table.appendChild(tbody);
-      element.appendChild(table);
-
-      // Summary
-      const summary = document.createElement('div');
-      summary.style.marginTop = '20px';
-      summary.style.fontSize = '11px';
-      summary.style.color = '#7f8c8d';
-      summary.innerHTML = `
-        <p style="margin:5px 0"><strong>Totale materiali:</strong> ${allMaterials.length}</p>
-        <p style="margin:5px 0"><strong>Valore totale:</strong> € ${allMaterials.reduce((sum, m)=>(sum + (m.priceValue||0) * (m.quantity||0)), 0).toFixed(2)}</p>
-      `;
-      element.appendChild(summary);
-
-      // Generate PDF
-      const opt = {
-        margin: 10,
-        filename: 'materiali_' + new Date().toISOString().split('T')[0] + '.pdf',
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { orientation: 'landscape', unit: 'mm', format: 'a4' }
-      };
-      document.body.appendChild(element);
-      try {
-        await new Promise(resolve => requestAnimationFrame(resolve));
-        await html2pdf().set(opt).from(element).save();
-        showAlert('✓ PDF Materiali scaricato con successo', 'info');
-      } catch (err) {
-        console.error('Errore export PDF materiali:', err);
-        showAlert('Errore durante export PDF materiali', 'warn');
-      } finally {
-        if(element.parentNode){
-          element.parentNode.removeChild(element);
-        }
-      }
+      const rows = allMaterials.map(item => [
+        item.name || '-',
+        item.orderDate || '-',
+        item.expiryStatus || '-',
+        item.priceText || '€ 0.00',
+        item.distributor || '-',
+        item.company || '-',
+        String(item.quantity || 0)
+      ]);
+      const summaryLines = [
+        'Totale materiali: ' + allMaterials.length,
+        'Valore totale: € ' + allMaterials.reduce((sum, m)=>(sum + (m.priceValue||0) * (m.quantity||0)), 0).toFixed(2)
+      ];
+      generateTablePDF(
+        'Studio Dentistico - Magazzino Materiali',
+        'materiali_' + new Date().toISOString().split('T')[0] + '.pdf',
+        headers,
+        rows,
+        summaryLines
+      );
+      showAlert('✓ PDF Materiali scaricato con successo', 'info');
     }
 
     async function downloadImplantsPDF(){
@@ -1691,120 +1705,40 @@
         return;
       }
 
-      const element = document.createElement('div');
-      element.style.padding = '20px';
-      element.style.fontFamily = 'Arial, sans-serif';
-      element.style.backgroundColor = '#fff';
-      element.style.width = '1100px';
-      element.style.position = 'fixed';
-      element.style.left = '0';
-      element.style.top = '0';
-      element.style.zIndex = '99999';
-
-      // Header
-      const header = document.createElement('div');
-      header.style.marginBottom = '20px';
-      header.style.textAlign = 'center';
-      header.innerHTML = `
-        <h1 style="color:#003d7a;margin:0 0 10px 0;font-size:24px">Studio Dentistico - Magazzino Impianti</h1>
-        <p style="color:#7f8c8d;margin:0;font-size:12px">Esportazione del: ${new Date().toLocaleDateString()}</p>
-      `;
-      element.appendChild(header);
-
-      // Table
-      const table = document.createElement('table');
-      table.style.width = '100%';
-      table.style.borderCollapse = 'collapse';
-      table.style.marginTop = '20px';
-
-      // Table header
-      const thead = document.createElement('thead');
-      const headerRow = document.createElement('tr');
-      headerRow.style.backgroundColor = '#003d7a';
-      headerRow.style.color = '#fff';
       const headers = ['Tipo', 'Azienda', 'Modello', 'Ø', 'L', 'Data Ordine', 'Scadenza', 'Prezzo (€)', 'Quantità'];
-      headers.forEach(h=>{
-        const th = document.createElement('th');
-        th.textContent = h;
-        th.style.border = '1px solid #ddd';
-        th.style.padding = '10px';
-        th.style.textAlign = 'left';
-        th.style.fontWeight = 'bold';
-        th.style.fontSize = '11px';
-        headerRow.appendChild(th);
-      });
-      thead.appendChild(headerRow);
-      table.appendChild(thead);
-
-      // Table body
-      const tbody = document.createElement('tbody');
-      implants.forEach(implant=>{
-        const tr = document.createElement('tr');
-        tr.style.borderBottom = '1px solid #ddd';
-
+      const rows = implants.map(implant => {
         const orderDate = implant.orderDate ? new Date(implant.orderDate).toLocaleDateString() : '-';
         const expiry = implant.expiry ? new Date(implant.expiry) : null;
         const expiryDate = expiry ? expiry.toLocaleDateString() : '-';
         const diameter = implant.diameter ? implant.diameter + ' mm' : '-';
         const length = implant.length ? implant.length + ' mm' : '-';
-
-        const cells = [
+        const modelValue = implant.type === 'Kit chirurgico'
+          ? (implant.kitComponents ? escapeHtml(implant.kitComponents) : '-')
+          : (implant.model ? escapeHtml(implant.model) : '-');
+        return [
           escapeHtml(implant.type),
           escapeHtml(implant.company),
-          implant.type === 'Kit chirurgico' ? (implant.kitComponents ? escapeHtml(implant.kitComponents) : '-') : (implant.model ? escapeHtml(implant.model) : '-'),
+          modelValue,
           diameter,
           length,
           orderDate,
           expiryDate,
           '€ ' + Number(implant.price || 0).toFixed(2),
-          implant.quantity || 0
+          String(implant.quantity || 0)
         ];
-
-        cells.forEach(cell=>{
-          const td = document.createElement('td');
-          td.textContent = cell;
-          td.style.border = '1px solid #ddd';
-          td.style.padding = '8px';
-          td.style.fontSize = '10px';
-          tr.appendChild(td);
-        });
-        tbody.appendChild(tr);
       });
-      table.appendChild(tbody);
-      element.appendChild(table);
-
-      // Summary
-      const summary = document.createElement('div');
-      summary.style.marginTop = '20px';
-      summary.style.fontSize = '11px';
-      summary.style.color = '#7f8c8d';
-      summary.innerHTML = `
-        <p style="margin:5px 0"><strong>Totale impianti:</strong> ${implants.length}</p>
-        <p style="margin:5px 0"><strong>Valore totale:</strong> € ${implants.reduce((sum, i)=>(sum + (parseFloat(i.price)||0) * (i.quantity||0)), 0).toFixed(2)}</p>
-      `;
-      element.appendChild(summary);
-
-      // Generate PDF
-      const opt = {
-        margin: 10,
-        filename: 'impianti_' + new Date().toISOString().split('T')[0] + '.pdf',
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { orientation: 'landscape', unit: 'mm', format: 'a4' }
-      };
-      document.body.appendChild(element);
-      try {
-        await new Promise(resolve => requestAnimationFrame(resolve));
-        await html2pdf().set(opt).from(element).save();
-        showAlert('✓ PDF Impianti scaricato con successo', 'info');
-      } catch (err) {
-        console.error('Errore export PDF impianti:', err);
-        showAlert('Errore durante export PDF impianti', 'warn');
-      } finally {
-        if(element.parentNode){
-          element.parentNode.removeChild(element);
-        }
-      }
+      const summaryLines = [
+        'Totale impianti: ' + implants.length,
+        'Valore totale: € ' + implants.reduce((sum, i)=>(sum + (parseFloat(i.price)||0) * (i.quantity||0)), 0).toFixed(2)
+      ];
+      generateTablePDF(
+        'Studio Dentistico - Magazzino Impianti',
+        'impianti_' + new Date().toISOString().split('T')[0] + '.pdf',
+        headers,
+        rows,
+        summaryLines
+      );
+      showAlert('✓ PDF Impianti scaricato con successo', 'info');
     }
 
     async function downloadPDF(){
