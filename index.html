@@ -565,6 +565,31 @@
         }
     }
 
+    // Auto-fill azienda quando si inserisce il nome materiale
+    document.getElementById('name').addEventListener('input', function() {
+      const materialName = this.value.trim().toLowerCase();
+      if(materialName.length < 3) return; // Attiva solo dopo 3 caratteri
+      
+      const materials = loadFromLocalStorage();
+      const match = materials.find(m => m.name && m.name.toLowerCase().includes(materialName));
+      
+      if(match && match.company) {
+        const companySelect = document.getElementById('companySelect');
+        const companyInput = document.getElementById('company');
+        
+        // Cerca se l'azienda è nelle opzioni predefinite
+        const option = Array.from(companySelect.options).find(opt => opt.value === match.company);
+        if(option) {
+          companySelect.value = match.company;
+          companyInput.style.display = 'none';
+        } else {
+          companySelect.value = 'Other';
+          companyInput.value = match.company;
+          companyInput.style.display = '';
+        }
+      }
+    });
+
     addForm.addEventListener('submit', async e=>{
       e.preventDefault();
       console.log('Form submitted');
