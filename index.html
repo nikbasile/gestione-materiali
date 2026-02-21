@@ -798,8 +798,8 @@
           <div class="material-form-group"><label for="matPrice">Prezzo (€)</label><input id="matPrice" type="number" step="0.01" placeholder="0.00" /></div>
           <div class="material-form-group"><label for="matQuantity">Quantità</label><input id="matQuantity" type="number" min="0" value="1" required /></div>
           <div class="material-form-group"><label for="matCategory">Categoria</label><select id="matCategory" required><option value="">-- Seleziona --</option><option value="Strumentario">Strumentario</option><option value="Consumabili Generici">Consumabili Generici</option><option value="Monouso">Monouso</option><option value="Disinfezione e Sterilizzazione">Disinfezione e Sterilizzazione</option><option value="Chirurgia">Chirurgia</option><option value="Endodonzia">Endodonzia</option><option value="Conservativa e Protesi">Conservativa e Protesi</option><option value="Frese e Lucidatura">Frese e Lucidatura</option><option value="Anestesia e Farmaci">Anestesia e Farmaci</option><option value="Impronte e Laboratorio">Impronte e Laboratorio</option><option value="Radiografia e Fotografia">Radiografia e Fotografia</option><option value="Profilassi e Igiene Orale">Profilassi e Igiene Orale</option><option value="Ortodonzia">Ortodonzia</option></select></div>
-          <div class="material-form-group"><label for="matDistributor">Distributore</label><select id="matDistributor" required><option value="">-- Seleziona --</option><option value="Dental Leader">Dental Leader</option><option value="Gherò">Gherò</option><option value="Revello">Revello</option><option value="Dentitalia">Dentitalia</option><option value="Dental Trey">Dental Trey</option><option value="Umbra">Umbra</option><option value="Eli Dent">Eli Dent</option><option value="Non disponibile">Non disponibile</option><option value="Other">Altro...</option></select></div>
-          <div class="material-form-group"><label for="matCompany">Azienda</label><select id="matCompany"><option value="">-- Seleziona --</option><option value="3M">3M</option><option value="Ivoclar">Ivoclar</option><option value="GC">GC</option><option value="Dentsply Sirona">Dentsply Sirona</option><option value="Coltene">Coltene</option><option value="Kerr">Kerr</option><option value="Voco">Voco</option><option value="Septodont">Septodont</option><option value="Zhermack">Zhermack</option><option value="DMG">DMG</option><option value="VOCO">VOCO</option><option value="Other">Altro...</option></select></div>
+          <div class="material-form-group"><label for="matDistributor">Distributore</label><select id="matDistributor" required><option value="">-- Seleziona --</option><option value="Dental Leader">Dental Leader</option><option value="Gherò">Gherò</option><option value="Revello">Revello</option><option value="Dentitalia">Dentitalia</option><option value="Dental Trey">Dental Trey</option><option value="Umbra">Umbra</option><option value="Eli Dent">Eli Dent</option><option value="Non disponibile">Non disponibile</option><option value="Other">Altro...</option></select><input id="matDistributorCustom" placeholder="Distributore personalizzato" style="display:none;margin-top:6px" /></div>
+          <div class="material-form-group"><label for="matCompany">Azienda</label><select id="matCompany"><option value="">-- Seleziona --</option><option value="3M">3M</option><option value="Ivoclar">Ivoclar</option><option value="GC">GC</option><option value="Dentsply Sirona">Dentsply Sirona</option><option value="Coltene">Coltene</option><option value="Kerr">Kerr</option><option value="Voco">Voco</option><option value="Septodont">Septodont</option><option value="Zhermack">Zhermack</option><option value="DMG">DMG</option><option value="VOCO">VOCO</option><option value="Other">Altro...</option></select><input id="matCompanyCustom" placeholder="Azienda personalizzata" style="display:none;margin-top:6px" /></div>
           <div class="material-form-group"><label for="matLowStock">Soglia quantità bassa</label><select id="matLowStock"><option value="1">1</option><option value="2" selected>2 (default)</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="Other">Altro...</option></select></div>
           <div class="material-buttons"><button type="button" class="material-btn cancel" onclick="closeMaterialModal()">Annulla</button><button type="submit" class="material-btn submit">✓ Aggiungi</button></div>
         </form>
@@ -827,6 +827,7 @@
               <select id="orderDistributor" required>
                 <option value="">-- Seleziona --</option>
               </select>
+              <input id="orderDistributorCustom" placeholder="Distributore personalizzato" style="display:none;margin-top:6px" />
             </div>
           </div>
 
@@ -1910,12 +1911,18 @@
       const price = parseFloat(document.getElementById('matPrice').value) || 0;
       const quantity = parseInt(document.getElementById('matQuantity').value,10) || 0;
       const category = document.getElementById('matCategory').value.trim();
-      const distributor = document.getElementById('matDistributor').value.trim();
-      const company = document.getElementById('matCompany').value.trim();
+      let distributor = document.getElementById('matDistributor').value.trim();
+      if (distributor === 'Other') {
+        distributor = document.getElementById('matDistributorCustom').value.trim();
+      }
+      let company = document.getElementById('matCompany').value.trim();
+      if (company === 'Other') {
+        company = document.getElementById('matCompanyCustom').value.trim();
+      }
       const lowStockThreshold = parseInt(document.getElementById('matLowStock').value,10) || 2;
       const notifyDays = 30;
       
-      if(!name || !orderDate || !expiry || !category) {
+      if(!name || !orderDate || !expiry || !category || !distributor) {
         showAlert('Compila tutti i campi richiesti', 'warn');
         return;
       }
@@ -3417,12 +3424,44 @@
     function openMaterialModal() {
       const modal = document.getElementById('materialModal');
       modal.classList.add('active');
+      setupMaterialCustomFields();
     }
 
     function closeMaterialModal() {
       const modal = document.getElementById('materialModal');
       modal.classList.remove('active');
       document.getElementById('materialForm').reset();
+    }
+
+    function setupMaterialCustomFields() {
+      const distSelect = document.getElementById('matDistributor');
+      const distInput = document.getElementById('matDistributorCustom');
+      const companySelect = document.getElementById('matCompany');
+      const companyInput = document.getElementById('matCompanyCustom');
+      if (!distSelect || !distInput || !companySelect || !companyInput) return;
+
+      distSelect.onchange = () => {
+        if (distSelect.value === 'Other') {
+          distInput.style.display = '';
+          distInput.required = true;
+        } else {
+          distInput.style.display = 'none';
+          distInput.required = false;
+          distInput.value = '';
+        }
+      };
+
+      companySelect.onchange = () => {
+        if (companySelect.value === 'Other') {
+          companyInput.style.display = '';
+        } else {
+          companyInput.style.display = 'none';
+          companyInput.value = '';
+        }
+      };
+
+      distSelect.onchange();
+      companySelect.onchange();
     }
 
     function openOrderModal() {
@@ -3455,8 +3494,34 @@
         distSelect.appendChild(opt);
       });
 
+      if (!Array.from(distSelect.options).some(o => o.value === 'Other')) {
+        const otherOpt = document.createElement('option');
+        otherOpt.value = 'Other';
+        otherOpt.textContent = 'Altro...';
+        distSelect.appendChild(otherOpt);
+      }
+
+      setupOrderDistributorCustom();
+
       orderArticles = [];
       addArticleRow();
+    }
+
+    function setupOrderDistributorCustom() {
+      const distSelect = document.getElementById('orderDistributor');
+      const distInput = document.getElementById('orderDistributorCustom');
+      if (!distSelect || !distInput) return;
+      distSelect.onchange = () => {
+        if (distSelect.value === 'Other') {
+          distInput.style.display = '';
+          distInput.required = true;
+        } else {
+          distInput.style.display = 'none';
+          distInput.required = false;
+          distInput.value = '';
+        }
+      };
+      distSelect.onchange();
     }
 
     function addArticleRow() {
@@ -3907,7 +3972,10 @@
       e.preventDefault();
 
       const orderDate = document.getElementById('orderDate').value;
-      const distributor = document.getElementById('orderDistributor').value;
+      let distributor = document.getElementById('orderDistributor').value;
+      if (distributor === 'Other') {
+        distributor = document.getElementById('orderDistributorCustom').value.trim();
+      }
 
       if (!orderDate || !distributor) {
         alert('Compila data ordine e distributore');
