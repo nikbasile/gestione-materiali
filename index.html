@@ -1429,7 +1429,7 @@
     }
 
     async function downloadMaterialsPDF(){
-      // Applica gli stessi filtri che sono visualizzati nella tabella
+      // Applica ESATTAMENTE gli stessi filtri della tabella
       let filtered = currentFilter === 'Tutti' 
         ? allDocs 
         : allDocs.filter(doc=>doc.data().category === currentFilter);
@@ -1440,7 +1440,7 @@
       if(currentDistributorFilter !== 'Tutti'){
         filtered = filtered.filter(doc => (doc.data().distributor || '') === currentDistributorFilter);
       }
-      // Filtro scadenza
+      // Filtro scadenza semaforo
       if(currentExpiryFilter !== 'Tutte'){
         const now = new Date();
         filtered = filtered.filter(doc => {
@@ -1455,7 +1455,7 @@
           return currentExpiryFilter === 'Verde';
         });
       }
-      // Filtro quantità
+      // Filtro quantità semaforo
       if(currentQuantityFilter !== 'Tutte'){
         filtered = filtered.filter(doc => {
           const data = doc.data();
@@ -1467,35 +1467,10 @@
         });
       }
 
-      // Se nessun filtro è impostato, includi tutti i dati
-      if(filtered.length === 0){
-        const hasActiveFilters = currentFilter !== 'Tutti' || 
-                                 currentCompanyFilter !== 'Tutte' || 
-                                 currentDistributorFilter !== 'Tutti' || 
-                                 currentExpiryFilter !== 'Tutte' || 
-                                 currentQuantityFilter !== 'Tutte';
-        
-        if(hasActiveFilters){
-          showAlert('Nessun materiale da esportare con i filtri selezionati', 'warn');
-          return;
-        } else {
-          // Nessun filtro attivo - carica tutto da localStorage come fallback
-          const allMaterialsStorage = loadFromLocalStorage() || [];
-          if(!allMaterialsStorage || allMaterialsStorage.length === 0){
-            showAlert('Nessun materiale da esportare', 'warn');
-            return;
-          }
-          // Converti in oggetti con .data() come da Firestore
-          filtered = allMaterialsStorage.map(m => ({
-            data: () => m
-          }));
-        }
-      }
-
       const allMaterials = filtered.map(d=>d.data());
 
       if(allMaterials.length === 0){
-        showAlert('Nessun materiale da esportare', 'warn');
+        showAlert('Nessun materiale da esportare con i filtri selezionati', 'warn');
         return;
       }
 
@@ -1588,7 +1563,7 @@
       summary.style.fontSize = '11px';
       summary.style.color = '#7f8c8d';
       summary.innerHTML = `
-        <p style="margin:5px 0"><strong>Totale materiali (filtrati):</strong> ${allMaterials.length}</p>
+        <p style="margin:5px 0"><strong>Totale materiali:</strong> ${allMaterials.length}</p>
         <p style="margin:5px 0"><strong>Valore totale:</strong> € ${allMaterials.reduce((sum, m)=>(sum + (parseFloat(m.price)||0) * (m.quantity||0)), 0).toFixed(2)}</p>
       `;
       element.appendChild(summary);
@@ -1710,28 +1685,18 @@
 
         const orderDate = implant.orderDate ? new Date(implant.orderDate).toLocaleDateString() : '-';
         const expiry = implant.expiry ? new Date(implant.expiry) : null;
+        const expiryDate = expiry ? expiry.toLocaleDateString() : '-';
         const diameter = implant.diameter ? implant.diameter + ' mm' : '-';
         const length = implant.length ? implant.length + ' mm' : '-';
 
-        let statusText = '';
-        if(!expiry){ statusText = '⚪'; }
-        else{
-          const days = daysBetween(now, expiry);
-          const mesi = days / 30.44;
-          if(days < 0) statusText = '🔴 Scaduto';
-          else if(mesi < 3) statusText = '🔴 < 3 mesi';
-          else if(mesi < 6) statusText = '🟡 < 6 mesi';
-          else statusText = '🟢 OK';
-        }
-
         const cells = [
-          implant.type || '-',
-          implant.company || '-',
-          implant.model || (implant.kitComponents || '-'),
+          escapeHtml(implant.type),
+          escapeHtml(implant.company),
+          implant.type === 'Kit chirurgico' ? (implant.kitComponents ? escapeHtml(implant.kitComponents) : '-') : (implant.model ? escapeHtml(implant.model) : '-'),
           diameter,
           length,
           orderDate,
-          statusText,
+          expiryDate,
           '€ ' + Number(implant.price || 0).toFixed(2),
           implant.quantity || 0
         ];
@@ -1755,7 +1720,7 @@
       summary.style.fontSize = '11px';
       summary.style.color = '#7f8c8d';
       summary.innerHTML = `
-        <p style="margin:5px 0"><strong>Totale impianti (filtrati):</strong> ${implants.length}</p>
+        <p style="margin:5px 0"><strong>Totale impianti:</strong> ${implants.length}</p>
         <p style="margin:5px 0"><strong>Valore totale:</strong> € ${implants.reduce((sum, i)=>(sum + (parseFloat(i.price)||0) * (i.quantity||0)), 0).toFixed(2)}</p>
       `;
       element.appendChild(summary);
