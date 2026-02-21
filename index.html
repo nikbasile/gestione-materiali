@@ -242,6 +242,7 @@
     .pdf-import-table th{padding:12px;text-align:left;background:#f4f7fb;color:#003d7a;font-size:12px;text-transform:uppercase;letter-spacing:0.4px}
     .pdf-import-table td{padding:10px;border-bottom:1px solid #eef2f6}
     .pdf-import-table input,.pdf-import-table select{width:100%;padding:8px 10px;border:1px solid #d0dce6;border-radius:6px;font-size:13px}
+    .pdf-import-table input[readonly]{background:#f4f7fb;color:#003d7a}
     .pdf-import-remove{background:#c62828;color:#fff;border:none;border-radius:6px;padding:8px 10px;cursor:pointer;font-weight:600;font-size:12px}
     .pdf-import-buttons{display:flex;gap:12px;margin-top:16px}
     .pdf-import-btn{flex:1;padding:12px;font-weight:600;border:none;border-radius:6px;cursor:pointer;transition:all 0.2s;font-size:13px;text-transform:uppercase;letter-spacing:0.4px}
@@ -875,9 +876,11 @@
             <thead>
               <tr>
                 <th>Descrizione</th>
-                <th>Materiale</th>
+                <th>Nome materiale</th>
                 <th>Quantità</th>
                 <th>Prezzo (€)</th>
+                <th>IVA %</th>
+                <th>IVA (€)</th>
                 <th>Categoria</th>
                 <th>Azioni</th>
               </tr>
@@ -885,6 +888,7 @@
             <tbody id="pdfImportTableBody"></tbody>
           </table>
         </div>
+        <datalist id="materialNameList"></datalist>
         <div class="pdf-import-buttons">
           <button type="button" class="pdf-import-btn cancel" onclick="closePdfImportModal()">Annulla</button>
           <button type="button" class="pdf-import-btn submit" onclick="applyPdfImportRows()">Importa nell'ordine</button>
@@ -3550,6 +3554,7 @@
       document.getElementById('pdfImportFile').value = '';
       document.getElementById('pdfImportRaw').value = '';
       document.getElementById('pdfImportTableBody').innerHTML = '';
+      renderMaterialDatalist();
     }
 
     function closePdfImportModal() {
@@ -3562,11 +3567,23 @@
     }
 
     function findMaterialMatch(name, materials) {
-      const n = (name || '').toLowerCase();
-      let exact = materials.find(m => m.name && m.name.toLowerCase() === n);
+      const n = (name || '').toLowerCase().trim();
+      let exact = materials.find(m => m.name && m.name.toLowerCase().trim() === n);
       if (exact) return exact.id;
-      let partial = materials.find(m => n.includes(m.name.toLowerCase()));
+      let partial = materials.find(m => n.includes(m.name.toLowerCase().trim()));
       return partial ? partial.id : '';
+    }
+
+    function renderMaterialDatalist() {
+      const list = document.getElementById('materialNameList');
+      if (!list) return;
+      const materials = getMaterialsForImport();
+      list.innerHTML = '';
+      materials.forEach(m => {
+        const opt = document.createElement('option');
+        opt.value = m.name;
+        list.appendChild(opt);
+      });
     }
 
     function addImportRow(data = {}) {
@@ -3574,33 +3591,42 @@
       const tr = document.createElement('tr');
       const materials = getMaterialsForImport();
 
-      const nameInput = document.createElement('input');
-      nameInput.type = 'text';
-      nameInput.value = data.name || '';
+      const descInput = document.createElement('input');
+      descInput.type = 'text';
+      descInput.className = 'pdf-import-desc';
+      descInput.value = data.name || '';
 
-      const materialSelect = document.createElement('select');
-      materialSelect.innerHTML = '<option value="">-- Seleziona --</option>';
-      materials.forEach(m => {
-        const opt = document.createElement('option');
-        opt.value = m.id;
-        opt.textContent = m.name + ' (' + m.category + ')';
-        materialSelect.appendChild(opt);
-      });
-      if (data.name) {
-        const matchId = findMaterialMatch(data.name, materials);
-        if (matchId) materialSelect.value = matchId;
-      }
+      const materialNameInput = document.createElement('input');
+      materialNameInput.type = 'text';
+      materialNameInput.className = 'pdf-import-name';
+      materialNameInput.setAttribute('list', 'materialNameList');
+      materialNameInput.value = data.name || '';
 
       const qtyInput = document.createElement('input');
       qtyInput.type = 'number';
       qtyInput.min = '1';
+      qtyInput.className = 'pdf-import-qty';
       qtyInput.value = data.quantity || '';
 
       const priceInput = document.createElement('input');
       priceInput.type = 'number';
       priceInput.min = '0';
       priceInput.step = '0.01';
+      priceInput.className = 'pdf-import-price';
       priceInput.value = data.price !== undefined ? data.price : '';
+
+      const ivaPercentInput = document.createElement('input');
+      ivaPercentInput.type = 'number';
+      ivaPercentInput.min = '0';
+      ivaPercentInput.step = '0.01';
+      ivaPercentInput.className = 'pdf-import-iva-percent';
+      ivaPercentInput.value = data.ivaPercent !== undefined ? data.ivaPercent : '';
+
+      const ivaAmountInput = document.createElement('input');
+      ivaAmountInput.type = 'number';
+      ivaAmountInput.step = '0.01';
+      ivaAmountInput.className = 'pdf-import-iva-amount';
+      ivaAmountInput.readOnly = true;
 
       const categorySelect = document.createElement('select');
       categorySelect.innerHTML = '<option value="">-- Seleziona --</option>' + CATEGORY_OPTIONS.map(c => `<option value="${c}">${c}</option>`).join('');
@@ -3612,12 +3638,18 @@
       removeBtn.textContent = 'Rimuovi';
       removeBtn.onclick = () => tr.remove();
 
-      const cells = [nameInput, materialSelect, qtyInput, priceInput, categorySelect, removeBtn];
+      const cells = [descInput, materialNameInput, qtyInput, priceInput, ivaPercentInput, ivaAmountInput, categorySelect, removeBtn];
       cells.forEach(c => {
         const td = document.createElement('td');
         td.appendChild(c);
         tr.appendChild(td);
       });
+
+      const updateIva = () => updateImportRowIva(tr);
+      qtyInput.addEventListener('input', updateIva);
+      priceInput.addEventListener('input', updateIva);
+      ivaPercentInput.addEventListener('input', updateIva);
+      updateIva();
 
       tbody.appendChild(tr);
     }
@@ -3651,6 +3683,7 @@
         showAlert('Nessuna riga riconosciuta. Aggiungi righe manualmente.', 'warn');
         return;
       }
+      renderMaterialDatalist();
       items.forEach(it => addImportRow(it));
     }
 
@@ -3701,8 +3734,9 @@
         const description = match[2].replace(/\s{2,}/g, ' ').trim();
         const quantity = parseInt(match[3], 10);
         const unitNet = parseFloat(match[6].replace(',', '.'));
+        const ivaPercent = parseFloat(match[8].replace(',', '.'));
         if (!description || quantity <= 0) return;
-        items.push({ name: `${code} ${description}`, quantity, price: unitNet, category: '' });
+        items.push({ name: `${code} ${description}`, quantity, price: unitNet, ivaPercent, category: '' });
       });
 
       return items;
@@ -3717,12 +3751,35 @@
       let imported = 0;
       let skipped = 0;
 
+      const materials = getMaterialsForImport();
+      const orderDate = document.getElementById('orderDate')?.value || new Date().toISOString().split('T')[0];
+      const orderDistributor = document.getElementById('orderDistributor')?.value || '';
+
       rows.forEach(row => {
-        const selects = row.querySelectorAll('select');
-        const inputs = row.querySelectorAll('input');
-        const materialId = selects[0]?.value;
-        const quantity = parseInt(inputs[1]?.value, 10) || 0;
-        const price = parseFloat(inputs[2]?.value) || 0;
+        const desc = row.querySelector('.pdf-import-desc')?.value || '';
+        const materialName = row.querySelector('.pdf-import-name')?.value || desc;
+        const quantity = parseInt(row.querySelector('.pdf-import-qty')?.value, 10) || 0;
+        const price = parseFloat(row.querySelector('.pdf-import-price')?.value) || 0;
+        const category = row.querySelector('select')?.value || '';
+
+        if (!materialName || quantity <= 0) {
+          skipped += 1;
+          return;
+        }
+
+        let materialId = findMaterialMatch(materialName, materials);
+        if (!materialId) {
+          if (!category) {
+            skipped += 1;
+            return;
+          }
+          materialId = createMaterialFromImport(materialName, category, orderDate, orderDistributor);
+          if (materialId) {
+            materials.push({ id: materialId, name: materialName, category });
+            renderMaterialDatalist();
+          }
+        }
+
         if (materialId && quantity > 0) {
           addArticleRowWithData({ materialId, quantity, price });
           imported += 1;
@@ -3732,11 +3789,55 @@
       });
 
       if (imported === 0) {
-        alert('Seleziona almeno un materiale e una quantita valida');
+        alert('Seleziona almeno un nome materiale e una quantita valida');
         return;
       }
       closePdfImportModal();
       showAlert(`✓ Importati ${imported} articoli${skipped ? ', ' + skipped + ' saltati' : ''}`, 'info');
+    }
+
+    function updateImportRowIva(row) {
+      const qty = parseFloat(row.querySelector('.pdf-import-qty')?.value) || 0;
+      const price = parseFloat(row.querySelector('.pdf-import-price')?.value) || 0;
+      const ivaPercent = parseFloat(row.querySelector('.pdf-import-iva-percent')?.value) || 0;
+      const ivaAmountInput = row.querySelector('.pdf-import-iva-amount');
+      const ivaAmount = (qty * price) * (ivaPercent / 100);
+      if (ivaAmountInput) ivaAmountInput.value = ivaAmount ? ivaAmount.toFixed(2) : '';
+    }
+
+    function createMaterialFromImport(name, category, orderDate, distributor) {
+      const materials = loadFromLocalStorage();
+      const materialId = window.crypto && window.crypto.randomUUID
+        ? window.crypto.randomUUID()
+        : ('m_' + Date.now() + '_' + Math.floor(Math.random()*100000));
+
+      const newMaterial = {
+        id: materialId,
+        name: name,
+        category: category,
+        orderDate: new Date(orderDate).toISOString(),
+        expiry: null,
+        price: 0,
+        quantity: 0,
+        distributor: distributor,
+        company: '',
+        notifyDays: 30,
+        lowStockThreshold: 2,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        batches: []
+      };
+
+      materials.push(newMaterial);
+      localStorage.setItem('magazzino_materials', JSON.stringify(materials));
+
+      if (firebaseReady && typeof db !== 'undefined') {
+        db.collection('materials').doc(materialId).set(newMaterial).catch(err => {
+          console.warn('Firebase unavailable:', err && err.message ? err.message : err);
+        });
+      }
+
+      return materialId;
     }
 
     document.getElementById('orderForm')?.addEventListener('submit', async function(e) {
