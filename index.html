@@ -50,6 +50,12 @@
     .action-buttons button.export{background:#388e3c}
     .action-buttons button.export:hover{background:#2e7d32}
     
+    .action-menu-btn{padding:10px 16px;font-size:14px;border:none;border-radius:6px;cursor:pointer;font-weight:500;transition:all 0.2s;background:#0066cc;color:#fff}
+    .action-menu-btn:hover{background:#0052a3}
+    .action-menu{position:absolute;background:white;border:1px solid #ddd;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.15);z-index:1000;min-width:250px}
+    .action-menu button.menu-item{width:100%;padding:12px 16px;border:none;background:none;color:#2c3e50;text-align:left;cursor:pointer;font-size:14px;transition:background 0.2s;display:flex;align-items:center;gap:8px;font-family:inherit}
+    .action-menu button.menu-item:hover{background:#f5f5f5}
+    
     #loginScreen{position:fixed;top:0;left:0;width:100%;height:100%;background:linear-gradient(135deg,#003d7a 0%,#0066cc 100%);display:flex;align-items:center;justify-content:center;z-index:9999}
     #loginScreen.hidden{display:none}
     .login-box{background:#fff;padding:40px;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,0.2);text-align:center;max-width:320px}
@@ -222,15 +228,17 @@
     
     <div id="categoryFilters" class="category-filters"></div>
 
-    <div class="action-buttons">
-      <button class="export" onclick="downloadMaterialsPDF()" style="background:#D32F2F">📄 PDF Materiali</button>
-      <button class="export" onclick="downloadImplantsPDF()" style="background:#7B1FA2">📄 PDF Impianti</button>
-      <button class="export" onclick="exportMaterialsCSV()" style="background:#FF9800">📊 CSV Materiali</button>
-      <button class="export" onclick="exportImplantsCSV()" style="background:#9C27B0">📊 CSV Impianti</button>
-      <button class="export" onclick="exportBackup()" style="background:#2196F3">💾 Backup Dati</button>
-      <button class="export" onclick="document.getElementById('importFile').click()" style="background:#4CAF50">📂 Importa Backup</button>
-      <input type="file" id="importFile" accept=".json" style="display:none" onchange="importBackup(event)" />
-      <button id="implantsBtn" class="implants-btn" style="display:none">🔩 Gestione Impianti</button>
+    <!-- Dropdown Azioni Materiali -->
+    <div class="action-dropdown-container" style="margin:20px 0;display:flex;gap:10px;align-items:center">
+      <button class="action-menu-btn" onclick="toggleActionMenu('materialsMenu')">⚙️ Azioni Materiali ▼</button>
+      <div id="materialsMenu" class="action-menu" style="display:none;position:absolute;background:white;border:1px solid #ddd;border-radius:8px;box-shadow:0 4px 8px rgba(0,0,0,0.1);z-index:100;min-width:250px">
+        <button class="menu-item" onclick="downloadMaterialsPDF()">📄 Scarica PDF Materiali</button>
+        <button class="menu-item" onclick="exportMaterialsCSV()">📊 Scarica CSV Materiali</button>
+        <hr style="margin:8px 0;border:none;border-top:1px solid #eee">
+        <button class="menu-item" onclick="exportBackup()">💾 Backup completo</button>
+        <button class="menu-item" onclick="document.getElementById('importFile').click()">📥 Importa Backup</button>
+        <input type="file" id="importFile" accept=".json" style="display:none" onchange="importBackup(event)" />
+      </div>
     </div>
 
     <div class="filters-row">
@@ -273,160 +281,165 @@
         <tbody id="list"></tbody>
       </table>
     </div>
-  </div>
 
-  <!-- Modal Gestione Impianti -->
-  <div id="implantsModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>🔩 Magazzino Impianti e Componenti</h2>
-        <button class="modal-close" onclick="closeImplantsModal()">×</button>
+    <!-- Magazzino Implantare Section -->
+    <div style="margin-top:60px;padding-top:40px;border-top:3px solid #003d7a">
+      <h2 style="color:#003d7a;font-size:28px;margin:0 0 20px 0;display:flex;align-items:center;gap:8px">
+        🔩 Magazzino Implantare
+      </h2>
+      
+      <form id="implantForm" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px;padding:24px;background:#f5f5f5;border-radius:8px;margin-bottom:24px">
+        <div class="form-group">
+          <label>Tipo</label>
+          <select id="implantType" required>
+            <option value="">-- Seleziona --</option>
+            <option value="Impianto">Impianto</option>
+            <option value="Vite tappo">Vite tappo</option>
+            <option value="Vite di guarigione">Vite di guarigione</option>
+            <option value="Kit chirurgico">Kit chirurgico</option>
+            <option value="Cacciavite">Cacciavite</option>
+            <option value="Cricchetto">Cricchetto</option>
+            <option value="Componenti protesiche">Componenti protesiche</option>
+            <option value="Altro">Altro</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Azienda</label>
+          <select id="implantCompany" required>
+            <option value="">-- Seleziona --</option>
+            <option value="Straumann">Straumann</option>
+            <option value="Nobel Biocare">Nobel Biocare</option>
+            <option value="Zimmer Biomet">Zimmer Biomet</option>
+            <option value="Dentsply Sirona">Dentsply Sirona</option>
+            <option value="Osstem">Osstem</option>
+            <option value="Biomet 3i">Biomet 3i</option>
+            <option value="Other">Altro...</option>
+          </select>
+          <input id="implantCompanyCustom" placeholder="Azienda personalizzata" style="display:none;margin-top:6px" />
+        </div>
+        <div class="form-group" id="implantModelGroup">
+          <label>Modello / Nomenclatura</label>
+          <select id="implantModel">
+            <option value="">-- Seleziona o scrivi sotto --</option>
+          </select>
+          <input id="implantModelCustom" placeholder="Scrivi modello/nomenclatura (es. BLX, NC, RC)" style="margin-top:6px" />
+        </div>
+        <div class="form-group" id="implantKitComponentsGroup" style="display:none">
+          <label>Componenti Kit</label>
+          <select id="implantKitComponents">
+            <option value="">-- Seleziona o scrivi sotto --</option>
+          </select>
+          <input id="implantKitComponentsCustom" placeholder="Scrivi componente (es. Frese chirurgiche, Maschiatore, ecc.)" style="margin-top:6px" />
+        </div>
+        <div class="form-group" id="implantDiameterGroup">
+          <label>Diametro (mm)</label>
+          <select id="implantDiameter">
+            <option value="">-- Seleziona --</option>
+            <option value="2.9">2.9 mm</option>
+            <option value="3.3">3.3 mm</option>
+            <option value="3.5">3.5 mm</option>
+            <option value="4.0">4.0 mm</option>
+            <option value="4.1">4.1 mm</option>
+            <option value="4.5">4.5 mm</option>
+            <option value="4.8">4.8 mm</option>
+            <option value="5.0">5.0 mm</option>
+            <option value="6.0">6.0 mm</option>
+            <option value="Other">Altro...</option>
+          </select>
+          <input id="implantDiameterCustom" type="number" step="0.1" placeholder="Personalizzato" style="display:none;margin-top:6px" />
+        </div>
+        <div class="form-group" id="implantLengthGroup">
+          <label>Lunghezza (mm)</label>
+          <select id="implantLength">
+            <option value="">-- Seleziona --</option>
+            <option value="6">6 mm</option>
+            <option value="8">8 mm</option>
+            <option value="10">10 mm</option>
+            <option value="12">12 mm</option>
+            <option value="14">14 mm</option>
+            <option value="16">16 mm</option>
+            <option value="18">18 mm</option>
+            <option value="Other">Altro...</option>
+          </select>
+          <input id="implantLengthCustom" type="number" step="0.5" placeholder="Personalizzato" style="display:none;margin-top:6px" />
+        </div>
+        <div class="form-group">
+          <label>📅 Data Ordine</label>
+          <input id="implantOrderDate" type="date" required />
+        </div>
+        <div class="form-group">
+          <label>⏰ Data Scadenza</label>
+          <input id="implantExpiry" type="date" />
+        </div>
+        <div class="form-group">
+          <label>Prezzo (€)</label>
+          <input id="implantPrice" type="number" step="0.01" placeholder="0.00" />
+        </div>
+        <div class="form-group">
+          <label>Quantità</label>
+          <input id="implantQuantity" type="number" min="0" value="1" required />
+        </div>
+        <button type="submit" style="grid-column:span 1;align-self:flex-end">Aggiungi impianto</button>
+      </form>
+
+      <h3 style="margin:24px 0 12px;color:#003d7a;font-size:18px">📋 Inventario Impianti</h3>
+      
+      <!-- Dropdown Azioni Impianti -->
+      <div style="margin:16px 0;display:flex;gap:10px;align-items:center;position:relative">
+        <button class="action-menu-btn" onclick="toggleActionMenu('implantsMenu')">⚙️ Azioni Impianti ▼</button>
+        <div id="implantsMenu" class="action-menu" style="display:none;position:absolute;background:white;border:1px solid #ddd;border-radius:8px;box-shadow:0 4px 8px rgba(0,0,0,0.1);z-index:100;min-width:250px;top:40px;left:0">
+          <button class="menu-item" onclick="downloadImplantsPDF()">📄 Scarica PDF Impianti</button>
+          <button class="menu-item" onclick="exportImplantsCSV()">📊 Scarica CSV Impianti</button>
+        </div>
       </div>
-      <div class="modal-body">
-        <form id="implantForm">
-          <div class="form-group">
-            <label>Tipo</label>
-            <select id="implantType" required>
-              <option value="">-- Seleziona --</option>
-              <option value="Impianto">Impianto</option>
-              <option value="Vite tappo">Vite tappo</option>
-              <option value="Vite di guarigione">Vite di guarigione</option>
-              <option value="Kit chirurgico">Kit chirurgico</option>
-              <option value="Cacciavite">Cacciavite</option>
-              <option value="Cricchetto">Cricchetto</option>
-              <option value="Componenti protesiche">Componenti protesiche</option>
-              <option value="Altro">Altro</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Azienda</label>
-            <select id="implantCompany" required>
-              <option value="">-- Seleziona --</option>
-              <option value="Straumann">Straumann</option>
-              <option value="Nobel Biocare">Nobel Biocare</option>
-              <option value="Zimmer Biomet">Zimmer Biomet</option>
-              <option value="Dentsply Sirona">Dentsply Sirona</option>
-              <option value="Osstem">Osstem</option>
-              <option value="Biomet 3i">Biomet 3i</option>
-              <option value="Other">Altro...</option>
-            </select>
-            <input id="implantCompanyCustom" placeholder="Azienda personalizzata" style="display:none;margin-top:6px" />
-          </div>
-          <div class="form-group" id="implantModelGroup">
-            <label>Modello / Nomenclatura</label>
-            <select id="implantModel">
-              <option value="">-- Seleziona o scrivi sotto --</option>
-            </select>
-            <input id="implantModelCustom" placeholder="Scrivi modello/nomenclatura (es. BLX, NC, RC)" style="margin-top:6px" />
-          </div>
-          <div class="form-group" id="implantKitComponentsGroup" style="display:none">
-            <label>Componenti Kit</label>
-            <select id="implantKitComponents">
-              <option value="">-- Seleziona o scrivi sotto --</option>
-            </select>
-            <input id="implantKitComponentsCustom" placeholder="Scrivi componente (es. Frese chirurgiche, Maschiatore, ecc.)" style="margin-top:6px" />
-          </div>
-          <div class="form-group" id="implantDiameterGroup">
-            <label>Diametro (mm)</label>
-            <select id="implantDiameter">
-              <option value="">-- Seleziona --</option>
-              <option value="2.9">2.9 mm</option>
-              <option value="3.3">3.3 mm</option>
-              <option value="3.5">3.5 mm</option>
-              <option value="4.0">4.0 mm</option>
-              <option value="4.1">4.1 mm</option>
-              <option value="4.5">4.5 mm</option>
-              <option value="4.8">4.8 mm</option>
-              <option value="5.0">5.0 mm</option>
-              <option value="6.0">6.0 mm</option>
-              <option value="Other">Altro...</option>
-            </select>
-            <input id="implantDiameterCustom" type="number" step="0.1" placeholder="Personalizzato" style="display:none;margin-top:6px" />
-          </div>
-          <div class="form-group" id="implantLengthGroup">
-            <label>Lunghezza (mm)</label>
-            <select id="implantLength">
-              <option value="">-- Seleziona --</option>
-              <option value="6">6 mm</option>
-              <option value="8">8 mm</option>
-              <option value="10">10 mm</option>
-              <option value="12">12 mm</option>
-              <option value="14">14 mm</option>
-              <option value="16">16 mm</option>
-              <option value="18">18 mm</option>
-              <option value="Other">Altro...</option>
-            </select>
-            <input id="implantLengthCustom" type="number" step="0.5" placeholder="Personalizzato" style="display:none;margin-top:6px" />
-          </div>
-          <div class="form-group">
-            <label>📅 Data Ordine</label>
-            <input id="implantOrderDate" type="date" required />
-          </div>
-          <div class="form-group">
-            <label>⏰ Data Scadenza</label>
-            <input id="implantExpiry" type="date" />
-          </div>
-          <div class="form-group">
-            <label>Prezzo (€)</label>
-            <input id="implantPrice" type="number" step="0.01" placeholder="0.00" />
-          </div>
-          <div class="form-group">
-            <label>Quantità</label>
-            <input id="implantQuantity" type="number" min="0" value="1" required />
-          </div>
-          <button type="submit" style="grid-column:span 1;align-self:flex-end">Aggiungi</button>
-        </form>
-
-        <h3 style="margin:24px 0 12px;color:#003d7a;font-size:18px">📋 Inventario Impianti</h3>
-        
-        <!-- Filtri Impianti -->
-        <div class="filters-row" style="margin-bottom:16px;display:flex;gap:16px;flex-wrap:wrap;align-items:flex-end">
-          <div>
-            <label for="implantTypeFilter" class="filter-label">Filtra per tipo:</label>
-            <select id="implantTypeFilter" class="filter-select">
-              <option value="Tutti">Tutti</option>
-              <option value="Impianto">Impianto</option>
-              <option value="Vite tappo">Vite tappo</option>
-              <option value="Vite di guarigione">Vite di guarigione</option>
-              <option value="Kit chirurgico">Kit chirurgico</option>
-              <option value="Cacciavite">Cacciavite</option>
-              <option value="Cricchetto">Cricchetto</option>
-              <option value="Componenti protesiche">Componenti protesiche</option>
-              <option value="Altro">Altro</option>
-            </select>
-          </div>
-          <div>
-            <label for="implantCompanyFilter" class="filter-label">Filtra per azienda:</label>
-            <select id="implantCompanyFilter" class="filter-select">
-              <option value="Tutte">Tutte</option>
-            </select>
-          </div>
-          <div>
-            <label for="implantModelFilter" id="implantModelFilterLabel" class="filter-label">Filtra per modello:</label>
-            <select id="implantModelFilter" class="filter-select">
-              <option value="Tutti">Tutti</option>
-            </select>
-          </div>
-          <div>
-            <label for="implantExpiryFilter" class="filter-label">Filtra per scadenza:</label>
-            <select id="implantExpiryFilter" class="filter-select">
-              <option value="Tutte">Tutte</option>
-              <option value="Scaduti">Scaduti</option>
-              <option value="< 3 mesi">< 3 mesi</option>
-              <option value="< 6 mesi">< 6 mesi</option>
-              <option value="> 6 mesi">> 6 mesi</option>
-            </select>
-          </div>
+      
+      <!-- Filtri Impianti -->
+      <div class="filters-row" style="margin-bottom:16px;display:flex;gap:16px;flex-wrap:wrap;align-items:flex-end">
+        <div>
+          <label for="implantTypeFilter" class="filter-label">Filtra per tipo:</label>
+          <select id="implantTypeFilter" class="filter-select">
+            <option value="Tutti">Tutti</option>
+            <option value="Impianto">Impianto</option>
+            <option value="Vite tappo">Vite tappo</option>
+            <option value="Vite di guarigione">Vite di guarigione</option>
+            <option value="Kit chirurgico">Kit chirurgico</option>
+            <option value="Cacciavite">Cacciavite</option>
+            <option value="Cricchetto">Cricchetto</option>
+            <option value="Componenti protesiche">Componenti protesiche</option>
+            <option value="Altro">Altro</option>
+          </select>
         </div>
-        
-        <div class="table-wrapper">
-          <table>
-            <thead>
-              <tr><th>Tipo</th><th>Azienda</th><th>Modello</th><th>Ø</th><th>L</th><th>Data ordine</th><th style="text-align:center;">Scadenza</th><th>Prezzo</th><th style="text-align:center;">Quantità</th><th>Azioni</th></tr>
-            </thead>
-            <tbody id="implantsList"></tbody>
-          </table>
+        <div>
+          <label for="implantCompanyFilter" class="filter-label">Filtra per azienda:</label>
+          <select id="implantCompanyFilter" class="filter-select">
+            <option value="Tutte">Tutte</option>
+          </select>
         </div>
+        <div>
+          <label for="implantModelFilter" id="implantModelFilterLabel" class="filter-label">Filtra per modello:</label>
+          <select id="implantModelFilter" class="filter-select">
+            <option value="Tutti">Tutti</option>
+          </select>
+        </div>
+        <div>
+          <label for="implantExpiryFilter" class="filter-label">Filtra per scadenza:</label>
+          <select id="implantExpiryFilter" class="filter-select">
+            <option value="Tutte">Tutte</option>
+            <option value="Scaduti">Scaduti</option>
+            <option value="< 3 mesi">< 3 mesi</option>
+            <option value="< 6 mesi">< 6 mesi</option>
+            <option value="> 6 mesi">> 6 mesi</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr><th>Tipo</th><th>Azienda</th><th>Modello</th><th>Ø</th><th>L</th><th>Data ordine</th><th style="text-align:center;">Scadenza</th><th>Prezzo</th><th style="text-align:center;">Quantità</th><th>Azioni</th></tr>
+          </thead>
+          <tbody id="implantsList"></tbody>
+        </table>
       </div>
     </div>
   </div>
@@ -832,8 +845,27 @@
       });
     }
 
+    function toggleActionMenu(menuId){
+      const menu = document.getElementById(menuId);
+      const isVisible = menu.style.display !== 'none';
+      
+      // Nascondi tutti i menu aperti
+      document.querySelectorAll('.action-menu').forEach(m => m.style.display = 'none');
+      
+      // Mostra il menu corrente se non era visibile
+      if(!isVisible){
+        menu.style.display = 'block';
+      }
+    }
+
+    // Chiudi i menu quando clicki fuori
+    document.addEventListener('click', function(event){
+      if(!event.target.closest('.action-menu-btn') && !event.target.closest('.action-menu')){
+        document.querySelectorAll('.action-menu').forEach(m => m.style.display = 'none');
+      }
+    });
+
     function openImplantsModal(){
-      document.getElementById('implantsModal').classList.add('active');
       populateImplantModelSelect();
       populateKitComponentsSelect();
       initImplantFilters();
@@ -898,9 +930,6 @@
       }
     }
 
-    function closeImplantsModal(){
-      document.getElementById('implantsModal').classList.remove('active');
-    }
 
     // Request browser notification permission (optional)
     if ('Notification' in window){
