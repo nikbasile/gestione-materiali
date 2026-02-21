@@ -250,7 +250,7 @@
     <div class="table-wrapper">
       <table>
         <thead>
-          <tr><th>Nome</th><th>Data ordine</th><th style="text-align:center;">Scadenza</th><th>Prezzo</th><th style="text-align:center;">Quantità</th><th>Distributore</th><th>Azienda</th><th>Azioni</th></tr>
+          <tr><th>Nome</th><th>Data ordine</th><th style="text-align:center;">Scadenza</th><th>Prezzo</th><th>Distributore</th><th>Azienda</th><th style="text-align:center;">Quantità</th><th>Azioni</th></tr>
         </thead>
         <tbody id="list"></tbody>
       </table>
@@ -688,9 +688,9 @@
         <td data-label="Data ordine">${orderDate ? orderDate.toLocaleDateString() : '-'}</td>
         <td data-label="Scadenza" style="text-align:center;white-space:nowrap;">${statusHtml}</td>
         <td data-label="Prezzo">€ ${Number(data.price).toFixed(2)}</td>
-        <td data-label="Quantità" style="text-align:center;">${lowBadge}</td>
         <td data-label="Distributore"><span class="editable-distributor" style="cursor:pointer;text-decoration:underline;">${escapeHtml(data.distributor||'-')}</span></td>
         <td data-label="Azienda"><span class="editable-company" style="cursor:pointer;text-decoration:underline;">${escapeHtml(data.company||'-')}</span></td>
+        <td data-label="Quantità" style="text-align:center;">${lowBadge}</td>
         <td data-label="Azioni" style="white-space:nowrap;padding:8px;">
           <button data-id="${doc.id}" class="btn-action btn-inc" title="Aggiungi 1">+</button>
           <button data-id="${doc.id}" class="btn-action btn-dec" title="Rimuovi 1">−</button>
