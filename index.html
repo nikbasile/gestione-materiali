@@ -313,6 +313,13 @@
             </select>
             <input id="implantModelCustom" placeholder="Scrivi modello/nomenclatura (es. BLX, NC, RC)" style="margin-top:6px" />
           </div>
+          <div class="form-group" id="implantKitComponentsGroup" style="display:none">
+            <label>Componenti Kit</label>
+            <select id="implantKitComponents">
+              <option value="">-- Seleziona o scrivi sotto --</option>
+            </select>
+            <input id="implantKitComponentsCustom" placeholder="Scrivi componente (es. Frese chirurgiche, Maschiatore, ecc.)" style="margin-top:6px" />
+          </div>
           <div class="form-group" id="implantDiameterGroup">
             <label>Diametro (mm)</label>
             <select id="implantDiameter">
@@ -602,6 +609,22 @@
       return saved ? JSON.parse(saved) : ['RN', 'RB', 'NC', 'RC'];
     }
 
+    function loadKitComponents(){
+      const saved = localStorage.getItem('kit_components');
+      return saved ? JSON.parse(saved) : ['Frese chirurgiche', 'Maschiatore', 'Parallelizzatore', 'Triloba', 'Esagono'];
+    }
+
+    function saveKitComponent(component){
+      if(!component || component.trim() === '') return;
+      const components = loadKitComponents();
+      const trimmedComponent = component.trim();
+      if(!components.includes(trimmedComponent)){
+        components.push(trimmedComponent);
+        components.sort();
+        localStorage.setItem('kit_components', JSON.stringify(components));
+      }
+    }
+
     function saveImplantModel(model, type){
       if(!model || model.trim() === '') return;
       const trimmedModel = model.trim();
@@ -635,6 +658,20 @@
         const option = document.createElement('option');
         option.value = model;
         option.textContent = model;
+        select.appendChild(option);
+      });
+    }
+
+    function populateKitComponentsSelect(){
+      const select = document.getElementById('implantKitComponents');
+      const components = loadKitComponents();
+      
+      select.innerHTML = '<option value="">-- Seleziona o scrivi sotto --</option>';
+      
+      components.forEach(component => {
+        const option = document.createElement('option');
+        option.value = component;
+        option.textContent = component;
         select.appendChild(option);
       });
     }
@@ -750,10 +787,18 @@
         // Badge quantità
         const qtyBadge = '<span class="badge ok" style="background:#388e3c;color:#fff;font-size:14px;padding:6px 12px;border-radius:6px;font-weight:600;">'+implant.quantity+'</span>';
         
+        // Mostra modello o componenti kit
+        let modelDisplay = '-';
+        if(implant.type === 'Kit chirurgico' && implant.kitComponents){
+          modelDisplay = escapeHtml(implant.kitComponents);
+        } else if(implant.model) {
+          modelDisplay = escapeHtml(implant.model);
+        }
+        
         tr.innerHTML = `
           <td data-label="Tipo">${escapeHtml(implant.type)}</td>
           <td data-label="Azienda">${escapeHtml(implant.company)}</td>
-          <td data-label="Modello">${escapeHtml(implant.model||'-')}</td>
+          <td data-label="Modello">${modelDisplay}</td>
           <td data-label="Ø">${diameter}</td>
           <td data-label="L">${length}</td>
           <td data-label="Data ordine">${orderDate}</td>
@@ -773,6 +818,7 @@
     function openImplantsModal(){
       document.getElementById('implantsModal').classList.add('active');
       populateImplantModelSelect();
+      populateKitComponentsSelect();
       initImplantFilters();
       renderImplantsList();
     }
@@ -1254,6 +1300,7 @@
               type: data.type,
               company: data.company,
               model: data.model,
+              kitComponents: data.kitComponents,
               diameter: data.diameter,
               length: data.length,
               orderDate: data.orderDate && data.orderDate.toDate ? data.orderDate.toDate().toISOString() : data.orderDate,
@@ -1503,6 +1550,13 @@
       }
     });
 
+    document.getElementById('implantKitComponents').addEventListener('change', function() {
+      const customInput = document.getElementById('implantKitComponentsCustom');
+      if(this.value) {
+        customInput.value = this.value;
+      }
+    });
+
     document.getElementById('implantDiameter').addEventListener('change', function() {
       const custom = document.getElementById('implantDiameterCustom');
       custom.style.display = this.value === 'Other' ? '' : 'none';
@@ -1518,6 +1572,7 @@
       const type = this.value;
       const isImplant = type === 'Impianto';
       const isScrew = type === 'Vite tappo' || type === 'Vite di guarigione';
+      const isKit = type === 'Kit chirurgico';
       
       const modelGroup = document.getElementById('implantModelGroup');
       const modelLabel = modelGroup.querySelector('label');
@@ -1534,6 +1589,7 @@
       modelGroup.style.display = (isImplant || isScrew) ? '' : 'none';
       document.getElementById('implantDiameterGroup').style.display = isImplant ? '' : 'none';
       document.getElementById('implantLengthGroup').style.display = isImplant ? '' : 'none';
+      document.getElementById('implantKitComponentsGroup').style.display = isKit ? '' : 'none';
       
       // Ricarica le opzioni appropriate
       populateImplantModelSelect();
@@ -1580,6 +1636,19 @@
         saveImplantModel(model, type);
       }
       
+      // Prendi i componenti del kit se il tipo è Kit chirurgico
+      let kitComponents = null;
+      if(type === 'Kit chirurgico') {
+        kitComponents = document.getElementById('implantKitComponentsCustom').value.trim();
+        if(!kitComponents) {
+          kitComponents = document.getElementById('implantKitComponents').value;
+        }
+        // Salva i componenti nelle opzioni per usi futuri
+        if(kitComponents) {
+          saveKitComponent(kitComponents);
+        }
+      }
+      
       let diameter = document.getElementById('implantDiameter').value;
       if(diameter === 'Other') diameter = document.getElementById('implantDiameterCustom').value;
       
@@ -1595,6 +1664,7 @@
         type,
         company,
         model: model || null,
+        kitComponents: kitComponents || null,
         diameter: diameter || null,
         length: length || null,
         orderDate: new Date(orderDate),
