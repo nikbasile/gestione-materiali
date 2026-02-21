@@ -74,6 +74,17 @@
     .filter-label{font-weight:600;color:#003d7a;font-size:14px;margin-right:8px}
     .filter-select{padding:8px 12px;font-size:14px;border-radius:6px;border:1px solid #d0dce6;min-width:180px}
     .header-content{min-width:0}
+    
+    .implants-btn{background:#ff6b35;margin-left:10px}
+    .implants-btn:hover{background:#e55a2b}
+    #implantsModal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:10000;overflow-y:auto}
+    #implantsModal.active{display:flex;align-items:flex-start;justify-content:center;padding:20px}
+    .modal-content{background:#fff;border-radius:12px;max-width:900px;width:100%;margin:20px auto;box-shadow:0 8px 32px rgba(0,0,0,0.3)}
+    .modal-header{background:#003d7a;color:#fff;padding:20px;border-radius:12px 12px 0 0;display:flex;justify-content:space-between;align-items:center}
+    .modal-header h2{margin:0;font-size:22px}
+    .modal-close{background:transparent;color:#fff;border:2px solid #fff;width:36px;height:36px;border-radius:50%;font-size:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s}
+    .modal-close:hover{background:#fff;color:#003d7a}
+    .modal-body{padding:24px}
 
     @media (max-width:900px){
       .container{padding:16px}
@@ -213,6 +224,7 @@
 
     <div class="action-buttons">
       <button class="export" onclick="downloadPDF()">📥 Scarica PDF</button>
+      <button id="implantsBtn" class="implants-btn" style="display:none">🦷 Gestione Impianti</button>
     </div>
 
     <div class="filters-row">
@@ -254,6 +266,124 @@
         </thead>
         <tbody id="list"></tbody>
       </table>
+    </div>
+  </div>
+
+  <!-- Modal Gestione Impianti -->
+  <div id="implantsModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>🦷 Magazzino Impianti e Componenti</h2>
+        <button class="modal-close" onclick="closeImplantsModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <form id="implantForm">
+          <div class="form-group">
+            <label>Tipo</label>
+            <select id="implantType" required>
+              <option value="">-- Seleziona --</option>
+              <option value="Impianto">Impianto</option>
+              <option value="Vite tappo">Vite tappo</option>
+              <option value="Vite di guarigione">Vite di guarigione</option>
+              <option value="Kit chirurgico">Kit chirurgico</option>
+              <option value="Cacciavite">Cacciavite</option>
+              <option value="Cricchetto">Cricchetto</option>
+              <option value="Componente protesica">Componente protesica</option>
+              <option value="Altro">Altro</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Azienda</label>
+            <select id="implantCompany" required>
+              <option value="">-- Seleziona --</option>
+              <option value="Straumann">Straumann</option>
+              <option value="Nobel Biocare">Nobel Biocare</option>
+              <option value="Zimmer Biomet">Zimmer Biomet</option>
+              <option value="Dentsply Sirona">Dentsply Sirona</option>
+              <option value="Osstem">Osstem</option>
+              <option value="Biomet 3i">Biomet 3i</option>
+              <option value="Other">Altro...</option>
+            </select>
+            <input id="implantCompanyCustom" placeholder="Azienda personalizzata" style="display:none;margin-top:6px" />
+          </div>
+          <div class="form-group" id="implantModelGroup">
+            <label>Modello</label>
+            <select id="implantModel">
+              <option value="">-- Seleziona --</option>
+              <optgroup label="Straumann">
+                <option value="BLX">BLX</option>
+                <option value="BLT">BLT</option>
+                <option value="SLA">SLA</option>
+                <option value="SLActive">SLActive</option>
+                <option value="Roxolid">Roxolid</option>
+                <option value="Bone Level Tapered">Bone Level Tapered</option>
+                <option value="Tissue Level">Tissue Level</option>
+              </optgroup>
+              <option value="Other">Altro...</option>
+            </select>
+            <input id="implantModelCustom" placeholder="Modello personalizzato" style="display:none;margin-top:6px" />
+          </div>
+          <div class="form-group" id="implantDiameterGroup">
+            <label>Diametro (mm)</label>
+            <select id="implantDiameter">
+              <option value="">-- Seleziona --</option>
+              <option value="2.9">2.9 mm</option>
+              <option value="3.3">3.3 mm</option>
+              <option value="3.5">3.5 mm</option>
+              <option value="4.0">4.0 mm</option>
+              <option value="4.1">4.1 mm</option>
+              <option value="4.5">4.5 mm</option>
+              <option value="4.8">4.8 mm</option>
+              <option value="5.0">5.0 mm</option>
+              <option value="6.0">6.0 mm</option>
+              <option value="Other">Altro...</option>
+            </select>
+            <input id="implantDiameterCustom" type="number" step="0.1" placeholder="Personalizzato" style="display:none;margin-top:6px" />
+          </div>
+          <div class="form-group" id="implantLengthGroup">
+            <label>Lunghezza (mm)</label>
+            <select id="implantLength">
+              <option value="">-- Seleziona --</option>
+              <option value="6">6 mm</option>
+              <option value="8">8 mm</option>
+              <option value="10">10 mm</option>
+              <option value="12">12 mm</option>
+              <option value="14">14 mm</option>
+              <option value="16">16 mm</option>
+              <option value="18">18 mm</option>
+              <option value="Other">Altro...</option>
+            </select>
+            <input id="implantLengthCustom" type="number" step="0.5" placeholder="Personalizzato" style="display:none;margin-top:6px" />
+          </div>
+          <div class="form-group">
+            <label>📅 Data Ordine</label>
+            <input id="implantOrderDate" type="date" required />
+          </div>
+          <div class="form-group">
+            <label>⏰ Data Scadenza</label>
+            <input id="implantExpiry" type="date" />
+          </div>
+          <div class="form-group">
+            <label>Prezzo (€)</label>
+            <input id="implantPrice" type="number" step="0.01" placeholder="0.00" />
+          </div>
+          <div class="form-group">
+            <label>Quantità</label>
+            <input id="implantQuantity" type="number" min="0" value="1" required />
+          </div>
+          <button type="submit" style="grid-column:span 1;align-self:flex-end">Aggiungi</button>
+        </form>
+
+        <h3 style="margin:24px 0 12px;color:#003d7a;font-size:18px">📋 Inventario Impianti</h3>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr><th>Tipo</th><th>Azienda</th><th>Modello</th><th>Ø</th><th>L</th><th>Data ordine</th><th style="text-align:center;">Scadenza</th><th>Prezzo</th><th style="text-align:center;">Quantità</th><th>Azioni</th></tr>
+            </thead>
+            <tbody id="implantsList"></tbody>
+          </table>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -413,6 +543,107 @@
       const selected = prompt(message, currentValue || '');
       if(selected === null) return null;
       return selected.trim();
+    }
+
+    // --- IMPLANTS MANAGEMENT ---
+    function loadImplantsFromStorage(){
+      const saved = localStorage.getItem('magazzino_implants');
+      return saved ? JSON.parse(saved) : [];
+    }
+
+    function saveImplantsToStorage(implants){
+      localStorage.setItem('magazzino_implants', JSON.stringify(implants));
+    }
+
+    function addImplantToStorage(implant){
+      const implants = loadImplantsFromStorage();
+      const newImplant = {...implant, id: implant.id || (window.crypto && window.crypto.randomUUID ? window.crypto.randomUUID() : '_implant_'+Date.now())};
+      if(newImplant.orderDate instanceof Date) newImplant.orderDate = newImplant.orderDate.toISOString();
+      if(newImplant.expiry instanceof Date) newImplant.expiry = newImplant.expiry.toISOString();
+      implants.push(newImplant);
+      saveImplantsToStorage(implants);
+      return newImplant.id;
+    }
+
+    function updateImplantQuantity(id, delta){
+      const implants = loadImplantsFromStorage();
+      const item = implants.find(m=>m.id === id);
+      if(item){
+        item.quantity = Math.max(0, (item.quantity || 0) + delta);
+        saveImplantsToStorage(implants);
+      }
+      renderImplantsList();
+    }
+
+    function deleteImplant(id){
+      if(!confirm('Eliminare questo impianto?')) return;
+      const implants = loadImplantsFromStorage();
+      const filtered = implants.filter(m=>m.id !== id);
+      saveImplantsToStorage(filtered);
+      renderImplantsList();
+    }
+
+    function renderImplantsList(){
+      const implantsList = document.getElementById('implantsList');
+      const implants = loadImplantsFromStorage();
+      implantsList.innerHTML = '';
+      const now = new Date();
+      
+      implants.forEach(implant=>{
+        const tr = document.createElement('tr');
+        const orderDate = implant.orderDate ? new Date(implant.orderDate).toLocaleDateString() : '-';
+        const expiry = implant.expiry ? new Date(implant.expiry) : null;
+        const diameter = implant.diameter ? implant.diameter + ' mm' : '-';
+        const length = implant.length ? implant.length + ' mm' : '-';
+        
+        // Semaforo scadenza
+        let statusHtml = '';
+        if(!expiry){
+          statusHtml = '<span title="Nessuna scadenza" style="font-size:24px;cursor:help;">⚪</span>';
+        } else {
+          const days = daysBetween(now, expiry);
+          const mesi = days / 30.44;
+          if(days < 0) {
+            statusHtml = '<span title="Scaduto il ' + expiry.toLocaleDateString() + '" style="font-size:24px;cursor:help;">🔴</span>';
+          } else if(mesi < 3) {
+            statusHtml = '<span title="Scade tra ' + days + ' giorni il ' + expiry.toLocaleDateString() + '" style="font-size:24px;cursor:help;">🔴</span>';
+          } else if(mesi < 6) {
+            statusHtml = '<span title="Scade tra ' + days + ' giorni il ' + expiry.toLocaleDateString() + '" style="font-size:24px;cursor:help;">🟡</span>';
+          } else {
+            statusHtml = '<span title="Scade tra ' + days + ' giorni il ' + expiry.toLocaleDateString() + '" style="font-size:24px;cursor:help;">🟢</span>';
+          }
+        }
+        
+        // Badge quantità
+        const qtyBadge = '<span class="badge ok" style="background:#388e3c;color:#fff;font-size:14px;padding:6px 12px;border-radius:6px;font-weight:600;">'+implant.quantity+'</span>';
+        
+        tr.innerHTML = `
+          <td data-label="Tipo">${escapeHtml(implant.type)}</td>
+          <td data-label="Azienda">${escapeHtml(implant.company)}</td>
+          <td data-label="Modello">${escapeHtml(implant.model||'-')}</td>
+          <td data-label="Ø">${diameter}</td>
+          <td data-label="L">${length}</td>
+          <td data-label="Data ordine">${orderDate}</td>
+          <td data-label="Scadenza" style="text-align:center;white-space:nowrap;">${statusHtml}</td>
+          <td data-label="Prezzo">€ ${Number(implant.price||0).toFixed(2)}</td>
+          <td data-label="Quantità" style="text-align:center">${qtyBadge}</td>
+          <td data-label="Azioni" style="white-space:nowrap">
+            <button class="btn-action btn-inc" onclick="updateImplantQuantity('${implant.id}', 1)" title="Aggiungi 1">+</button>
+            <button class="btn-action btn-dec" onclick="updateImplantQuantity('${implant.id}', -1)" title="Rimuovi 1">−</button>
+            <button class="btn-action btn-del" onclick="deleteImplant('${implant.id}')" title="Elimina">×</button>
+          </td>
+        `;
+        implantsList.appendChild(tr);
+      });
+    }
+
+    function openImplantsModal(){
+      document.getElementById('implantsModal').classList.add('active');
+      renderImplantsList();
+    }
+
+    function closeImplantsModal(){
+      document.getElementById('implantsModal').classList.remove('active');
     }
 
     // Request browser notification permission (optional)
@@ -818,6 +1049,21 @@
       console.warn('Firebase init error, usando localStorage:', err);
       loadMaterialsFromStorage();
     }
+
+    // Listen realtime for implants
+    try {
+      db.collection('implants').onSnapshot(
+        snapshot => {
+          const implants = snapshot.docs.map(doc => ({id: doc.id, ...doc.data()}));
+          saveImplantsToStorage(implants);
+        },
+        error => {
+          console.warn('Firebase error for implants, usando localStorage:', error);
+        }
+      );
+    } catch(err) {
+      console.warn('Firebase init error for implants, usando localStorage:', err);
+    }
     
     // Gestione visibilità input azienda e distributore personalizzati
     document.getElementById('companySelect').addEventListener('change', function() {
@@ -1028,6 +1274,103 @@
       html2pdf().set(opt).from(element).save();
       showAlert('✓ PDF scaricato con successo', 'info');
     }
+
+    // --- IMPLANTS EVENT LISTENERS ---
+    document.getElementById('implantsBtn').addEventListener('click', openImplantsModal);
+    
+    // Gestione campi custom per impianti
+    document.getElementById('implantCompany').addEventListener('change', function() {
+      const custom = document.getElementById('implantCompanyCustom');
+      custom.style.display = this.value === 'Other' ? '' : 'none';
+    });
+
+    document.getElementById('implantModel').addEventListener('change', function() {
+      const custom = document.getElementById('implantModelCustom');
+      custom.style.display = this.value === 'Other' ? '' : 'none';
+    });
+
+    document.getElementById('implantDiameter').addEventListener('change', function() {
+      const custom = document.getElementById('implantDiameterCustom');
+      custom.style.display = this.value === 'Other' ? '' : 'none';
+    });
+
+    document.getElementById('implantLength').addEventListener('change', function() {
+      const custom = document.getElementById('implantLengthCustom');
+      custom.style.display = this.value === 'Other' ? '' : 'none';
+    });
+
+    // Mostra/nascondi campi in base al tipo di impianto
+    document.getElementById('implantType').addEventListener('change', function() {
+      const isImplant = this.value === 'Impianto';
+      document.getElementById('implantModelGroup').style.display = isImplant ? '' : 'none';
+      document.getElementById('implantDiameterGroup').style.display = isImplant ? '' : 'none';
+      document.getElementById('implantLengthGroup').style.display = isImplant ? '' : 'none';
+    });
+
+    // Submit form impianti
+    document.getElementById('implantForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      
+      const type = document.getElementById('implantType').value;
+      let company = document.getElementById('implantCompany').value;
+      if(company === 'Other') company = document.getElementById('implantCompanyCustom').value.trim();
+      
+      let model = document.getElementById('implantModel').value;
+      if(model === 'Other') model = document.getElementById('implantModelCustom').value.trim();
+      
+      let diameter = document.getElementById('implantDiameter').value;
+      if(diameter === 'Other') diameter = document.getElementById('implantDiameterCustom').value;
+      
+      let length = document.getElementById('implantLength').value;
+      if(length === 'Other') length = document.getElementById('implantLengthCustom').value;
+      
+      const orderDate = document.getElementById('implantOrderDate').value;
+      const expiry = document.getElementById('implantExpiry').value;
+      const price = parseFloat(document.getElementById('implantPrice').value) || 0;
+      const quantity = parseInt(document.getElementById('implantQuantity').value, 10) || 0;
+
+      const newImplant = {
+        type,
+        company,
+        model: model || null,
+        diameter: diameter || null,
+        length: length || null,
+        orderDate: new Date(orderDate),
+        expiry: expiry ? new Date(expiry) : null,
+        price,
+        quantity,
+        createdAt: new Date()
+      };
+
+      const implantId = addImplantToStorage(newImplant);
+      
+      // Sync to Firebase (optional)
+      if(firebaseReady && typeof db !== 'undefined'){
+        try {
+          await db.collection('implants').doc(implantId).set(newImplant);
+        } catch(err) {
+          console.warn('Firebase sync failed for implant:', err.message);
+        }
+      }
+
+      document.getElementById('implantForm').reset();
+      document.getElementById('implantQuantity').value = 1;
+      showAlert('✓ Impianto aggiunto', 'info');
+      renderImplantsList();
+    });
+
+    // Mostra/nascondi pulsante Gestione Impianti in base alla categoria
+    function updateImplantsButtonVisibility() {
+      const btn = document.getElementById('implantsBtn');
+      btn.style.display = (currentFilter === 'Implantologia e Chirurgia') ? '' : 'none';
+    }
+
+    // Chiama questa funzione quando cambia il filtro categoria
+    const originalUpdateCategoryFilters = updateCategoryFilters;
+    updateCategoryFilters = function() {
+      originalUpdateCategoryFilters();
+      updateImplantsButtonVisibility();
+    };
   </script>
 </body>
 </html>
