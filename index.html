@@ -1480,8 +1480,8 @@
           return;
         } else {
           // Nessun filtro attivo - carica tutto da localStorage come fallback
-          const allMaterialsStorage = loadFromLocalStorage();
-          if(allMaterialsStorage.length === 0){
+          const allMaterialsStorage = loadFromLocalStorage() || [];
+          if(!allMaterialsStorage || allMaterialsStorage.length === 0){
             showAlert('Nessun materiale da esportare', 'warn');
             return;
           }
@@ -1493,6 +1493,11 @@
       }
 
       const allMaterials = filtered.map(d=>d.data());
+
+      if(allMaterials.length === 0){
+        showAlert('Nessun materiale da esportare', 'warn');
+        return;
+      }
 
       const element = document.createElement('div');
       element.style.padding = '20px';
@@ -1644,12 +1649,17 @@
           return;
         } else {
           // Nessun filtro attivo - carica tutto da localStorage come fallback
-          implants = loadImplantsFromStorage();
-          if(implants.length === 0){
+          implants = loadImplantsFromStorage() || [];
+          if(!implants || implants.length === 0){
             showAlert('Nessun impianto da esportare', 'warn');
             return;
           }
         }
+      }
+
+      if(!implants || implants.length === 0){
+        showAlert('Nessun impianto da esportare', 'warn');
+        return;
       }
 
       const element = document.createElement('div');
