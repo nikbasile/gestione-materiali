@@ -224,6 +224,8 @@
 
     <div class="action-buttons">
       <button class="export" onclick="downloadPDF()">📥 Scarica PDF</button>
+      <button class="export" onclick="exportMaterialsCSV()" style="background:#FF9800">📄 Export CSV Materiali</button>
+      <button class="export" onclick="exportImplantsCSV()" style="background:#9C27B0">📄 Export CSV Impianti</button>
       <button class="export" onclick="exportBackup()" style="background:#2196F3">💾 Backup Dati</button>
       <button class="export" onclick="document.getElementById('importFile').click()" style="background:#4CAF50">📂 Importa Backup</button>
       <input type="file" id="importFile" accept=".json" style="display:none" onchange="importBackup(event)" />
@@ -1679,6 +1681,93 @@
       reader.readAsText(file);
       // Reset input file
       event.target.value = '';
+    }
+
+    // --- CSV EXPORTS ---
+    function exportMaterialsCSV(){
+      const materials = loadFromLocalStorage();
+      if(!materials || materials.length === 0){
+        showAlert('Nessun materiale da esportare', 'warn');
+        return;
+      }
+      
+      // Header CSV
+      const headers = ['ID', 'Nome', 'Data Ordine', 'Data Scadenza', 'Prezzo', 'Quantità', 'Categoria', 'Distributore', 'Azienda', 'Soglia Bassa', 'Giorni Notifica'];
+      let csvContent = headers.join(',') + '\n';
+      
+      // Rows
+      materials.forEach(material => {
+        const orderDate = material.orderDate ? new Date(material.orderDate).toLocaleDateString('it-IT') : '';
+        const expiry = material.expiry ? new Date(material.expiry).toLocaleDateString('it-IT') : '';
+        
+        const row = [
+          material.id || '',
+          '"' + (material.name || '').replace(/"/g, '""') + '"',
+          orderDate,
+          expiry,
+          (material.price || 0).toFixed(2),
+          material.quantity || 0,
+          '"' + (material.category || '').replace(/"/g, '""') + '"',
+          '"' + (material.distributor || '').replace(/"/g, '""') + '"',
+          '"' + (material.company || '').replace(/"/g, '""') + '"',
+          material.lowStockThreshold || 2,
+          material.notifyDays || 30
+        ];
+        csvContent += row.join(',') + '\n';
+      });
+      
+      // Download
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'materiali_' + new Date().toISOString().split('T')[0] + '.csv';
+      link.click();
+      URL.revokeObjectURL(url);
+      showAlert('✓ CSV Materiali scaricato con successo', 'info');
+    }
+    
+    function exportImplantsCSV(){
+      const implants = loadImplantsFromStorage();
+      if(!implants || implants.length === 0){
+        showAlert('Nessun impianto da esportare', 'warn');
+        return;
+      }
+      
+      // Header CSV
+      const headers = ['ID', 'Tipo', 'Azienda', 'Modello', 'Componenti Kit', 'Diametro (mm)', 'Lunghezza (mm)', 'Data Ordine', 'Data Scadenza', 'Prezzo', 'Quantità'];
+      let csvContent = headers.join(',') + '\n';
+      
+      // Rows
+      implants.forEach(implant => {
+        const orderDate = implant.orderDate ? new Date(implant.orderDate).toLocaleDateString('it-IT') : '';
+        const expiry = implant.expiry ? new Date(implant.expiry).toLocaleDateString('it-IT') : '';
+        
+        const row = [
+          implant.id || '',
+          '"' + (implant.type || '').replace(/"/g, '""') + '"',
+          '"' + (implant.company || '').replace(/"/g, '""') + '"',
+          '"' + (implant.model || '').replace(/"/g, '""') + '"',
+          '"' + (implant.kitComponents || '').replace(/"/g, '""') + '"',
+          implant.diameter || '',
+          implant.length || '',
+          orderDate,
+          expiry,
+          (implant.price || 0).toFixed(2),
+          implant.quantity || 0
+        ];
+        csvContent += row.join(',') + '\n';
+      });
+      
+      // Download
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'impianti_' + new Date().toISOString().split('T')[0] + '.csv';
+      link.click();
+      URL.revokeObjectURL(url);
+      showAlert('✓ CSV Impianti scaricato con successo', 'info');
     }
 
     // --- IMPLANTS EVENT LISTENERS ---
