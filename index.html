@@ -228,16 +228,30 @@
     
     <div id="categoryFilters" class="category-filters"></div>
 
-    <!-- Dropdown Azioni Materiali -->
-    <div class="action-dropdown-container" style="margin:20px 0;display:flex;gap:10px;align-items:center">
-      <button class="action-menu-btn" onclick="toggleActionMenu('materialsMenu')">⚙️ Azioni Materiali ▼</button>
-      <div id="materialsMenu" class="action-menu" style="display:none;position:absolute;background:white;border:1px solid #ddd;border-radius:8px;box-shadow:0 4px 8px rgba(0,0,0,0.1);z-index:100;min-width:250px">
-        <button class="menu-item" onclick="downloadMaterialsPDF()">📄 Scarica PDF Materiali</button>
-        <button class="menu-item" onclick="exportMaterialsCSV()">📊 Scarica CSV Materiali</button>
-        <hr style="margin:8px 0;border:none;border-top:1px solid #eee">
-        <button class="menu-item" onclick="exportBackup()">💾 Backup completo</button>
-        <button class="menu-item" onclick="document.getElementById('importFile').click()">📥 Importa Backup</button>
-        <input type="file" id="importFile" accept=".json" style="display:none" onchange="importBackup(event)" />
+    <!-- Pulsanti Principali -->
+    <div class="action-dropdown-container" style="margin:20px 0;display:flex;gap:16px;align-items:center;flex-wrap:wrap">
+      <!-- Pulsante Scarica Dati Materiali -->
+      <div style="position:relative">
+        <button class="action-menu-btn" onclick="toggleActionMenu('downloadMenu')">📥 Scarica Dati ▼</button>
+        <div id="downloadMenu" class="action-menu" style="display:none;position:absolute;background:white;border:1px solid #ddd;border-radius:8px;box-shadow:0 4px 8px rgba(0,0,0,0.1);z-index:100;min-width:250px;top:40px;left:0">
+          <button class="menu-item" onclick="downloadMaterialsPDF()">📄 PDF Materiali</button>
+          <button class="menu-item" onclick="exportMaterialsCSV()">📊 CSV Materiali</button>
+        </div>
+      </div>
+
+      <!-- Pulsante Magazzino Implantare con grafica distintiva -->
+      <button id="implantsBtn" class="implants-btn-main" onclick="openImplantsModal()" style="background:linear-gradient(135deg,#7B1FA2 0%,#5E35B1 100%);color:#fff;padding:12px 20px;font-size:15px;border:none;border-radius:8px;cursor:pointer;font-weight:600;box-shadow:0 4px 12px rgba(123,31,162,0.3);transition:all 0.2s;display:flex;align-items:center;gap:6px">
+        🔩 Magazzino Implantare
+      </button>
+
+      <!-- Pulsante Backup -->
+      <div style="position:relative">
+        <button class="action-menu-btn" onclick="toggleActionMenu('backupMenu')">💾 Backup ▼</button>
+        <div id="backupMenu" class="action-menu" style="display:none;position:absolute;background:white;border:1px solid #ddd;border-radius:8px;box-shadow:0 4px 8px rgba(0,0,0,0.1);z-index:100;min-width:250px;top:40px;left:0">
+          <button class="menu-item" onclick="exportBackup()">📥 Esporta Backup Completo</button>
+          <button class="menu-item" onclick="document.getElementById('importFile').click()">📤 Importa Backup</button>
+          <input type="file" id="importFile" accept=".json" style="display:none" onchange="importBackup(event)" />
+        </div>
       </div>
     </div>
 
@@ -282,11 +296,16 @@
       </table>
     </div>
 
-    <!-- Magazzino Implantare Section -->
-    <div style="margin-top:60px;padding-top:40px;border-top:3px solid #003d7a">
-      <h2 style="color:#003d7a;font-size:28px;margin:0 0 20px 0;display:flex;align-items:center;gap:8px">
-        🔩 Magazzino Implantare
-      </h2>
+  </div>
+
+  <!-- Modal Magazzino Implantare -->
+  <div id="implantsModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>🔩 Magazzino Implantare</h2>
+        <button class="modal-close" onclick="closeImplantsModal()">×</button>
+      </div>
+      <div class="modal-body">
       
       <form id="implantForm" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px;padding:24px;background:#f5f5f5;border-radius:8px;margin-bottom:24px">
         <div class="form-group">
@@ -384,9 +403,9 @@
 
       <h3 style="margin:24px 0 12px;color:#003d7a;font-size:18px">📋 Inventario Impianti</h3>
       
-      <!-- Dropdown Azioni Impianti -->
+      <!-- Dropdown Scarica Dati Impianti -->
       <div style="margin:16px 0;display:flex;gap:10px;align-items:center;position:relative">
-        <button class="action-menu-btn" onclick="toggleActionMenu('implantsMenu')">⚙️ Azioni Impianti ▼</button>
+        <button class="action-menu-btn" onclick="toggleActionMenu('implantsMenu')">📥 Scarica Dati ▼</button>
         <div id="implantsMenu" class="action-menu" style="display:none;position:absolute;background:white;border:1px solid #ddd;border-radius:8px;box-shadow:0 4px 8px rgba(0,0,0,0.1);z-index:100;min-width:250px;top:40px;left:0">
           <button class="menu-item" onclick="downloadImplantsPDF()">📄 Scarica PDF Impianti</button>
           <button class="menu-item" onclick="exportImplantsCSV()">📊 Scarica CSV Impianti</button>
@@ -442,6 +461,7 @@
         </table>
       </div>
     </div>
+  </div>
   </div>
 
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
@@ -866,10 +886,15 @@
     });
 
     function openImplantsModal(){
+      document.getElementById('implantsModal').classList.add('active');
       populateImplantModelSelect();
       populateKitComponentsSelect();
       initImplantFilters();
       renderImplantsList();
+    }
+
+    function closeImplantsModal(){
+      document.getElementById('implantsModal').classList.remove('active');
     }
 
     function initImplantFilters(){
