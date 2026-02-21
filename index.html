@@ -160,6 +160,28 @@
     .selection-btn.material:hover{transform:translateY(-3px);box-shadow:0 6px 16px rgba(25,118,210,0.3)}
     @keyframes slideDown{from{opacity:0;transform:translateY(-30px)}to{opacity:1;transform:translateY(0)}}
 
+    /* Material Modal Styles */
+    #materialModal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:10000;overflow-y:auto;padding:20px}
+    #materialModal.active{display:flex;align-items:flex-start;justify-content:center}
+    .material-modal-content{background:#fff;border-radius:12px;max-width:700px;width:100%;margin:20px auto;box-shadow:0 8px 32px rgba(0,0,0,0.3)}
+    .material-header{background:linear-gradient(135deg,#1976d2 0%,#0d47a1 100%);color:#fff;padding:24px;border-radius:12px 12px 0 0;display:flex;justify-content:space-between;align-items:center}
+    .material-header h2{margin:0;font-size:22px;font-weight:700}
+    .material-close{background:transparent;color:#fff;border:2px solid #fff;width:36px;height:36px;border-radius:50%;font-size:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s}
+    .material-close:hover{background:#fff;color:#1976d2}
+    .material-body{padding:32px}
+    .material-form{display:grid;grid-template-columns:1fr 1fr;gap:20px;grid-auto-flow:dense}
+    .material-form-group{display:flex;flex-direction:column;gap:8px}
+    .material-form-group.full{grid-column:1/-1}
+    .material-form-group label{font-weight:600;color:#003d7a;font-size:12px;text-transform:uppercase;letter-spacing:0.5px}
+    .material-form-group input,.material-form-group select{padding:12px;border:1.5px solid #d0dce6;border-radius:8px;font-size:14px;transition:all 0.2s;background:#fff}
+    .material-form-group input:focus,.material-form-group select:focus{outline:none;border-color:#1976d2;box-shadow:0 0 0 3px rgba(25,118,210,0.1);background:#f8f9fa}
+    .material-buttons{display:flex;gap:12px;margin-top:32px}
+    .material-btn{flex:1;padding:12px;font-weight:600;border:none;border-radius:8px;cursor:pointer;transition:all 0.2s;font-size:15px;text-transform:uppercase;letter-spacing:0.5px}
+    .material-btn.cancel{background:#e0e0e0;color:#333}
+    .material-btn.cancel:hover{background:#bdbdbd;transform:translateY(-1px)}
+    .material-btn.submit{background:linear-gradient(135deg,#1976d2 0%,#0d47a1 100%);color:#fff;box-shadow:0 4px 12px rgba(25,118,210,0.25)}
+    .material-btn.submit:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(25,118,210,0.35)}
+
     /* Order Modal Styles */
     #orderModal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:10000;overflow-y:auto;padding:20px}
     #orderModal.active{display:flex;align-items:flex-start;justify-content:center}
@@ -168,24 +190,24 @@
     .order-header h2{margin:0;font-size:22px}
     .order-close{background:transparent;color:#fff;border:2px solid #fff;width:36px;height:36px;border-radius:50%;font-size:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s}
     .order-close:hover{background:#fff;color:#388e3c}
-    .order-body{padding:24px}
-    .order-info{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;padding:16px;background:#f0f4f8;border-radius:8px}
+    .order-body{padding:32px}
+    .order-info{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:32px;padding:20px;background:#f0f4f8;border-radius:10px;border-left:4px solid #388e3c}
     .order-info-group{display:flex;flex-direction:column;gap:8px}
-    .order-info-group label{font-weight:600;color:#003d7a;font-size:13px;text-transform:uppercase;letter-spacing:0.5px}
-    .order-info-group input,.order-info-group select{padding:10px 12px;border:1px solid #d0dce6;border-radius:6px;font-size:14px;transition:border-color 0.2s}
-    .order-info-group input:focus,.order-info-group select:focus{outline:none;border-color:#388e3c;box-shadow:0 0 0 3px rgba(56,142,60,0.1)}
-    .articles-container{margin:24px 0;border:1px solid #e0e0e0;border-radius:8px;padding:16px;background:#fafafa}
-    .articles-title{font-weight:600;color:#003d7a;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;font-size:15px}
-    .article-row{display:grid;grid-template-columns:1fr 1fr 1fr 1fr 100px;gap:12px;margin-bottom:12px;padding:14px;background:#fff;border-radius:8px;border:1px solid #e8ecf1;align-items:flex-end;transition:all 0.2s}
-    .article-row:hover{box-shadow:0 2px 8px rgba(0,0,0,0.08);border-color:#388e3c}
+    .order-info-group label{font-weight:700;color:#003d7a;font-size:12px;text-transform:uppercase;letter-spacing:0.5px}
+    .order-info-group input,.order-info-group select{padding:12px;border:1.5px solid #d0dce6;border-radius:8px;font-size:14px;transition:all 0.2s;background:#fff}
+    .order-info-group input:focus,.order-info-group select:focus{outline:none;border-color:#388e3c;box-shadow:0 0 0 3px rgba(56,142,60,0.1);background:#f8f9fa}
+    .articles-container{margin:32px 0;border:none;border-radius:0;padding:0;background:transparent}
+    .articles-title{font-weight:700;color:#003d7a;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;font-size:16px;padding-bottom:12px;border-bottom:2px solid #e0e0e0}
+    .article-row{display:grid;grid-template-columns:1fr 1fr 1fr 80px;gap:12px;margin-bottom:14px;padding:16px;background:#f9f9f9;border-radius:10px;border:1px solid #e8ecf1;align-items:flex-end;transition:all 0.2s;border-left:4px solid #388e3c}
+    .article-row:hover{box-shadow:0 4px 12px rgba(0,0,0,0.08);background:#fff}
     .article-field{display:flex;flex-direction:column;gap:6px}
     .article-field label{font-weight:600;color:#003d7a;font-size:12px;text-transform:uppercase;letter-spacing:0.4px}
     .article-field input,.article-field select{padding:9px 12px;border:1px solid #d0dce6;border-radius:6px;font-size:14px;transition:border-color 0.2s}
     .article-field input:focus,.article-field select:focus{outline:none;border-color:#388e3c;box-shadow:0 0 0 3px rgba(56,142,60,0.1)}
     .article-remove{background:#c62828;color:#fff;border:none;border-radius:6px;padding:9px 12px;cursor:pointer;font-weight:600;transition:all 0.2s;font-size:14px;display:flex;align-items:center;gap:4px;justify-content:center}
     .article-remove:hover{background:#b71c1c;transform:translateY(-1px);box-shadow:0 2px 6px rgba(198,40,40,0.3)}
-    .add-article-btn{padding:10px 18px;background:linear-gradient(135deg,#388e3c 0%,#2e7d32 100%);color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:600;transition:all 0.2s;font-size:14px;display:flex;align-items:center;gap:6px;box-shadow:0 2px 6px rgba(56,142,60,0.2)}
-    .add-article-btn:hover{transform:translateY(-2px);box-shadow:0 4px 10px rgba(56,142,60,0.3)}
+    .add-article-btn{padding:10px 16px;background:linear-gradient(135deg,#388e3c 0%,#2e7d32 100%);color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:600;transition:all 0.2s;font-size:13px;display:flex;align-items:center;gap:6px;box-shadow:0 2px 8px rgba(56,142,60,0.25);text-transform:uppercase;letter-spacing:0.3px}
+    .add-article-btn:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(56,142,60,0.35)}
     .order-buttons{display:flex;gap:12px;margin-top:24px}
     .order-btn{flex:1;padding:12px 20px;font-weight:600;border:none;border-radius:6px;cursor:pointer;transition:all 0.2s;font-size:14px;text-transform:uppercase;letter-spacing:0.5px}
     .order-btn.cancel{background:#e0e0e0;color:#333;border:1px solid #bdbdbd}
@@ -721,6 +743,30 @@
           <span>📝</span>
           <span>Nuovo Materiale</span>
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Nuovo Materiale Modal -->
+  <div id="materialModal">
+    <div class="material-modal-content">
+      <div class="material-header">
+        <h2>📝 Nuovo Materiale</h2>
+        <button class="material-close" onclick="closeMaterialModal()">×</button>
+      </div>
+      <div class="material-body">
+        <form id="materialForm" class="material-form">
+          <div class="material-form-group"><label for="matName">Nome materiale</label><input id="matName" placeholder="Es. Cemento composito" required /></div>
+          <div class="material-form-group"><label for="matOrderDate">Data Ordine</label><input id="matOrderDate" type="date" required /></div>
+          <div class="material-form-group"><label for="matExpiry">Data Scadenza</label><input id="matExpiry" type="date" required /></div>
+          <div class="material-form-group"><label for="matPrice">Prezzo (€)</label><input id="matPrice" type="number" step="0.01" placeholder="0.00" /></div>
+          <div class="material-form-group"><label for="matQuantity">Quantità</label><input id="matQuantity" type="number" min="0" value="1" required /></div>
+          <div class="material-form-group"><label for="matCategory">Categoria</label><select id="matCategory" required><option value="">-- Seleziona --</option><option value="Strumentario">Strumentario</option><option value="Consumabili Generici">Consumabili Generici</option><option value="Monouso">Monouso</option><option value="Disinfezione e Sterilizzazione">Disinfezione e Sterilizzazione</option><option value="Chirurgia">Chirurgia</option><option value="Endodonzia">Endodonzia</option><option value="Conservativa e Protesi">Conservativa e Protesi</option><option value="Frese e Lucidatura">Frese e Lucidatura</option><option value="Anestesia e Farmaci">Anestesia e Farmaci</option><option value="Impronte e Laboratorio">Impronte e Laboratorio</option><option value="Radiografia e Fotografia">Radiografia e Fotografia</option><option value="Profilassi e Igiene Orale">Profilassi e Igiene Orale</option><option value="Ortodonzia">Ortodonzia</option></select></div>
+          <div class="material-form-group"><label for="matDistributor">Distributore</label><select id="matDistributor" required><option value="">-- Seleziona --</option><option value="Dental Leader">Dental Leader</option><option value="Gherò">Gherò</option><option value="Revello">Revello</option><option value="Dentitalia">Dentitalia</option><option value="Dental Trey">Dental Trey</option><option value="Umbra">Umbra</option><option value="Eli Dent">Eli Dent</option><option value="Non disponibile">Non disponibile</option><option value="Other">Altro...</option></select></div>
+          <div class="material-form-group"><label for="matCompany">Azienda</label><select id="matCompany"><option value="">-- Seleziona --</option><option value="3M">3M</option><option value="Ivoclar">Ivoclar</option><option value="GC">GC</option><option value="Dentsply Sirona">Dentsply Sirona</option><option value="Coltene">Coltene</option><option value="Kerr">Kerr</option><option value="Voco">Voco</option><option value="Septodont">Septodont</option><option value="Zhermack">Zhermack</option><option value="DMG">DMG</option><option value="VOCO">VOCO</option><option value="Other">Altro...</option></select></div>
+          <div class="material-form-group"><label for="matLowStock">Soglia quantità bassa</label><select id="matLowStock"><option value="1">1</option><option value="2" selected>2 (default)</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="Other">Altro...</option></select></div>
+          <div class="material-buttons"><button type="button" class="material-btn cancel" onclick="closeMaterialModal()">Annulla</button><button type="submit" class="material-btn submit">✓ Aggiungi</button></div>
+        </form>
       </div>
     </div>
   </div>
@@ -1765,6 +1811,57 @@
       showAlert('✓ ' + name + ' aggiunto', 'info');
       
       // Reload immediately
+      setTimeout(loadMaterialsFromStorage, 100);
+    });
+
+    // Material Modal Form Handler
+    document.getElementById('materialForm').addEventListener('submit', async e=>{
+      e.preventDefault();
+      const name = toTitleCase(document.getElementById('matName').value.trim());
+      const orderDate = document.getElementById('matOrderDate').value;
+      const expiry = document.getElementById('matExpiry').value;
+      const price = parseFloat(document.getElementById('matPrice').value) || 0;
+      const quantity = parseInt(document.getElementById('matQuantity').value,10) || 0;
+      const category = document.getElementById('matCategory').value.trim();
+      const distributor = document.getElementById('matDistributor').value.trim();
+      const company = document.getElementById('matCompany').value.trim();
+      const lowStockThreshold = parseInt(document.getElementById('matLowStock').value,10) || 2;
+      const notifyDays = 30;
+      
+      if(!name || !orderDate || !expiry || !category) {
+        showAlert('Compila tutti i campi richiesti', 'warn');
+        return;
+      }
+      
+      const newData = {
+        name, 
+        orderDate: new Date(orderDate), 
+        expiry: new Date(expiry), 
+        price, 
+        quantity, 
+        category, 
+        distributor, 
+        company,
+        notifyDays, 
+        lowStockThreshold,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+      
+      const materialId = window.crypto && window.crypto.randomUUID ? window.crypto.randomUUID() : ('m_' + Date.now() + '_' + Math.floor(Math.random()*100000));
+      
+      addToLocalStorage({id: materialId, ...newData});
+      
+      if(firebaseReady && typeof db !== 'undefined'){
+        try {
+          await db.collection('materials').doc(materialId).set(newData);
+        } catch(err) {
+          console.warn('Firebase unavailable:', err.message);
+        }
+      }
+      
+      closeMaterialModal();
+      showAlert('✓ ' + name + ' aggiunto', 'info');
       setTimeout(loadMaterialsFromStorage, 100);
     });
 
@@ -3225,9 +3322,20 @@
     function continueWithMaterial() {
       closeAddSelectionModal();
       setTimeout(() => {
-        document.getElementById('addForm').scrollIntoView({ behavior: 'smooth', block: 'start' });
-        document.getElementById('name').focus();
+        const modal = document.getElementById('materialModal');
+        modal.classList.add('active');
       }, 200);
+    }
+
+    function openMaterialModal() {
+      const modal = document.getElementById('materialModal');
+      modal.classList.add('active');
+    }
+
+    function closeMaterialModal() {
+      const modal = document.getElementById('materialModal');
+      modal.classList.remove('active');
+      document.getElementById('materialForm').reset();
     }
 
     function openOrderModal() {
