@@ -200,7 +200,7 @@
     .articles-container{margin:32px 0;border:none;border-radius:0;padding:0;background:transparent;flex:1;overflow-y:auto;overflow-x:hidden;padding-right:8px}
     .articles-title{font-weight:700;color:#003d7a;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;font-size:15px;padding-bottom:14px;border-bottom:2px solid #e0e0e0;gap:12px;flex-wrap:wrap}
     .order-articles-actions{display:flex;gap:10px;flex-wrap:wrap}
-    .article-row{display:grid;grid-template-columns:minmax(220px,1.5fr) minmax(90px,0.7fr) minmax(90px,0.7fr) minmax(140px,1fr) 90px;gap:14px;margin-bottom:16px;padding:18px;background:#fafbfc;border-radius:10px;border:1.5px solid #e8ecf1;align-items:flex-end;transition:all 0.3s;border-left:4px solid #388e3c}
+    .article-row{display:grid;grid-template-columns:minmax(220px,1.5fr) minmax(90px,0.7fr) minmax(90px,0.7fr) minmax(140px,1fr) minmax(140px,1fr) 90px;gap:14px;margin-bottom:16px;padding:18px;background:#fafbfc;border-radius:10px;border:1.5px solid #e8ecf1;align-items:flex-end;transition:all 0.3s;border-left:4px solid #388e3c}
     .article-row > *{min-width:0}
     .article-row:hover{box-shadow:0 6px 16px rgba(0,0,0,0.1);background:#fff;border-color:#388e3c}
     .article-field{display:flex;flex-direction:column;gap:7px}
@@ -875,8 +875,8 @@
           <table class="pdf-import-table">
             <thead>
               <tr>
-                <th>Descrizione</th>
                 <th>Nome materiale</th>
+                <th>Descrizione (opz.)</th>
                 <th>Quantità</th>
                 <th>Prezzo (€)</th>
                 <th>Totale netto (€)</th>
@@ -3468,7 +3468,7 @@
       row.id = rowId;
       
       const materialSelect = document.createElement('select');
-      materialSelect.className = 'article-field';
+      materialSelect.className = 'article-material';
       materialSelect.innerHTML = '<option value="">-- Seleziona materiale --</option>';
       materials.forEach(m => {
         const opt = document.createElement('option');
@@ -3482,18 +3482,23 @@
       quantityInput.min = '1';
       quantityInput.step = '1';
       quantityInput.placeholder = 'Quantità';
-      quantityInput.className = 'article-field';
+      quantityInput.className = 'article-qty';
 
       const priceInput = document.createElement('input');
       priceInput.type = 'number';
       priceInput.min = '0';
       priceInput.step = '0.01';
       priceInput.placeholder = '€ Prezzo';
-      priceInput.className = 'article-field';
+      priceInput.className = 'article-price';
 
       const expiryInput = document.createElement('input');
       expiryInput.type = 'date';
-      expiryInput.className = 'article-field';
+      expiryInput.className = 'article-expiry';
+
+      const companyInput = document.createElement('input');
+      companyInput.type = 'text';
+      companyInput.placeholder = 'Azienda';
+      companyInput.className = 'article-company';
 
       const removeBtn = document.createElement('button');
       removeBtn.type = 'button';
@@ -3517,6 +3522,11 @@
       priceFieldWrapper.innerHTML = '<label>Prezzo (€)</label>';
       priceFieldWrapper.appendChild(priceInput);
 
+      const companyFieldWrapper = document.createElement('div');
+      companyFieldWrapper.className = 'article-field';
+      companyFieldWrapper.innerHTML = '<label>Azienda</label>';
+      companyFieldWrapper.appendChild(companyInput);
+
       const expiryFieldWrapper = document.createElement('div');
       expiryFieldWrapper.className = 'article-field';
       expiryFieldWrapper.innerHTML = '<label>📅 Scadenza</label>';
@@ -3525,6 +3535,7 @@
       row.appendChild(matFieldWrapper);
       row.appendChild(qtyFieldWrapper);
       row.appendChild(priceFieldWrapper);
+      row.appendChild(companyFieldWrapper);
       row.appendChild(expiryFieldWrapper);
       row.appendChild(removeBtn);
 
@@ -3534,12 +3545,16 @@
 
     function addArticleRowWithData(data) {
       const row = addArticleRow();
-      const selects = row.querySelectorAll('select');
-      const inputs = row.querySelectorAll('input');
-      if (data.materialId) selects[0].value = data.materialId;
-      if (data.quantity !== undefined) inputs[0].value = data.quantity;
-      if (data.price !== undefined) inputs[1].value = data.price;
-      if (data.expiry) inputs[2].value = data.expiry;
+      const materialSelect = row.querySelector('.article-material');
+      const qtyInput = row.querySelector('.article-qty');
+      const priceInput = row.querySelector('.article-price');
+      const companyInput = row.querySelector('.article-company');
+      const expiryInput = row.querySelector('.article-expiry');
+      if (data.materialId) materialSelect.value = data.materialId;
+      if (data.quantity !== undefined) qtyInput.value = data.quantity;
+      if (data.price !== undefined) priceInput.value = data.price;
+      if (data.company) companyInput.value = data.company;
+      if (data.expiry) expiryInput.value = data.expiry;
       return row;
     }
 
@@ -3593,16 +3608,17 @@
       const tr = document.createElement('tr');
       const materials = getMaterialsForImport();
 
-      const descInput = document.createElement('input');
-      descInput.type = 'text';
-      descInput.className = 'pdf-import-desc';
-      descInput.value = data.name || '';
-
       const materialNameInput = document.createElement('input');
       materialNameInput.type = 'text';
       materialNameInput.className = 'pdf-import-name';
       materialNameInput.setAttribute('list', 'materialNameList');
       materialNameInput.value = data.name || '';
+
+      const descInput = document.createElement('input');
+      descInput.type = 'text';
+      descInput.className = 'pdf-import-desc';
+      descInput.placeholder = 'Note opzionali';
+      descInput.value = data.description || '';
 
       const qtyInput = document.createElement('input');
       qtyInput.type = 'number';
@@ -3652,7 +3668,7 @@
       removeBtn.textContent = 'Rimuovi';
       removeBtn.onclick = () => tr.remove();
 
-      const cells = [descInput, materialNameInput, qtyInput, priceInput, totalNetInput, ivaPercentInput, ivaAmountInput, companyInput, categorySelect, removeBtn];
+      const cells = [materialNameInput, descInput, qtyInput, priceInput, totalNetInput, ivaPercentInput, ivaAmountInput, companyInput, categorySelect, removeBtn];
       cells.forEach(c => {
         const td = document.createElement('td');
         td.appendChild(c);
@@ -3791,8 +3807,7 @@
       const orderDistributor = document.getElementById('orderDistributor')?.value || '';
 
       rows.forEach(row => {
-        const desc = row.querySelector('.pdf-import-desc')?.value || '';
-        const materialName = row.querySelector('.pdf-import-name')?.value || desc;
+        const materialName = row.querySelector('.pdf-import-name')?.value || '';
         const quantity = parseInt(row.querySelector('.pdf-import-qty')?.value, 10) || 0;
         const price = parseFloat(row.querySelector('.pdf-import-price')?.value) || 0;
         const category = row.querySelector('select')?.value || '';
@@ -3817,7 +3832,7 @@
         }
 
         if (materialId && quantity > 0) {
-          addArticleRowWithData({ materialId, quantity, price });
+          addArticleRowWithData({ materialId, quantity, price, company });
           imported += 1;
         } else {
           skipped += 1;
@@ -3891,16 +3906,14 @@
 
       const articles = [];
       document.querySelectorAll('#articlesContainer .article-row').forEach(row => {
-        const selects = row.querySelectorAll('select');
-        const inputs = row.querySelectorAll('input');
-        
-        const materialId = selects[0]?.value;
-        const quantity = parseInt(inputs[0]?.value) || 0;
-        const price = parseFloat(inputs[1]?.value) || 0;
-        const expiry = inputs[2]?.value;
+        const materialId = row.querySelector('.article-material')?.value;
+        const quantity = parseInt(row.querySelector('.article-qty')?.value) || 0;
+        const price = parseFloat(row.querySelector('.article-price')?.value) || 0;
+        const company = row.querySelector('.article-company')?.value || '';
+        const expiry = row.querySelector('.article-expiry')?.value;
 
         if (materialId && quantity > 0) {
-          articles.push({ materialId, quantity, price, expiry });
+          articles.push({ materialId, quantity, price, company, expiry });
         }
       });
 
@@ -3928,6 +3941,7 @@
             quantità: article.quantity,
             quantitàRimanente: article.quantity,
             prezzo: article.price,
+            azienda: article.company || '',
             scadenza: article.expiry
           };
 
