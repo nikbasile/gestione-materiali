@@ -307,21 +307,11 @@
             <input id="implantCompanyCustom" placeholder="Azienda personalizzata" style="display:none;margin-top:6px" />
           </div>
           <div class="form-group" id="implantModelGroup">
-            <label>Modello</label>
+            <label>Modello / Nomenclatura</label>
             <select id="implantModel">
-              <option value="">-- Seleziona --</option>
-              <optgroup label="Straumann">
-                <option value="BLX">BLX</option>
-                <option value="BLT">BLT</option>
-                <option value="SLA">SLA</option>
-                <option value="SLActive">SLActive</option>
-                <option value="Roxolid">Roxolid</option>
-                <option value="Bone Level Tapered">Bone Level Tapered</option>
-                <option value="Tissue Level">Tissue Level</option>
-              </optgroup>
-              <option value="Other">Altro...</option>
+              <option value="">-- Seleziona o scrivi sotto --</option>
             </select>
-            <input id="implantModelCustom" placeholder="Modello personalizzato" style="display:none;margin-top:6px" />
+            <input id="implantModelCustom" placeholder="Scrivi modello/nomenclatura (es. BLX, NC, RC)" style="margin-top:6px" />
           </div>
           <div class="form-group" id="implantDiameterGroup">
             <label>Diametro (mm)</label>
@@ -555,6 +545,39 @@
       localStorage.setItem('magazzino_implants', JSON.stringify(implants));
     }
 
+    // Gestione opzioni dinamiche per modelli
+    function loadImplantModels(){
+      const saved = localStorage.getItem('implant_models');
+      return saved ? JSON.parse(saved) : ['BLX', 'BLT', 'SLA', 'SLActive', 'Roxolid', 'NC', 'RC', 'RB', 'RN'];
+    }
+
+    function saveImplantModel(model){
+      if(!model || model.trim() === '') return;
+      const models = loadImplantModels();
+      const trimmedModel = model.trim();
+      if(!models.includes(trimmedModel)){
+        models.push(trimmedModel);
+        models.sort();
+        localStorage.setItem('implant_models', JSON.stringify(models));
+      }
+    }
+
+    function populateImplantModelSelect(){
+      const select = document.getElementById('implantModel');
+      const models = loadImplantModels();
+      
+      // Mantieni solo l'opzione vuota
+      select.innerHTML = '<option value="">-- Seleziona o scrivi sotto --</option>';
+      
+      // Aggiungi le opzioni salvate
+      models.forEach(model => {
+        const option = document.createElement('option');
+        option.value = model;
+        option.textContent = model;
+        select.appendChild(option);
+      });
+    }
+
     function addImplantToStorage(implant){
       const implants = loadImplantsFromStorage();
       const newImplant = {...implant, id: implant.id || (window.crypto && window.crypto.randomUUID ? window.crypto.randomUUID() : '_implant_'+Date.now())};
@@ -639,6 +662,7 @@
 
     function openImplantsModal(){
       document.getElementById('implantsModal').classList.add('active');
+      populateImplantModelSelect();
       renderImplantsList();
     }
 
@@ -1285,8 +1309,10 @@
     });
 
     document.getElementById('implantModel').addEventListener('change', function() {
-      const custom = document.getElementById('implantModelCustom');
-      custom.style.display = this.value === 'Other' ? '' : 'none';
+      const customInput = document.getElementById('implantModelCustom');
+      if(this.value) {
+        customInput.value = this.value;
+      }
     });
 
     document.getElementById('implantDiameter').addEventListener('change', function() {
@@ -1301,8 +1327,23 @@
 
     // Mostra/nascondi campi in base al tipo di impianto
     document.getElementById('implantType').addEventListener('change', function() {
-      const isImplant = this.value === 'Impianto';
-      document.getElementById('implantModelGroup').style.display = isImplant ? '' : 'none';
+      const type = this.value;
+      const isImplant = type === 'Impianto';
+      const isScrew = type === 'Vite tappo' || type === 'Vite di guarigione';
+      
+      const modelGroup = document.getElementById('implantModelGroup');
+      const modelLabel = modelGroup.querySelector('label');
+      
+      // Cambia etichetta in base al tipo
+      if(isScrew) {
+        modelLabel.textContent = 'Nomenclatura';
+      } else if(isImplant) {
+        modelLabel.textContent = 'Modello';
+      } else {
+        modelLabel.textContent = 'Modello / Nomenclatura';
+      }
+      
+      modelGroup.style.display = (isImplant || isScrew) ? '' : 'none';
       document.getElementById('implantDiameterGroup').style.display = isImplant ? '' : 'none';
       document.getElementById('implantLengthGroup').style.display = isImplant ? '' : 'none';
     });
@@ -1315,8 +1356,16 @@
       let company = document.getElementById('implantCompany').value;
       if(company === 'Other') company = document.getElementById('implantCompanyCustom').value.trim();
       
-      let model = document.getElementById('implantModel').value;
-      if(model === 'Other') model = document.getElementById('implantModelCustom').value.trim();
+      // Prendi il valore dall'input personalizzato (sempre visibile ora)
+      let model = document.getElementById('implantModelCustom').value.trim();
+      if(!model) {
+        model = document.getElementById('implantModel').value;
+      }
+      
+      // Salva il modello nelle opzioni per usi futuri
+      if(model) {
+        saveImplantModel(model);
+      }
       
       let diameter = document.getElementById('implantDiameter').value;
       if(diameter === 'Other') diameter = document.getElementById('implantDiameterCustom').value;
