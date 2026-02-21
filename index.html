@@ -1504,7 +1504,7 @@
       allMaterials = loadFromLocalStorage();
     }
 
-    function generateTablePDF(title, filename, headers, rows, summaryLines){
+    function generateTablePDF(title, filename, headers, rows, summaryLines, columnWidths){
       const JsPdfCtor = (window.jspdf && window.jspdf.jsPDF) || window.jsPDF || null;
       if(!JsPdfCtor){
         showAlert('Libreria PDF non disponibile', 'warn');
@@ -1517,7 +1517,11 @@
       const margin = 10;
       const tableWidth = pageWidth - (margin * 2);
       const colCount = headers.length;
-      const colWidth = tableWidth / colCount;
+      const baseWidths = Array.isArray(columnWidths) && columnWidths.length === colCount
+        ? columnWidths.slice()
+        : new Array(colCount).fill(1);
+      const baseTotal = baseWidths.reduce((sum, w) => sum + w, 0) || colCount;
+      const scaledWidths = baseWidths.map(w => (w / baseTotal) * tableWidth);
       const rowHeight = 6;
       let y = margin;
 
@@ -1551,12 +1555,14 @@
         doc.setTextColor(0, 61, 122);
         doc.setDrawColor(200, 210, 220);
         doc.setFont('helvetica', 'bold');
-        doc.setFontSize(8);
+        doc.setFontSize(8.5);
+        let xCursor = margin;
         headers.forEach((header, index) => {
-          const x = margin + (index * colWidth);
-          doc.rect(x, y, colWidth, rowHeight, 'F');
-          doc.rect(x, y, colWidth, rowHeight);
-          doc.text(fitText(header, colWidth - 2), x + 1, y + 4);
+          const colWidth = scaledWidths[index];
+          doc.rect(xCursor, y, colWidth, rowHeight, 'F');
+          doc.rect(xCursor, y, colWidth, rowHeight);
+          doc.text(fitText(header, colWidth - 2), xCursor + 1, y + 4);
+          xCursor += colWidth;
         });
         y += rowHeight;
       }
@@ -1574,18 +1580,20 @@
       drawTableHeader();
 
       doc.setFont('helvetica', 'normal');
-      doc.setFontSize(8);
+      doc.setFontSize(8.5);
       doc.setTextColor(20, 20, 20);
       rows.forEach((row, rowIndex) => {
         ensureSpace(rowHeight);
         const fill = rowIndex % 2 === 0 ? 252 : 245;
+        let xCursor = margin;
         row.forEach((cell, index) => {
-          const x = margin + (index * colWidth);
+          const colWidth = scaledWidths[index];
           doc.setFillColor(fill, fill, fill);
-          doc.rect(x, y, colWidth, rowHeight, 'F');
+          doc.rect(xCursor, y, colWidth, rowHeight, 'F');
           doc.setDrawColor(220, 220, 220);
-          doc.rect(x, y, colWidth, rowHeight);
-          doc.text(fitText(cell, colWidth - 2), x + 1, y + 4);
+          doc.rect(xCursor, y, colWidth, rowHeight);
+          doc.text(fitText(cell, colWidth - 2), xCursor + 1, y + 4);
+          xCursor += colWidth;
         });
         y += rowHeight;
       });
@@ -1612,15 +1620,8 @@
         const statusCell = cells[2];
         const statusBadge = statusCell ? statusCell.querySelector('span') : null;
         const statusTitle = statusBadge ? (statusBadge.getAttribute('title') || '').trim() : '';
-        const statusSymbol = statusBadge ? (statusBadge.textContent || '').trim() : '';
-        let expiryStatus = statusTitle;
-        if(!expiryStatus){
-          if(statusSymbol === '🔴') expiryStatus = 'Rosso';
-          else if(statusSymbol === '🟡') expiryStatus = 'Giallo';
-          else if(statusSymbol === '🟢') expiryStatus = 'Verde';
-          else if(statusSymbol === '⚪') expiryStatus = 'Senza scadenza';
-          else expiryStatus = (statusCell?.textContent || '-').trim() || '-';
-        }
+        const expiryDateMatch = statusTitle.match(/(\d{1,2}\/\d{1,2}\/\d{2,4})/);
+        const expiryStatus = expiryDateMatch ? expiryDateMatch[1] : '-';
         const qtyText = (cells[6]?.textContent || '0').replace(/[^\d-]/g, '');
         const priceRaw = (cells[3]?.textContent || '0').replace(/[^\d,.-]/g, '').replace(',', '.');
         return {
@@ -1658,7 +1659,8 @@
         'materiali_' + new Date().toISOString().split('T')[0] + '.pdf',
         headers,
         rows,
-        summaryLines
+        summaryLines,
+        [18, 14, 14, 12, 18, 18, 8]
       );
       showAlert('✓ PDF Materiali scaricato con successo', 'info');
     }
