@@ -389,7 +389,7 @@
             </select>
           </div>
           <div>
-            <label for="implantModelFilter" class="filter-label">Filtra per modello:</label>
+            <label for="implantModelFilter" id="implantModelFilterLabel" class="filter-label">Filtra per modello:</label>
             <select id="implantModelFilter" class="filter-select">
               <option value="Tutti">Tutti</option>
             </select>
@@ -791,9 +791,35 @@
         companyFilter.appendChild(option);
       });
       
-      // Popola filtro modelli
-      const models = [...new Set(implants.map(i => i.model).filter(m => m))];
+      // Popola filtro modelli in base al tipo
+      updateImplantModelFilter();
+    }
+
+    function updateImplantModelFilter(){
+      const implants = loadImplantsFromStorage();
+      const selectedType = currentImplantTypeFilter;
       const modelFilter = document.getElementById('implantModelFilter');
+      const modelLabel = document.getElementById('implantModelFilterLabel');
+      
+      // Cambia etichetta in base al tipo
+      const isScrew = selectedType === 'Vite tappo' || selectedType === 'Vite di guarigione';
+      const isImplant = selectedType === 'Impianto';
+      
+      if(isScrew) {
+        modelLabel.textContent = 'Filtra per nomenclatura:';
+      } else if(isImplant) {
+        modelLabel.textContent = 'Filtra per modello:';
+      } else {
+        modelLabel.textContent = 'Filtra per modello/nomenclatura:';
+      }
+      
+      // Filtra modelli in base al tipo selezionato
+      let filteredImplants = implants;
+      if(selectedType !== 'Tutti'){
+        filteredImplants = implants.filter(i => i.type === selectedType);
+      }
+      
+      const models = [...new Set(filteredImplants.map(i => i.model).filter(m => m))];
       modelFilter.innerHTML = '<option value="Tutti">Tutti</option>';
       models.sort().forEach(model => {
         const option = document.createElement('option');
@@ -801,6 +827,12 @@
         option.textContent = model;
         modelFilter.appendChild(option);
       });
+      
+      // Reset selezione se il modello corrente non è più nella lista
+      if(currentImplantModelFilter !== 'Tutti' && !models.includes(currentImplantModelFilter)){
+        currentImplantModelFilter = 'Tutti';
+        modelFilter.value = 'Tutti';
+      }
     }
 
     function closeImplantsModal(){
@@ -1510,6 +1542,7 @@
     // Event listeners per i filtri impianti
     document.getElementById('implantTypeFilter').addEventListener('change', function() {
       currentImplantTypeFilter = this.value;
+      updateImplantModelFilter(); // Aggiorna il filtro modello in base al tipo
       renderImplantsList();
     });
     
