@@ -229,28 +229,30 @@
     <div id="categoryFilters" class="category-filters"></div>
 
     <!-- Pulsanti Principali -->
-    <div class="action-dropdown-container" style="margin:20px 0;display:flex;gap:16px;align-items:center;flex-wrap:wrap">
-      <!-- Pulsante Scarica Dati Materiali -->
-      <div style="position:relative">
-        <button class="action-menu-btn" onclick="toggleActionMenu('downloadMenu')">📥 Scarica Dati ▼</button>
-        <div id="downloadMenu" class="action-menu" style="display:none;position:absolute;background:white;border:1px solid #ddd;border-radius:8px;box-shadow:0 4px 8px rgba(0,0,0,0.1);z-index:100;min-width:250px;top:40px;left:0">
-          <button class="menu-item" onclick="downloadMaterialsPDF()">📄 PDF Materiali</button>
-          <button class="menu-item" onclick="exportMaterialsCSV()">📊 CSV Materiali</button>
-        </div>
-      </div>
-
+    <div class="action-dropdown-container" style="margin:20px 0;display:flex;gap:16px;align-items:center;flex-wrap:wrap;justify-content:space-between">
       <!-- Pulsante Magazzino Implantare con grafica distintiva -->
       <button id="implantsBtn" class="implants-btn-main" onclick="openImplantsModal()" style="background:linear-gradient(135deg,#7B1FA2 0%,#5E35B1 100%);color:#fff;padding:12px 20px;font-size:15px;border:none;border-radius:8px;cursor:pointer;font-weight:600;box-shadow:0 4px 12px rgba(123,31,162,0.3);transition:all 0.2s;display:flex;align-items:center;gap:6px">
         🔩 Magazzino Implantare
       </button>
 
-      <!-- Pulsante Backup -->
-      <div style="position:relative">
-        <button class="action-menu-btn" onclick="toggleActionMenu('backupMenu')">💾 Backup ▼</button>
-        <div id="backupMenu" class="action-menu" style="display:none;position:absolute;background:white;border:1px solid #ddd;border-radius:8px;box-shadow:0 4px 8px rgba(0,0,0,0.1);z-index:100;min-width:250px;top:40px;left:0">
-          <button class="menu-item" onclick="exportBackup()">📥 Esporta Backup Completo</button>
-          <button class="menu-item" onclick="document.getElementById('importFile').click()">📤 Importa Backup</button>
-          <input type="file" id="importFile" accept=".json" style="display:none" onchange="importBackup(event)" />
+      <div style="display:flex;gap:12px;align-items:center;margin-left:auto;flex-wrap:wrap">
+        <!-- Pulsante Scarica Dati Materiali -->
+        <div style="position:relative">
+          <button class="action-menu-btn" onclick="toggleActionMenu('downloadMenu')">📥 Scarica Dati ▼</button>
+          <div id="downloadMenu" class="action-menu" style="display:none;position:absolute;background:white;border:1px solid #ddd;border-radius:8px;box-shadow:0 4px 8px rgba(0,0,0,0.1);z-index:100;min-width:250px;top:40px;left:0">
+            <button class="menu-item" onclick="downloadMaterialsPDF()">📄 PDF Materiali</button>
+            <button class="menu-item" onclick="exportMaterialsCSV()">📊 CSV Materiali</button>
+          </div>
+        </div>
+
+        <!-- Pulsante Backup -->
+        <div style="position:relative">
+          <button class="action-menu-btn" onclick="toggleActionMenu('backupMenu')">💾 Backup ▼</button>
+          <div id="backupMenu" class="action-menu" style="display:none;position:absolute;background:white;border:1px solid #ddd;border-radius:8px;box-shadow:0 4px 8px rgba(0,0,0,0.1);z-index:100;min-width:250px;top:40px;right:0;left:auto">
+            <button class="menu-item" onclick="exportBackup()">📥 Esporta Backup Completo</button>
+            <button class="menu-item" onclick="document.getElementById('importFile').click()">📤 Importa Backup</button>
+            <input type="file" id="importFile" accept=".json" style="display:none" onchange="importBackup(event)" />
+          </div>
         </div>
       </div>
     </div>
