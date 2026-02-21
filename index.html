@@ -187,7 +187,7 @@
       <div class="form-group"><label>⏰ Data Scadenza</label><input id="expiry" type="date" required /></div>
       <div class="form-group"><label>Prezzo (€)</label><input id="price" type="number" step="0.01" placeholder="0.00" /></div>
       <div class="form-group"><label>Quantità</label><input id="quantity" type="number" min="0" value="1" required /></div>
-      <div class="form-group"><label>🗂️ Categoria</label><select id="category" required><option value="">-- Seleziona --</option><option value="Strumentario">Strumentario</option><option value="Consumabili Generici">Consumabili Generici</option><option value="Monouso">Monouso</option><option value="Disinfezione e Sterilizzazione">Disinfezione e Sterilizzazione</option><option value="Implantologia e Chirurgia">Implantologia e Chirurgia</option><option value="Endodonzia">Endodonzia</option><option value="Conservativa e Protesi">Conservativa e Protesi</option><option value="Frese e Lucidatura">Frese e Lucidatura</option><option value="Anestesia e Farmaci">Anestesia e Farmaci</option><option value="Impronte e Laboratorio">Impronte e Laboratorio</option><option value="Radiografia e Fotografia">Radiografia e Fotografia</option><option value="Profilassi e Igiene Orale">Profilassi e Igiene Orale</option><option value="Ortodonzia">Ortodonzia</option></select></div>
+      <div class="form-group"><label>🗂️ Categoria</label><select id="category" required><option value="">-- Seleziona --</option><option value="Strumentario">Strumentario</option><option value="Consumabili Generici">Consumabili Generici</option><option value="Monouso">Monouso</option><option value="Disinfezione e Sterilizzazione">Disinfezione e Sterilizzazione</option><option value="Chirurgia">Chirurgia</option><option value="Endodonzia">Endodonzia</option><option value="Conservativa e Protesi">Conservativa e Protesi</option><option value="Frese e Lucidatura">Frese e Lucidatura</option><option value="Anestesia e Farmaci">Anestesia e Farmaci</option><option value="Impronte e Laboratorio">Impronte e Laboratorio</option><option value="Radiografia e Fotografia">Radiografia e Fotografia</option><option value="Profilassi e Igiene Orale">Profilassi e Igiene Orale</option><option value="Ortodonzia">Ortodonzia</option></select></div>
 
       <div class="form-group"><label>🚚 Distributore</label>
         <select id="distributorSelect" required>
@@ -525,7 +525,7 @@
     const companyFilterSelect = document.getElementById('companyFilterSelect');
     const distributorFilterSelect = document.getElementById('distributorFilterSelect');
 
-    const CATEGORIES = ['Tutti', 'Strumentario', 'Consumabili Generici', 'Monouso', 'Disinfezione e Sterilizzazione', 'Implantologia e Chirurgia', 'Endodonzia', 'Conservativa e Protesi', 'Frese e Lucidatura', 'Anestesia e Farmaci', 'Impronte e Laboratorio', 'Radiografia e Fotografia', 'Profilassi e Igiene Orale', 'Ortodonzia'];
+    const CATEGORIES = ['Tutti', 'Strumentario', 'Consumabili Generici', 'Monouso', 'Disinfezione e Sterilizzazione', 'Chirurgia', 'Endodonzia', 'Conservativa e Protesi', 'Frese e Lucidatura', 'Anestesia e Farmaci', 'Impronte e Laboratorio', 'Radiografia e Fotografia', 'Profilassi e Igiene Orale', 'Ortodonzia'];
     const COMPANY_OPTIONS = ['3M', 'Ivoclar', 'GC', 'Dentsply Sirona', 'Coltene', 'Kerr', 'Voco', 'Septodont', 'Zhermack', 'DMG', 'VOCO', 'Other'];
     const DISTRIBUTOR_OPTIONS = ['Dental Leader', 'Gherò', 'Revello', 'Dentitalia', 'Dental Trey', 'Umbra', 'Eli Dent', 'Non disponibile', 'Other'];
     let currentFilter = 'Tutti';
@@ -2294,7 +2294,7 @@
     // Mostra/nascondi pulsante Gestione Impianti in base alla categoria
     function updateImplantsButtonVisibility() {
       const btn = document.getElementById('implantsBtn');
-      btn.style.display = (currentFilter === 'Implantologia e Chirurgia') ? '' : 'none';
+      btn.style.display = (currentFilter === 'Chirurgia') ? '' : 'none';
     }
 
     // Chiama questa funzione quando cambia il filtro categoria
