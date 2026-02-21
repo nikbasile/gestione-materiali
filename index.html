@@ -86,6 +86,39 @@
     .filters-reset-btn{padding:9px 18px;font-size:13px;font-weight:600;background:#fff;color:#d32f2f;border:1.5px solid #d32f2f;border-radius:8px;cursor:pointer;transition:all 0.2s;text-transform:uppercase;letter-spacing:0.5px}
     .filters-reset-btn:hover{background:#d32f2f;color:#fff}
     .filters-reset-btn.hidden{display:none}
+
+    /* Report Modal Styles */
+    #reportModal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:10000;overflow-y:auto;padding:20px}
+    #reportModal.active{display:flex;align-items:flex-start;justify-content:center}
+    #implantsReportModal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:10000;overflow-y:auto;padding:20px}
+    #implantsReportModal.active{display:flex;align-items:flex-start;justify-content:center}
+    .report-modal-content{background:#fff;border-radius:12px;max-width:1400px;width:100%;margin:20px auto;box-shadow:0 8px 32px rgba(0,0,0,0.3)}
+    .report-header{background:linear-gradient(135deg,#0066cc 0%,#003d7a 100%);color:#fff;padding:20px;border-radius:12px 12px 0 0;display:flex;justify-content:space-between;align-items:center}
+    .report-header h2{margin:0;font-size:22px}
+    .report-close{background:transparent;color:#fff;border:2px solid #fff;width:36px;height:36px;border-radius:50%;font-size:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s}
+    .report-close:hover{background:#fff;color:#0066cc}
+    .report-body{padding:24px}
+    .report-filters{display:flex;gap:16px;margin-bottom:20px;flex-wrap:wrap;padding:16px;background:#f0f4f8;border-radius:8px}
+    .report-filter-group{display:flex;flex-direction:column;gap:6px}
+    .report-filter-group label{font-weight:600;color:#003d7a;font-size:12px}
+    .report-filter-group select{padding:8px 12px;border-radius:6px;border:1px solid #d0dce6;font-size:14px}
+    .report-content{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:20px}
+    .report-chart-container{background:#f9fbfd;padding:16px;border-radius:8px;position:relative;height:400px}
+    .report-table-container{overflow-x:auto;margin-top:20px}
+    .report-table{width:100%;border-collapse:collapse;background:#fff}
+    .report-table thead{background:#003d7a;color:#fff}
+    .report-table th{padding:12px;text-align:left;font-weight:600;font-size:13px}
+    .report-table td{padding:12px;border-bottom:1px solid #e8ecf1;font-size:14px}
+    .report-table tbody tr:hover{background:#f9fbfd}
+    .report-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:24px}
+    .report-stat{background:linear-gradient(135deg,#e3f2fd 0%,#f3f8ff 100%);padding:16px;border-radius:8px;border-left:4px solid #0066cc}
+    .report-stat-label{font-size:12px;color:#003d7a;font-weight:600}
+    .report-stat-value{font-size:24px;font-weight:700;color:#0066cc;margin-top:8px}
+
+    @media (max-width:1200px){
+      .report-content{grid-template-columns:1fr}
+      .report-chart-container{height:350px}
+    }
     .header-content{min-width:0}
     
     .implants-btn{background:#ff6b35;margin-left:10px}
@@ -243,6 +276,10 @@
       <!-- Pulsante Magazzino Implantare con grafica distintiva -->
       <button id="implantsBtn" class="implants-btn-main" onclick="openImplantsModal()" style="background:linear-gradient(135deg,#2E7D32 0%,#1B5E20 100%);color:#fff;padding:12px 20px;font-size:15px;border:none;border-radius:8px;cursor:pointer;font-weight:600;box-shadow:0 4px 12px rgba(27,94,32,0.35);transition:all 0.2s;display:flex;align-items:center;gap:6px">
         🔩 Magazzino Implantare
+      </button>
+
+      <button onclick="openReportModal()" style="background:linear-gradient(135deg,#1976d2 0%,#0d47a1 100%);color:#fff;padding:12px 20px;font-size:15px;border:none;border-radius:8px;cursor:pointer;font-weight:600;box-shadow:0 4px 12px rgba(13,71,161,0.35);transition:all 0.2s;display:flex;align-items:center;gap:6px">
+        📊 Report Economici
       </button>
 
       <div style="display:flex;gap:12px;align-items:center;margin-left:auto;flex-wrap:wrap">
@@ -419,6 +456,7 @@
       <!-- Dropdown Scarica Dati Impianti -->
       <div style="margin:16px 0;display:flex;gap:10px;align-items:center;position:relative">
         <button class="action-menu-btn" onclick="toggleActionMenu('implantsMenu')">📥 Scarica Dati ▼</button>
+        <button class="action-menu-btn" onclick="openImplantsReportModal()" style="background-color:#1976d2">📊 Report Impianti</button>
         <div id="implantsMenu" class="action-menu" style="display:none;position:absolute;background:white;border:1px solid #ddd;border-radius:8px;box-shadow:0 4px 8px rgba(0,0,0,0.1);z-index:100;min-width:250px;top:40px;left:0">
           <button class="menu-item" onclick="downloadImplantsPDF()">📄 Scarica PDF Impianti</button>
           <button class="menu-item" onclick="exportImplantsCSV()">📊 Scarica CSV Impianti</button>
@@ -477,11 +515,191 @@
   </div>
   </div>
 
+  <!-- Report Economici Modal -->
+  <div id="reportModal">
+    <div class="report-modal-content">
+      <div class="report-header">
+        <h2>📊 Report Economici Materiali</h2>
+        <button class="report-close" onclick="closeReportModal()">×</button>
+      </div>
+      <div class="report-body">
+        
+        <!-- Filtri Report -->
+        <div class="report-filters">
+          <div class="report-filter-group">
+            <label>Categoria / Macroarea</label>
+            <select id="reportCategoryFilter" onchange="updateReportData()">
+              <option value="Tutti">Tutti</option>
+            </select>
+          </div>
+          <div class="report-filter-group">
+            <label>Azienda</label>
+            <select id="reportCompanyFilter" onchange="updateReportData()">
+              <option value="Tutte">Tutte</option>
+            </select>
+          </div>
+          <div class="report-filter-group">
+            <label>Distributore</label>
+            <select id="reportDistributorFilter" onchange="updateReportData()">
+              <option value="Tutti">Tutti</option>
+            </select>
+          </div>
+          <div class="report-filter-group" style="margin-top:24px">
+            <button onclick="resetReportFilters()" style="padding:8px 16px;background:#d32f2f;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:600">Azzera Filtri</button>
+          </div>
+        </div>
+
+        <!-- Statistiche Riassuntive -->
+        <div class="report-stats">
+          <div class="report-stat">
+            <div class="report-stat-label">Spesa Totale</div>
+            <div class="report-stat-value" id="reportTotalExpense">€ 0.00</div>
+          </div>
+          <div class="report-stat">
+            <div class="report-stat-label">Numero Ordini</div>
+            <div class="report-stat-value" id="reportOrderCount">0</div>
+          </div>
+          <div class="report-stat">
+            <div class="report-stat-label">Prezzo Medio</div>
+            <div class="report-stat-value" id="reportAveragePrice">€ 0.00</div>
+          </div>
+          <div class="report-stat">
+            <div class="report-stat-label">Top Categoria</div>
+            <div class="report-stat-value" id="reportTopCategory" style="font-size:16px">--</div>
+          </div>
+        </div>
+
+        <!-- Grafici -->
+        <div class="report-content">
+          <div>
+            <h3 style="color:#003d7a;margin-bottom:12px">📈 Trend Spese (Mese)</h3>
+            <div class="report-chart-container">
+              <canvas id="reportTrendChart"></canvas>
+            </div>
+          </div>
+          <div>
+            <h3 style="color:#003d7a;margin-bottom:12px">📊 Distribuzione Spese</h3>
+            <div class="report-chart-container">
+              <canvas id="reportDistributionChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabella Analitica -->
+        <h3 style="color:#003d7a;margin-bottom:12px">📋 Analisi Dettagliata</h3>
+        <div class="report-table-container">
+          <table class="report-table">
+            <thead>
+              <tr>
+                <th>Data Ordine</th>
+                <th>Categoria</th>
+                <th>Nome Materiale</th>
+                <th>Azienda</th>
+                <th>Distributore</th>
+                <th>Prezzo (€)</th>
+                <th>Quantità</th>
+                <th>Totale (€)</th>
+              </tr>
+            </thead>
+            <tbody id="reportTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Implants Report Modal -->
+  <div id="implantsReportModal">
+    <div class="report-modal-content">
+      <div class="report-header">
+        <h2>📊 Report Economici Impianti</h2>
+        <button class="report-close" onclick="closeImplantsReportModal()">×</button>
+      </div>
+      <div class="report-body">
+        
+        <!-- Filtri Report -->
+        <div class="report-filters">
+          <div class="report-filter-group">
+            <label>Tipo Impianto</label>
+            <select id="implantsReportTypeFilter" onchange="updateImplantsReportData()">
+              <option value="Tutti">Tutti</option>
+            </select>
+          </div>
+          <div class="report-filter-group">
+            <label>Azienda</label>
+            <select id="implantsReportCompanyFilter" onchange="updateImplantsReportData()">
+              <option value="Tutte">Tutte</option>
+            </select>
+          </div>
+          <div class="report-filter-group" style="margin-top:24px">
+            <button onclick="resetImplantsReportFilters()" style="padding:8px 16px;background:#d32f2f;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:600">Azzera Filtri</button>
+          </div>
+        </div>
+
+        <!-- Statistiche Riassuntive -->
+        <div class="report-stats">
+          <div class="report-stat">
+            <div class="report-stat-label">Spesa Totale</div>
+            <div class="report-stat-value" id="implantsReportTotalExpense">€ 0.00</div>
+          </div>
+          <div class="report-stat">
+            <div class="report-stat-label">Numero Ordini</div>
+            <div class="report-stat-value" id="implantsReportOrderCount">0</div>
+          </div>
+          <div class="report-stat">
+            <div class="report-stat-label">Prezzo Medio</div>
+            <div class="report-stat-value" id="implantsReportAveragePrice">€ 0.00</div>
+          </div>
+          <div class="report-stat">
+            <div class="report-stat-label">Top Tipo</div>
+            <div class="report-stat-value" id="implantsReportTopType" style="font-size:16px">--</div>
+          </div>
+        </div>
+
+        <!-- Grafici -->
+        <div class="report-content">
+          <div>
+            <h3 style="color:#003d7a;margin-bottom:12px">📈 Trend Spese (Mese)</h3>
+            <div class="report-chart-container">
+              <canvas id="implantsReportTrendChart"></canvas>
+            </div>
+          </div>
+          <div>
+            <h3 style="color:#003d7a;margin-bottom:12px">📊 Distribuzione per Tipo</h3>
+            <div class="report-chart-container">
+              <canvas id="implantsReportDistributionChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabella Analitica -->
+        <h3 style="color:#003d7a;margin-bottom:12px">📋 Analisi Dettagliata</h3>
+        <div class="report-table-container">
+          <table class="report-table">
+            <thead>
+              <tr>
+                <th>Data Ordine</th>
+                <th>Tipo</th>
+                <th>Azienda</th>
+                <th>Modello</th>
+                <th>Prezzo (€)</th>
+                <th>Quantità</th>
+                <th>Totale (€)</th>
+              </tr>
+            </thead>
+            <tbody id="implantsReportTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
   <script>
     // --- Firebase Configuration ---
     const firebaseConfig = {
@@ -2290,6 +2508,397 @@
       initImplantFilters(); // Aggiorna i filtri
       renderImplantsList();
     });
+
+    // ===== REPORT ECONOMICI FUNCTIONS =====
+    let reportCharts = { trend: null, distribution: null };
+
+    function openReportModal() {
+      const modal = document.getElementById('reportModal');
+      modal.classList.add('active');
+      setTimeout(() => initReportFilters(), 100);
+    }
+
+    function closeReportModal() {
+      const modal = document.getElementById('reportModal');
+      modal.classList.remove('active');
+      if (reportCharts.trend) reportCharts.trend.destroy();
+      if (reportCharts.distribution) reportCharts.distribution.destroy();
+    }
+
+    function initReportFilters() {
+      const materials = loadFromLocalStorage();
+      
+      // Popola categorie
+      const categories = Array.from(new Set(materials.map(m => m.category).filter(c => c))).sort();
+      const categorySelect = document.getElementById('reportCategoryFilter');
+      categorySelect.innerHTML = '<option value="Tutti">Tutti</option>';
+      categories.forEach(cat => {
+        const opt = document.createElement('option');
+        opt.value = cat;
+        opt.textContent = cat;
+        categorySelect.appendChild(opt);
+      });
+
+      // Popola aziende
+      const companies = Array.from(new Set(materials.map(m => m.company).filter(c => c))).sort();
+      const companySelect = document.getElementById('reportCompanyFilter');
+      companySelect.innerHTML = '<option value="Tutte">Tutte</option>';
+      companies.forEach(comp => {
+        const opt = document.createElement('option');
+        opt.value = comp;
+        opt.textContent = comp;
+        companySelect.appendChild(opt);
+      });
+
+      // Popola distributori
+      const distributors = Array.from(new Set(materials.map(m => m.distributor).filter(d => d))).sort();
+      const distributorSelect = document.getElementById('reportDistributorFilter');
+      distributorSelect.innerHTML = '<option value="Tutti">Tutti</option>';
+      distributors.forEach(dist => {
+        const opt = document.createElement('option');
+        opt.value = dist;
+        opt.textContent = dist;
+        distributorSelect.appendChild(opt);
+      });
+
+      updateReportData();
+    }
+
+    function getFilteredReportData() {
+      const materials = loadFromLocalStorage();
+      const categoryFilter = document.getElementById('reportCategoryFilter').value;
+      const companyFilter = document.getElementById('reportCompanyFilter').value;
+      const distributorFilter = document.getElementById('reportDistributorFilter').value;
+
+      return materials.filter(m => {
+        if (categoryFilter !== 'Tutti' && m.category !== categoryFilter) return false;
+        if (companyFilter !== 'Tutte' && m.company !== companyFilter) return false;
+        if (distributorFilter !== 'Tutti' && m.distributor !== distributorFilter) return false;
+        return true;
+      });
+    }
+
+    function updateReportData() {
+      const filtered = getFilteredReportData();
+      
+      // Calcola statistiche
+      const totalExpense = filtered.reduce((sum, m) => sum + ((m.price || 0) * (m.quantity || 1)), 0);
+      const orderCount = filtered.length;
+      const avgPrice = orderCount > 0 ? totalExpense / orderCount : 0;
+      
+      // Top categoria
+      const categoryExpense = {};
+      filtered.forEach(m => {
+        const cat = m.category || 'Non categorizzato';
+        categoryExpense[cat] = (categoryExpense[cat] || 0) + ((m.price || 0) * (m.quantity || 1));
+      });
+      const topCategory = Object.entries(categoryExpense).sort((a, b) => b[1] - a[1])[0]?.[0] || '--';
+
+      document.getElementById('reportTotalExpense').textContent = '€ ' + totalExpense.toFixed(2);
+      document.getElementById('reportOrderCount').textContent = orderCount;
+      document.getElementById('reportAveragePrice').textContent = '€ ' + avgPrice.toFixed(2);
+      document.getElementById('reportTopCategory').textContent = topCategory;
+
+      // Aggiorna grafici e tabella
+      updateReportCharts(filtered);
+      updateReportTable(filtered);
+    }
+
+    function updateReportCharts(filtered) {
+      // Trend spese per mese
+      const monthlyData = {};
+      filtered.forEach(m => {
+        const orderDate = m.orderDate ? (typeof m.orderDate === 'string' ? new Date(m.orderDate) : m.orderDate) : new Date();
+        const monthKey = orderDate.toLocaleDateString('it-IT', { year: 'numeric', month: '2-digit' });
+        monthlyData[monthKey] = (monthlyData[monthKey] || 0) + ((m.price || 0) * (m.quantity || 1));
+      });
+
+      const sortedMonths = Object.keys(monthlyData).sort();
+      const monthlyExpenses = sortedMonths.map(m => monthlyData[m]);
+
+      // Distrubuzione per categoria
+      const categoryData = {};
+      filtered.forEach(m => {
+        const cat = m.category || 'Non categorizzato';
+        categoryData[cat] = (categoryData[cat] || 0) + ((m.price || 0) * (m.quantity || 1));
+      });
+
+      // Destroy previous charts
+      if (reportCharts.trend) reportCharts.trend.destroy();
+      if (reportCharts.distribution) reportCharts.distribution.destroy();
+
+      // Trend Chart
+      const trendCtx = document.getElementById('reportTrendChart').getContext('2d');
+      reportCharts.trend = new Chart(trendCtx, {
+        type: 'line',
+        data: {
+          labels: sortedMonths,
+          datasets: [{
+            label: 'Spesa Mensile (€)',
+            data: monthlyExpenses,
+            borderColor: '#0066cc',
+            backgroundColor: 'rgba(0, 102, 204, 0.1)',
+            borderWidth: 2,
+            fill: true,
+            tension: 0.4,
+            pointRadius: 5,
+            pointBackgroundColor: '#0066cc'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: true }
+          },
+          scales: {
+            y: { beginAtZero: true, title: { display: true, text: 'Spesa (€)' } }
+          }
+        }
+      });
+
+      // Distribution Chart
+      const distCtx = document.getElementById('reportDistributionChart').getContext('2d');
+      const colors = ['#0066cc', '#d32f2f', '#f57c00', '#388e3c', '#7b1fa2', '#c2185b', '#00838f', '#6d4c41'];
+      reportCharts.distribution = new Chart(distCtx, {
+        type: 'doughnut',
+        data: {
+          labels: Object.keys(categoryData),
+          datasets: [{
+            data: Object.values(categoryData),
+            backgroundColor: colors
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'bottom' }
+          }
+        }
+      });
+    }
+
+    function updateReportTable(filtered) {
+      const tbody = document.getElementById('reportTableBody');
+      tbody.innerHTML = '';
+
+      filtered.sort((a, b) => {
+        const dateA = a.orderDate ? (typeof a.orderDate === 'string' ? new Date(a.orderDate) : a.orderDate) : new Date();
+        const dateB = b.orderDate ? (typeof b.orderDate === 'string' ? new Date(b.orderDate) : b.orderDate) : new Date();
+        return dateB - dateA;
+      }).forEach(m => {
+        const orderDate = m.orderDate ? (typeof m.orderDate === 'string' ? m.orderDate : m.orderDate.toLocaleDateString('it-IT')) : '--';
+        const total = ((m.price || 0) * (m.quantity || 1)).toFixed(2);
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${orderDate}</td>
+          <td>${m.category || '--'}</td>
+          <td>${m.name || '--'}</td>
+          <td>${m.company || '--'}</td>
+          <td>${m.distributor || '--'}</td>
+          <td>€ ${(m.price || 0).toFixed(2)}</td>
+          <td>${m.quantity || 0}</td>
+          <td>€ ${total}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function resetReportFilters() {
+      document.getElementById('reportCategoryFilter').value = 'Tutti';
+      document.getElementById('reportCompanyFilter').value = 'Tutte';
+      document.getElementById('reportDistributorFilter').value = 'Tutti';
+      updateReportData();
+    }
+
+    // ===== IMPLANTS REPORT FUNCTIONS =====
+    let implantsReportCharts = { trend: null, distribution: null };
+
+    function openImplantsReportModal() {
+      const modal = document.getElementById('implantsReportModal');
+      modal.classList.add('active');
+      setTimeout(() => initImplantsReportFilters(), 100);
+    }
+
+    function closeImplantsReportModal() {
+      const modal = document.getElementById('implantsReportModal');
+      modal.classList.remove('active');
+      if (implantsReportCharts.trend) implantsReportCharts.trend.destroy();
+      if (implantsReportCharts.distribution) implantsReportCharts.distribution.destroy();
+    }
+
+    function initImplantsReportFilters() {
+      const implants = loadImplantsFromStorage();
+      
+      // Popola tipi
+      const types = Array.from(new Set(implants.map(i => i.type).filter(t => t))).sort();
+      const typeSelect = document.getElementById('implantsReportTypeFilter');
+      typeSelect.innerHTML = '<option value="Tutti">Tutti</option>';
+      types.forEach(type => {
+        const opt = document.createElement('option');
+        opt.value = type;
+        opt.textContent = type;
+        typeSelect.appendChild(opt);
+      });
+
+      // Popola aziende
+      const companies = Array.from(new Set(implants.map(i => i.company).filter(c => c))).sort();
+      const companySelect = document.getElementById('implantsReportCompanyFilter');
+      companySelect.innerHTML = '<option value="Tutte">Tutte</option>';
+      companies.forEach(comp => {
+        const opt = document.createElement('option');
+        opt.value = comp;
+        opt.textContent = comp;
+        companySelect.appendChild(opt);
+      });
+
+      updateImplantsReportData();
+    }
+
+    function getFilteredImplantsReportData() {
+      const implants = loadImplantsFromStorage();
+      const typeFilter = document.getElementById('implantsReportTypeFilter').value;
+      const companyFilter = document.getElementById('implantsReportCompanyFilter').value;
+
+      return implants.filter(i => {
+        if (typeFilter !== 'Tutti' && i.type !== typeFilter) return false;
+        if (companyFilter !== 'Tutte' && i.company !== companyFilter) return false;
+        return true;
+      });
+    }
+
+    function updateImplantsReportData() {
+      const filtered = getFilteredImplantsReportData();
+      
+      // Calcola statistiche
+      const totalExpense = filtered.reduce((sum, i) => sum + ((i.price || 0) * (i.quantity || 1)), 0);
+      const orderCount = filtered.length;
+      const avgPrice = orderCount > 0 ? totalExpense / orderCount : 0;
+      
+      // Top tipo
+      const typeExpense = {};
+      filtered.forEach(i => {
+        const type = i.type || 'Non categorizzato';
+        typeExpense[type] = (typeExpense[type] || 0) + ((i.price || 0) * (i.quantity || 1));
+      });
+      const topType = Object.entries(typeExpense).sort((a, b) => b[1] - a[1])[0]?.[0] || '--';
+
+      document.getElementById('implantsReportTotalExpense').textContent = '€ ' + totalExpense.toFixed(2);
+      document.getElementById('implantsReportOrderCount').textContent = orderCount;
+      document.getElementById('implantsReportAveragePrice').textContent = '€ ' + avgPrice.toFixed(2);
+      document.getElementById('implantsReportTopType').textContent = topType;
+
+      // Aggiorna grafici e tabella
+      updateImplantsReportCharts(filtered);
+      updateImplantsReportTable(filtered);
+    }
+
+    function updateImplantsReportCharts(filtered) {
+      // Trend spese per mese
+      const monthlyData = {};
+      filtered.forEach(i => {
+        const orderDate = i.orderDate ? (typeof i.orderDate === 'string' ? new Date(i.orderDate) : i.orderDate) : new Date();
+        const monthKey = orderDate.toLocaleDateString('it-IT', { year: 'numeric', month: '2-digit' });
+        monthlyData[monthKey] = (monthlyData[monthKey] || 0) + ((i.price || 0) * (i.quantity || 1));
+      });
+
+      const sortedMonths = Object.keys(monthlyData).sort();
+      const monthlyExpenses = sortedMonths.map(m => monthlyData[m]);
+
+      // Distribuzione per tipo
+      const typeData = {};
+      filtered.forEach(i => {
+        const type = i.type || 'Non categorizzato';
+        typeData[type] = (typeData[type] || 0) + ((i.price || 0) * (i.quantity || 1));
+      });
+
+      // Destroy previous charts
+      if (implantsReportCharts.trend) implantsReportCharts.trend.destroy();
+      if (implantsReportCharts.distribution) implantsReportCharts.distribution.destroy();
+
+      // Trend Chart
+      const trendCtx = document.getElementById('implantsReportTrendChart').getContext('2d');
+      implantsReportCharts.trend = new Chart(trendCtx, {
+        type: 'line',
+        data: {
+          labels: sortedMonths,
+          datasets: [{
+            label: 'Spesa Mensile (€)',
+            data: monthlyExpenses,
+            borderColor: '#1976d2',
+            backgroundColor: 'rgba(25, 118, 210, 0.1)',
+            borderWidth: 2,
+            fill: true,
+            tension: 0.4,
+            pointRadius: 5,
+            pointBackgroundColor: '#1976d2'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: true }
+          },
+          scales: {
+            y: { beginAtZero: true, title: { display: true, text: 'Spesa (€)' } }
+          }
+        }
+      });
+
+      // Distribution Chart
+      const distCtx = document.getElementById('implantsReportDistributionChart').getContext('2d');
+      const colors = ['#1976d2', '#d32f2f', '#f57c00', '#388e3c', '#7b1fa2', '#c2185b', '#00838f', '#6d4c41'];
+      implantsReportCharts.distribution = new Chart(distCtx, {
+        type: 'doughnut',
+        data: {
+          labels: Object.keys(typeData),
+          datasets: [{
+            data: Object.values(typeData),
+            backgroundColor: colors
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'bottom' }
+          }
+        }
+      });
+    }
+
+    function updateImplantsReportTable(filtered) {
+      const tbody = document.getElementById('implantsReportTableBody');
+      tbody.innerHTML = '';
+
+      filtered.sort((a, b) => {
+        const dateA = a.orderDate ? (typeof a.orderDate === 'string' ? new Date(a.orderDate) : a.orderDate) : new Date();
+        const dateB = b.orderDate ? (typeof b.orderDate === 'string' ? new Date(b.orderDate) : b.orderDate) : new Date();
+        return dateB - dateA;
+      }).forEach(i => {
+        const orderDate = i.orderDate ? (typeof i.orderDate === 'string' ? i.orderDate : i.orderDate.toLocaleDateString('it-IT')) : '--';
+        const total = ((i.price || 0) * (i.quantity || 1)).toFixed(2);
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${orderDate}</td>
+          <td>${i.type || '--'}</td>
+          <td>${i.company || '--'}</td>
+          <td>${i.model || '--'}</td>
+          <td>€ ${(i.price || 0).toFixed(2)}</td>
+          <td>${i.quantity || 0}</td>
+          <td>€ ${total}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function resetImplantsReportFilters() {
+      document.getElementById('implantsReportTypeFilter').value = 'Tutti';
+      document.getElementById('implantsReportCompanyFilter').value = 'Tutte';
+      updateImplantsReportData();
+    }
 
     // Mostra/nascondi pulsante Gestione Impianti in base alla categoria
     function updateImplantsButtonVisibility() {
