@@ -365,6 +365,47 @@
         </form>
 
         <h3 style="margin:24px 0 12px;color:#003d7a;font-size:18px">📋 Inventario Impianti</h3>
+        
+        <!-- Filtri Impianti -->
+        <div class="filters-row" style="margin-bottom:16px;display:flex;gap:16px;flex-wrap:wrap;align-items:flex-end">
+          <div>
+            <label for="implantTypeFilter" class="filter-label">Filtra per tipo:</label>
+            <select id="implantTypeFilter" class="filter-select">
+              <option value="Tutti">Tutti</option>
+              <option value="Impianto">Impianto</option>
+              <option value="Vite tappo">Vite tappo</option>
+              <option value="Vite di guarigione">Vite di guarigione</option>
+              <option value="Kit chirurgico">Kit chirurgico</option>
+              <option value="Cacciavite">Cacciavite</option>
+              <option value="Cricchetto">Cricchetto</option>
+              <option value="Componente protesica">Componente protesica</option>
+              <option value="Altro">Altro</option>
+            </select>
+          </div>
+          <div>
+            <label for="implantCompanyFilter" class="filter-label">Filtra per azienda:</label>
+            <select id="implantCompanyFilter" class="filter-select">
+              <option value="Tutte">Tutte</option>
+            </select>
+          </div>
+          <div>
+            <label for="implantModelFilter" class="filter-label">Filtra per modello:</label>
+            <select id="implantModelFilter" class="filter-select">
+              <option value="Tutti">Tutti</option>
+            </select>
+          </div>
+          <div>
+            <label for="implantExpiryFilter" class="filter-label">Filtra per scadenza:</label>
+            <select id="implantExpiryFilter" class="filter-select">
+              <option value="Tutte">Tutte</option>
+              <option value="Scaduti">Scaduti</option>
+              <option value="< 3 mesi">< 3 mesi</option>
+              <option value="< 6 mesi">< 6 mesi</option>
+              <option value="> 6 mesi">> 6 mesi</option>
+            </select>
+          </div>
+        </div>
+        
         <div class="table-wrapper">
           <table>
             <thead>
@@ -536,6 +577,11 @@
     }
 
     // --- IMPLANTS MANAGEMENT ---
+    let currentImplantTypeFilter = 'Tutti';
+    let currentImplantCompanyFilter = 'Tutte';
+    let currentImplantModelFilter = 'Tutti';
+    let currentImplantExpiryFilter = 'Tutte';
+
     function loadImplantsFromStorage(){
       const saved = localStorage.getItem('magazzino_implants');
       return saved ? JSON.parse(saved) : [];
@@ -644,9 +690,37 @@
 
     function renderImplantsList(){
       const implantsList = document.getElementById('implantsList');
-      const implants = loadImplantsFromStorage();
-      implantsList.innerHTML = '';
+      let implants = loadImplantsFromStorage();
       const now = new Date();
+      
+      // Applica filtri
+      if(currentImplantTypeFilter !== 'Tutti'){
+        implants = implants.filter(i => i.type === currentImplantTypeFilter);
+      }
+      if(currentImplantCompanyFilter !== 'Tutte'){
+        implants = implants.filter(i => i.company === currentImplantCompanyFilter);
+      }
+      if(currentImplantModelFilter !== 'Tutti'){
+        implants = implants.filter(i => i.model === currentImplantModelFilter);
+      }
+      if(currentImplantExpiryFilter !== 'Tutte'){
+        implants = implants.filter(i => {
+          if(!i.expiry) return currentImplantExpiryFilter === 'Tutte';
+          const expiry = new Date(i.expiry);
+          const days = daysBetween(now, expiry);
+          const mesi = days / 30.44;
+          
+          switch(currentImplantExpiryFilter){
+            case 'Scaduti': return days < 0;
+            case '< 3 mesi': return days >= 0 && mesi < 3;
+            case '< 6 mesi': return days >= 0 && mesi < 6;
+            case '> 6 mesi': return mesi >= 6;
+            default: return true;
+          }
+        });
+      }
+      
+      implantsList.innerHTML = '';
       
       implants.forEach(implant=>{
         const tr = document.createElement('tr');
@@ -699,7 +773,34 @@
     function openImplantsModal(){
       document.getElementById('implantsModal').classList.add('active');
       populateImplantModelSelect();
+      initImplantFilters();
       renderImplantsList();
+    }
+
+    function initImplantFilters(){
+      const implants = loadImplantsFromStorage();
+      
+      // Popola filtro aziende
+      const companies = [...new Set(implants.map(i => i.company).filter(c => c))];
+      const companyFilter = document.getElementById('implantCompanyFilter');
+      companyFilter.innerHTML = '<option value="Tutte">Tutte</option>';
+      companies.sort().forEach(company => {
+        const option = document.createElement('option');
+        option.value = company;
+        option.textContent = company;
+        companyFilter.appendChild(option);
+      });
+      
+      // Popola filtro modelli
+      const models = [...new Set(implants.map(i => i.model).filter(m => m))];
+      const modelFilter = document.getElementById('implantModelFilter');
+      modelFilter.innerHTML = '<option value="Tutti">Tutti</option>';
+      models.sort().forEach(model => {
+        const option = document.createElement('option');
+        option.value = model;
+        option.textContent = model;
+        modelFilter.appendChild(option);
+      });
     }
 
     function closeImplantsModal(){
@@ -1406,6 +1507,27 @@
       populateImplantModelSelect();
     });
 
+    // Event listeners per i filtri impianti
+    document.getElementById('implantTypeFilter').addEventListener('change', function() {
+      currentImplantTypeFilter = this.value;
+      renderImplantsList();
+    });
+    
+    document.getElementById('implantCompanyFilter').addEventListener('change', function() {
+      currentImplantCompanyFilter = this.value;
+      renderImplantsList();
+    });
+    
+    document.getElementById('implantModelFilter').addEventListener('change', function() {
+      currentImplantModelFilter = this.value;
+      renderImplantsList();
+    });
+    
+    document.getElementById('implantExpiryFilter').addEventListener('change', function() {
+      currentImplantExpiryFilter = this.value;
+      renderImplantsList();
+    });
+
     // Submit form impianti
     document.getElementById('implantForm').addEventListener('submit', async e => {
       e.preventDefault();
@@ -1463,6 +1585,7 @@
       document.getElementById('implantForm').reset();
       document.getElementById('implantQuantity').value = 1;
       showAlert('✓ Impianto aggiunto', 'info');
+      initImplantFilters(); // Aggiorna i filtri
       renderImplantsList();
     });
 
