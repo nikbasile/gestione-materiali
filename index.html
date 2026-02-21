@@ -223,9 +223,10 @@
     <div id="categoryFilters" class="category-filters"></div>
 
     <div class="action-buttons">
-      <button class="export" onclick="downloadPDF()">📥 Scarica PDF</button>
-      <button class="export" onclick="exportMaterialsCSV()" style="background:#FF9800">📄 Export CSV Materiali</button>
-      <button class="export" onclick="exportImplantsCSV()" style="background:#9C27B0">📄 Export CSV Impianti</button>
+      <button class="export" onclick="downloadMaterialsPDF()" style="background:#D32F2F">📄 PDF Materiali</button>
+      <button class="export" onclick="downloadImplantsPDF()" style="background:#7B1FA2">📄 PDF Impianti</button>
+      <button class="export" onclick="exportMaterialsCSV()" style="background:#FF9800">📊 CSV Materiali</button>
+      <button class="export" onclick="exportImplantsCSV()" style="background:#9C27B0">📊 CSV Impianti</button>
       <button class="export" onclick="exportBackup()" style="background:#2196F3">💾 Backup Dati</button>
       <button class="export" onclick="document.getElementById('importFile').click()" style="background:#4CAF50">📂 Importa Backup</button>
       <input type="file" id="importFile" accept=".json" style="display:none" onchange="importBackup(event)" />
@@ -1427,8 +1428,8 @@
       allMaterials = loadFromLocalStorage();
     }
 
-    async function downloadPDF(){
-      if(allMaterials.length === 0){
+    async function downloadMaterialsPDF(){
+      if(!allMaterials || allMaterials.length === 0){
         showAlert('Nessun materiale da esportare', 'warn');
         return;
       }
@@ -1530,13 +1531,135 @@
       // Generate PDF
       const opt = {
         margin: 10,
-        filename: 'magazzino_' + new Date().toISOString().split('T')[0] + '.pdf',
+        filename: 'materiali_' + new Date().toISOString().split('T')[0] + '.pdf',
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: { scale: 2 },
         jsPDF: { orientation: 'landscape', unit: 'mm', format: 'a4' }
       };
       html2pdf().set(opt).from(element).save();
-      showAlert('✓ PDF scaricato con successo', 'info');
+      showAlert('✓ PDF Materiali scaricato con successo', 'info');
+    }
+
+    async function downloadImplantsPDF(){
+      const implants = loadImplantsFromStorage();
+      if(!implants || implants.length === 0){
+        showAlert('Nessun impianto da esportare', 'warn');
+        return;
+      }
+
+      const element = document.createElement('div');
+      element.style.padding = '20px';
+      element.style.fontFamily = 'Arial, sans-serif';
+      element.style.backgroundColor = '#fff';
+
+      // Header
+      const header = document.createElement('div');
+      header.style.marginBottom = '20px';
+      header.style.textAlign = 'center';
+      header.innerHTML = `
+        <h1 style="color:#003d7a;margin:0 0 10px 0;font-size:24px">Studio Dentistico - Magazzino Impianti</h1>
+        <p style="color:#7f8c8d;margin:0;font-size:12px">Esportazione del: ${new Date().toLocaleDateString()}</p>
+      `;
+      element.appendChild(header);
+
+      // Table
+      const table = document.createElement('table');
+      table.style.width = '100%';
+      table.style.borderCollapse = 'collapse';
+      table.style.marginTop = '20px';
+
+      // Table header
+      const thead = document.createElement('thead');
+      const headerRow = document.createElement('tr');
+      headerRow.style.backgroundColor = '#003d7a';
+      headerRow.style.color = '#fff';
+      const headers = ['Tipo', 'Azienda', 'Modello', 'Ø', 'L', 'Data Ordine', 'Scadenza', 'Prezzo (€)', 'Quantità'];
+      headers.forEach(h=>{
+        const th = document.createElement('th');
+        th.textContent = h;
+        th.style.border = '1px solid #ddd';
+        th.style.padding = '10px';
+        th.style.textAlign = 'left';
+        th.style.fontWeight = 'bold';
+        th.style.fontSize = '11px';
+        headerRow.appendChild(th);
+      });
+      thead.appendChild(headerRow);
+      table.appendChild(thead);
+
+      // Table body
+      const tbody = document.createElement('tbody');
+      const now = new Date();
+      implants.forEach(implant=>{
+        const tr = document.createElement('tr');
+        tr.style.borderBottom = '1px solid #ddd';
+
+        const orderDate = implant.orderDate ? new Date(implant.orderDate).toLocaleDateString() : '-';
+        const expiry = implant.expiry ? new Date(implant.expiry) : null;
+        const diameter = implant.diameter ? implant.diameter + ' mm' : '-';
+        const length = implant.length ? implant.length + ' mm' : '-';
+
+        let statusText = '';
+        if(!expiry){ statusText = '⚪'; }
+        else{
+          const days = daysBetween(now, expiry);
+          const mesi = days / 30.44;
+          if(days < 0) statusText = '🔴 Scaduto';
+          else if(mesi < 3) statusText = '🔴 < 3 mesi';
+          else if(mesi < 6) statusText = '🟡 < 6 mesi';
+          else statusText = '🟢 OK';
+        }
+
+        const cells = [
+          implant.type || '-',
+          implant.company || '-',
+          implant.model || (implant.kitComponents || '-'),
+          diameter,
+          length,
+          orderDate,
+          statusText,
+          '€ ' + Number(implant.price || 0).toFixed(2),
+          implant.quantity || 0
+        ];
+
+        cells.forEach(cell=>{
+          const td = document.createElement('td');
+          td.textContent = cell;
+          td.style.border = '1px solid #ddd';
+          td.style.padding = '8px';
+          td.style.fontSize = '10px';
+          tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+      });
+      table.appendChild(tbody);
+      element.appendChild(table);
+
+      // Summary
+      const summary = document.createElement('div');
+      summary.style.marginTop = '20px';
+      summary.style.fontSize = '11px';
+      summary.style.color = '#7f8c8d';
+      summary.innerHTML = `
+        <p style="margin:5px 0"><strong>Totale impianti:</strong> ${implants.length}</p>
+        <p style="margin:5px 0"><strong>Valore totale:</strong> € ${implants.reduce((sum, i)=>(sum + (parseFloat(i.price)||0) * (i.quantity||0)), 0).toFixed(2)}</p>
+      `;
+      element.appendChild(summary);
+
+      // Generate PDF
+      const opt = {
+        margin: 10,
+        filename: 'impianti_' + new Date().toISOString().split('T')[0] + '.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { orientation: 'landscape', unit: 'mm', format: 'a4' }
+      };
+      html2pdf().set(opt).from(element).save();
+      showAlert('✓ PDF Impianti scaricato con successo', 'info');
+    }
+
+    async function downloadPDF(){
+      downloadMaterialsPDF();
     }
 
     // --- BACKUP & RESTORE ---
