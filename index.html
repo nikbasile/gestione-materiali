@@ -3500,6 +3500,12 @@
       companyInput.placeholder = 'Azienda';
       companyInput.className = 'article-company';
 
+      const descriptionInput = document.createElement('input');
+      descriptionInput.type = 'text';
+      descriptionInput.className = 'article-desc';
+      descriptionInput.value = '';
+      descriptionInput.style.display = 'none';
+
       const removeBtn = document.createElement('button');
       removeBtn.type = 'button';
       removeBtn.className = 'article-remove';
@@ -3537,6 +3543,7 @@
       row.appendChild(priceFieldWrapper);
       row.appendChild(companyFieldWrapper);
       row.appendChild(expiryFieldWrapper);
+      row.appendChild(descriptionInput);
       row.appendChild(removeBtn);
 
       document.getElementById('articlesContainer').appendChild(row);
@@ -3550,11 +3557,13 @@
       const priceInput = row.querySelector('.article-price');
       const companyInput = row.querySelector('.article-company');
       const expiryInput = row.querySelector('.article-expiry');
+      const descInput = row.querySelector('.article-desc');
       if (data.materialId) materialSelect.value = data.materialId;
       if (data.quantity !== undefined) qtyInput.value = data.quantity;
       if (data.price !== undefined) priceInput.value = data.price;
       if (data.company) companyInput.value = data.company;
       if (data.expiry) expiryInput.value = data.expiry;
+      if (data.description) descInput.value = data.description;
       return row;
     }
 
@@ -3808,6 +3817,7 @@
 
       rows.forEach(row => {
         const materialName = row.querySelector('.pdf-import-name')?.value || '';
+        const description = row.querySelector('.pdf-import-desc')?.value || '';
         const quantity = parseInt(row.querySelector('.pdf-import-qty')?.value, 10) || 0;
         const price = parseFloat(row.querySelector('.pdf-import-price')?.value) || 0;
         const category = row.querySelector('select')?.value || '';
@@ -3832,7 +3842,7 @@
         }
 
         if (materialId && quantity > 0) {
-          addArticleRowWithData({ materialId, quantity, price, company });
+          addArticleRowWithData({ materialId, quantity, price, company, description });
           imported += 1;
         } else {
           skipped += 1;
@@ -3911,9 +3921,10 @@
         const price = parseFloat(row.querySelector('.article-price')?.value) || 0;
         const company = row.querySelector('.article-company')?.value || '';
         const expiry = row.querySelector('.article-expiry')?.value;
+        const description = row.querySelector('.article-desc')?.value || '';
 
         if (materialId && quantity > 0) {
-          articles.push({ materialId, quantity, price, company, expiry });
+          articles.push({ materialId, quantity, price, company, expiry, description });
         }
       });
 
@@ -3942,6 +3953,7 @@
             quantitàRimanente: article.quantity,
             prezzo: article.price,
             azienda: article.company || '',
+            descrizione: article.description || '',
             scadenza: article.expiry
           };
 
