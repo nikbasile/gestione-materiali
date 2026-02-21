@@ -1756,7 +1756,8 @@
         'impianti_' + new Date().toISOString().split('T')[0] + '.pdf',
         headers,
         rows,
-        summaryLines
+        summaryLines,
+        [14, 16, 20, 8, 8, 14, 14, 10, 8]
       );
       showAlert('✓ PDF Impianti scaricato con successo', 'info');
     }
@@ -1931,7 +1932,7 @@
           '"' + (material.name || '').replace(/"/g, '""') + '"',
           orderDate,
           expiry,
-          (material.price || 0).toFixed(2),
+          Number(material.price || 0).toFixed(2),
           material.quantity || 0,
           '"' + (material.category || '').replace(/"/g, '""') + '"',
           '"' + (material.distributor || '').replace(/"/g, '""') + '"',
@@ -1979,7 +1980,7 @@
           implant.length || '',
           orderDate,
           expiry,
-          (implant.price || 0).toFixed(2),
+          Number(implant.price || 0).toFixed(2),
           implant.quantity || 0
         ];
         csvContent += row.join(',') + '\n';
