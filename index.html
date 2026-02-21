@@ -199,6 +199,7 @@
     .order-info-group input:focus,.order-info-group select:focus{outline:none;border-color:#388e3c;box-shadow:0 0 0 3px rgba(56,142,60,0.12);background:#fafbfc}
     .articles-container{margin:32px 0;border:none;border-radius:0;padding:0;background:transparent;flex:1;overflow-y:auto;overflow-x:hidden;padding-right:8px}
     .articles-title{font-weight:700;color:#003d7a;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;font-size:15px;padding-bottom:14px;border-bottom:2px solid #e0e0e0;gap:12px;flex-wrap:wrap}
+    .order-articles-actions{display:flex;gap:10px;flex-wrap:wrap}
     .article-row{display:grid;grid-template-columns:minmax(220px,1.5fr) minmax(90px,0.7fr) minmax(90px,0.7fr) minmax(140px,1fr) 90px;gap:14px;margin-bottom:16px;padding:18px;background:#fafbfc;border-radius:10px;border:1.5px solid #e8ecf1;align-items:flex-end;transition:all 0.3s;border-left:4px solid #388e3c}
     .article-row > *{min-width:0}
     .article-row:hover{box-shadow:0 6px 16px rgba(0,0,0,0.1);background:#fff;border-color:#388e3c}
@@ -210,12 +211,44 @@
     .article-remove:hover{background:#b71c1c;transform:translateY(-2px);box-shadow:0 4px 10px rgba(198,40,40,0.35)}
     .add-article-btn{padding:12px 20px;background:linear-gradient(135deg,#388e3c 0%,#2e7d32 100%);color:#fff;border:none;border-radius:7px;cursor:pointer;font-weight:600;transition:all 0.3s;font-size:13px;display:flex;align-items:center;gap:6px;box-shadow:0 3px 10px rgba(56,142,60,0.3);text-transform:uppercase;letter-spacing:0.4px}
     .add-article-btn:hover{transform:translateY(-3px);box-shadow:0 6px 16px rgba(56,142,60,0.4)}
+    .import-article-btn{padding:12px 18px;background:linear-gradient(135deg,#1976d2 0%,#0d47a1 100%);color:#fff;border:none;border-radius:7px;cursor:pointer;font-weight:600;transition:all 0.3s;font-size:13px;display:flex;align-items:center;gap:6px;box-shadow:0 3px 10px rgba(25,118,210,0.25);text-transform:uppercase;letter-spacing:0.4px}
+    .import-article-btn:hover{transform:translateY(-3px);box-shadow:0 6px 16px rgba(25,118,210,0.35)}
     .order-buttons{display:flex;gap:14px;margin-top:20px;padding:20px 40px;border-top:2px solid #e0e0e0;background:#fff;position:sticky;bottom:0;left:0;right:0;z-index:100;width:100%}
     .order-btn{flex:1;padding:14px 20px;font-weight:600;border:none;border-radius:8px;cursor:pointer;transition:all 0.3s;font-size:13px;text-transform:uppercase;letter-spacing:0.5px}
     .order-btn.cancel{background:#e0e0e0;color:#333}
     .order-btn.cancel:hover{background:#bdbdbd;transform:translateY(-2px);box-shadow:0 4px 10px rgba(0,0,0,0.15)}
     .order-btn.submit{background:linear-gradient(135deg,#388e3c 0%,#2e7d32 100%);color:#fff;box-shadow:0 3px 10px rgba(56,142,60,0.3)}
     .order-btn.submit:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(56,142,60,0.4)}
+
+    /* PDF Import Modal Styles */
+    #pdfImportModal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:10002;overflow-y:auto;padding:20px}
+    #pdfImportModal.active{display:flex;align-items:flex-start;justify-content:center}
+    .pdf-import-content{background:#fff;border-radius:12px;max-width:1100px;width:100%;margin:20px auto;box-shadow:0 8px 32px rgba(0,0,0,0.3)}
+    .pdf-import-header{background:linear-gradient(135deg,#1976d2 0%,#0d47a1 100%);color:#fff;padding:20px;border-radius:12px 12px 0 0;display:flex;justify-content:space-between;align-items:center}
+    .pdf-import-header h2{margin:0;font-size:22px}
+    .pdf-import-close{background:transparent;color:#fff;border:2px solid #fff;width:36px;height:36px;border-radius:50%;font-size:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s}
+    .pdf-import-close:hover{background:#fff;color:#1976d2}
+    .pdf-import-body{padding:24px}
+    .pdf-import-actions{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+    .pdf-upload-btn{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#1976d2 0%,#0d47a1 100%);color:#fff;padding:10px 14px;border-radius:6px;cursor:pointer;font-weight:600;font-size:13px;text-transform:uppercase;letter-spacing:0.3px;box-shadow:0 2px 8px rgba(25,118,210,0.2)}
+    .pdf-upload-btn input{display:none}
+    .pdf-import-addrow{background:#f0f4f8;color:#003d7a;border:1px solid #d0dce6;padding:10px 14px;border-radius:6px;font-weight:600;cursor:pointer;font-size:13px;text-transform:uppercase;letter-spacing:0.3px}
+    .pdf-import-addrow:hover{background:#e6eef7}
+    .pdf-import-raw{margin-bottom:16px}
+    .pdf-import-raw label{display:block;font-weight:600;color:#003d7a;font-size:12px;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.4px}
+    .pdf-import-raw textarea{width:100%;min-height:120px;padding:10px 12px;border:1px solid #d0dce6;border-radius:6px;font-size:13px;font-family:inherit}
+    .pdf-import-table-wrap{overflow-x:auto;border:1px solid #e8ecf1;border-radius:8px}
+    .pdf-import-table{width:100%;border-collapse:collapse;background:#fff}
+    .pdf-import-table th{padding:12px;text-align:left;background:#f4f7fb;color:#003d7a;font-size:12px;text-transform:uppercase;letter-spacing:0.4px}
+    .pdf-import-table td{padding:10px;border-bottom:1px solid #eef2f6}
+    .pdf-import-table input,.pdf-import-table select{width:100%;padding:8px 10px;border:1px solid #d0dce6;border-radius:6px;font-size:13px}
+    .pdf-import-remove{background:#c62828;color:#fff;border:none;border-radius:6px;padding:8px 10px;cursor:pointer;font-weight:600;font-size:12px}
+    .pdf-import-buttons{display:flex;gap:12px;margin-top:16px}
+    .pdf-import-btn{flex:1;padding:12px;font-weight:600;border:none;border-radius:6px;cursor:pointer;transition:all 0.2s;font-size:13px;text-transform:uppercase;letter-spacing:0.4px}
+    .pdf-import-btn.cancel{background:#e0e0e0;color:#333}
+    .pdf-import-btn.cancel:hover{background:#bdbdbd}
+    .pdf-import-btn.submit{background:linear-gradient(135deg,#1976d2 0%,#0d47a1 100%);color:#fff;box-shadow:0 3px 10px rgba(25,118,210,0.25)}
+    .pdf-import-btn.submit:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(25,118,210,0.35)}
 
     /* Batch Expansion Styles */
     .batch-expand-row{background:#f9fbfd;cursor:pointer;user-select:none}
@@ -799,8 +832,11 @@
           <!-- Articoli -->
           <div class="articles-container">
             <div class="articles-title">
-              📋 Articoli dell'Ordine
-              <button type="button" class="add-article-btn" onclick="addArticleRow()">➕ Aggiungi Articolo</button>
+              <div>📋 Articoli dell'Ordine</div>
+              <div class="order-articles-actions">
+                <button type="button" class="add-article-btn" onclick="addArticleRow()">➕ Aggiungi Articolo</button>
+                <button type="button" class="import-article-btn" onclick="openPdfImportModal()">📄 Importa PDF</button>
+              </div>
             </div>
             <div id="articlesContainer"></div>
           </div>
@@ -811,6 +847,48 @@
             <button type="submit" class="order-btn submit">✓ Salva Ordine</button>
           </div>
         </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- PDF Import Modal -->
+  <div id="pdfImportModal">
+    <div class="pdf-import-content">
+      <div class="pdf-import-header">
+        <h2>📄 Importa Fattura PDF</h2>
+        <button class="pdf-import-close" onclick="closePdfImportModal()">×</button>
+      </div>
+      <div class="pdf-import-body">
+        <div class="pdf-import-actions">
+          <label class="pdf-upload-btn">
+            📥 Carica PDF
+            <input type="file" id="pdfImportFile" accept="application/pdf" onchange="handlePdfImportFile(event)" />
+          </label>
+          <button type="button" class="pdf-import-addrow" onclick="addImportRow()">➕ Riga manuale</button>
+        </div>
+        <div class="pdf-import-raw">
+          <label for="pdfImportRaw">Testo estratto (facoltativo)</label>
+          <textarea id="pdfImportRaw" placeholder="Testo estratto dal PDF..."></textarea>
+        </div>
+        <div class="pdf-import-table-wrap">
+          <table class="pdf-import-table">
+            <thead>
+              <tr>
+                <th>Descrizione</th>
+                <th>Materiale</th>
+                <th>Quantità</th>
+                <th>Prezzo (€)</th>
+                <th>Categoria</th>
+                <th>Azioni</th>
+              </tr>
+            </thead>
+            <tbody id="pdfImportTableBody"></tbody>
+          </table>
+        </div>
+        <div class="pdf-import-buttons">
+          <button type="button" class="pdf-import-btn cancel" onclick="closePdfImportModal()">Annulla</button>
+          <button type="button" class="pdf-import-btn submit" onclick="applyPdfImportRows()">Importa nell'ordine</button>
+        </div>
       </div>
     </div>
   </div>
@@ -949,6 +1027,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
   <script>
     // --- Firebase Configuration ---
@@ -3444,6 +3523,184 @@
       row.appendChild(removeBtn);
 
       document.getElementById('articlesContainer').appendChild(row);
+      return row;
+    }
+
+    function addArticleRowWithData(data) {
+      const row = addArticleRow();
+      const selects = row.querySelectorAll('select');
+      const inputs = row.querySelectorAll('input');
+      if (data.materialId) selects[0].value = data.materialId;
+      if (data.quantity !== undefined) inputs[0].value = data.quantity;
+      if (data.price !== undefined) inputs[1].value = data.price;
+      if (data.expiry) inputs[2].value = data.expiry;
+      return row;
+    }
+
+    // ===== PDF IMPORT FUNCTIONS =====
+    const CATEGORY_OPTIONS = [
+      'Strumentario','Consumabili Generici','Monouso','Disinfezione e Sterilizzazione','Chirurgia','Endodonzia',
+      'Conservativa e Protesi','Frese e Lucidatura','Anestesia e Farmaci','Impronte e Laboratorio',
+      'Radiografia e Fotografia','Profilassi e Igiene Orale','Ortodonzia'
+    ];
+
+    function openPdfImportModal() {
+      const modal = document.getElementById('pdfImportModal');
+      modal.classList.add('active');
+      document.getElementById('pdfImportFile').value = '';
+      document.getElementById('pdfImportRaw').value = '';
+      document.getElementById('pdfImportTableBody').innerHTML = '';
+    }
+
+    function closePdfImportModal() {
+      const modal = document.getElementById('pdfImportModal');
+      modal.classList.remove('active');
+    }
+
+    function getMaterialsForImport() {
+      return loadFromLocalStorage();
+    }
+
+    function findMaterialMatch(name, materials) {
+      const n = (name || '').toLowerCase();
+      let exact = materials.find(m => m.name && m.name.toLowerCase() === n);
+      if (exact) return exact.id;
+      let partial = materials.find(m => n.includes(m.name.toLowerCase()));
+      return partial ? partial.id : '';
+    }
+
+    function addImportRow(data = {}) {
+      const tbody = document.getElementById('pdfImportTableBody');
+      const tr = document.createElement('tr');
+      const materials = getMaterialsForImport();
+
+      const nameInput = document.createElement('input');
+      nameInput.type = 'text';
+      nameInput.value = data.name || '';
+
+      const materialSelect = document.createElement('select');
+      materialSelect.innerHTML = '<option value="">-- Seleziona --</option>';
+      materials.forEach(m => {
+        const opt = document.createElement('option');
+        opt.value = m.id;
+        opt.textContent = m.name + ' (' + m.category + ')';
+        materialSelect.appendChild(opt);
+      });
+      if (data.name) {
+        const matchId = findMaterialMatch(data.name, materials);
+        if (matchId) materialSelect.value = matchId;
+      }
+
+      const qtyInput = document.createElement('input');
+      qtyInput.type = 'number';
+      qtyInput.min = '1';
+      qtyInput.value = data.quantity || '';
+
+      const priceInput = document.createElement('input');
+      priceInput.type = 'number';
+      priceInput.min = '0';
+      priceInput.step = '0.01';
+      priceInput.value = data.price !== undefined ? data.price : '';
+
+      const categorySelect = document.createElement('select');
+      categorySelect.innerHTML = '<option value="">-- Seleziona --</option>' + CATEGORY_OPTIONS.map(c => `<option value="${c}">${c}</option>`).join('');
+      if (data.category) categorySelect.value = data.category;
+
+      const removeBtn = document.createElement('button');
+      removeBtn.type = 'button';
+      removeBtn.className = 'pdf-import-remove';
+      removeBtn.textContent = 'Rimuovi';
+      removeBtn.onclick = () => tr.remove();
+
+      const cells = [nameInput, materialSelect, qtyInput, priceInput, categorySelect, removeBtn];
+      cells.forEach(c => {
+        const td = document.createElement('td');
+        td.appendChild(c);
+        tr.appendChild(td);
+      });
+
+      tbody.appendChild(tr);
+    }
+
+    async function handlePdfImportFile(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+      if (!window.pdfjsLib) {
+        alert('PDF.js non disponibile');
+        return;
+      }
+      if (window.pdfjsLib.GlobalWorkerOptions && !window.pdfjsLib.GlobalWorkerOptions.workerSrc) {
+        window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+      }
+
+      const buffer = await file.arrayBuffer();
+      const pdf = await window.pdfjsLib.getDocument({ data: buffer }).promise;
+      let fullText = '';
+
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const text = await page.getTextContent();
+        const pageText = text.items.map(it => it.str).join(' ');
+        fullText += pageText + '\n';
+      }
+
+      document.getElementById('pdfImportRaw').value = fullText.trim();
+      const items = extractPdfLineItems(fullText);
+      document.getElementById('pdfImportTableBody').innerHTML = '';
+      if (items.length === 0) {
+        showAlert('Nessuna riga riconosciuta. Aggiungi righe manualmente.', 'warn');
+        return;
+      }
+      items.forEach(it => addImportRow(it));
+    }
+
+    function extractPdfLineItems(text) {
+      const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+      const items = [];
+      lines.forEach(line => {
+        if (/totale|imponibile|iva|pagamento|sconto|trasporto/i.test(line)) return;
+        const priceMatch = line.match(/(\d{1,6}[.,]\d{2})\s*€?/);
+        const qtyMatch = line.match(/(?:^|\s)(\d{1,4})(?:\s*(?:pz|pcs|x|qt|qta|q\.t[aà]))?/i);
+        if (!priceMatch || !qtyMatch) return;
+        const price = parseFloat(priceMatch[1].replace(',', '.'));
+        const quantity = parseInt(qtyMatch[1], 10);
+        let name = line.replace(priceMatch[0], ' ').replace(qtyMatch[0], ' ').replace(/€/g, ' ');
+        name = name.replace(/\s{2,}/g, ' ').trim();
+        if (name.length < 3) return;
+        items.push({ name, quantity, price, category: '' });
+      });
+      return items;
+    }
+
+    function applyPdfImportRows() {
+      const rows = Array.from(document.querySelectorAll('#pdfImportTableBody tr'));
+      if (rows.length === 0) {
+        alert('Nessuna riga da importare');
+        return;
+      }
+      let imported = 0;
+      let skipped = 0;
+
+      rows.forEach(row => {
+        const selects = row.querySelectorAll('select');
+        const inputs = row.querySelectorAll('input');
+        const materialId = selects[0]?.value;
+        const quantity = parseInt(inputs[1]?.value, 10) || 0;
+        const price = parseFloat(inputs[2]?.value) || 0;
+        if (materialId && quantity > 0) {
+          addArticleRowWithData({ materialId, quantity, price });
+          imported += 1;
+        } else {
+          skipped += 1;
+        }
+      });
+
+      if (imported === 0) {
+        alert('Seleziona almeno un materiale e una quantita valida');
+        return;
+      }
+      closePdfImportModal();
+      showAlert(`✓ Importati ${imported} articoli${skipped ? ', ' + skipped + ' saltati' : ''}`, 'info');
     }
 
     document.getElementById('orderForm')?.addEventListener('submit', async function(e) {
