@@ -763,6 +763,17 @@
         });
       }
       
+      // Ordina alfabeticamente per tipo e azienda
+      implants.sort((a, b) => {
+        const typeA = (a.type || '').toLowerCase();
+        const typeB = (b.type || '').toLowerCase();
+        const companyA = (a.company || '').toLowerCase();
+        const companyB = (b.company || '').toLowerCase();
+        
+        if(typeA !== typeB) return typeA.localeCompare(typeB);
+        return companyA.localeCompare(companyB);
+      });
+      
       implantsList.innerHTML = '';
       
       implants.forEach(implant=>{
@@ -1019,6 +1030,14 @@
           return true;
         });
       }
+      
+      // Ordina alfabeticamente per nome
+      filtered.sort((a, b) => {
+        const nameA = (a.data().name || '').toLowerCase();
+        const nameB = (b.data().name || '').toLowerCase();
+        return nameA.localeCompare(nameB);
+      });
+      
       filtered.forEach(doc=>{
         const tr = renderItem(doc);
         listEl.appendChild(tr);
