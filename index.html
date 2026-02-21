@@ -642,6 +642,21 @@
       localStorage.setItem('magazzino_implants', JSON.stringify(implants));
     }
 
+    function toFirestoreImplantData(implant){
+      const implantData = {...implant};
+      delete implantData.id;
+      if(implantData.orderDate && typeof implantData.orderDate === 'string'){
+        implantData.orderDate = new Date(implantData.orderDate);
+      }
+      if(implantData.expiry && typeof implantData.expiry === 'string'){
+        implantData.expiry = new Date(implantData.expiry);
+      }
+      if(implantData.createdAt && typeof implantData.createdAt === 'string'){
+        implantData.createdAt = new Date(implantData.createdAt);
+      }
+      return implantData;
+    }
+
     // Gestione opzioni dinamiche per modelli e nomenclature
     function loadImplantModels(){
       const saved = localStorage.getItem('implant_models');
@@ -1381,7 +1396,7 @@
       try {
         db.collection('implants').onSnapshot(
           snapshot => {
-            const implants = snapshot.docs.map(doc => {
+            const cloudImplants = snapshot.docs.map(doc => {
               const data = doc.data();
               return {
                 id: doc.id,
@@ -1398,7 +1413,36 @@
                 createdAt: data.createdAt && data.createdAt.toDate ? data.createdAt.toDate().toISOString() : data.createdAt
               };
             });
-            saveImplantsToStorage(implants);
+
+            const localImplants = loadImplantsFromStorage();
+            const mergedMap = new Map();
+
+            cloudImplants.forEach(item => {
+              if(item && item.id) mergedMap.set(item.id, item);
+            });
+
+            const missingOnCloud = [];
+            localImplants.forEach(item => {
+              if(!item || !item.id) return;
+              if(!mergedMap.has(item.id)){
+                mergedMap.set(item.id, item);
+                missingOnCloud.push(item);
+              }
+            });
+
+            const mergedImplants = Array.from(mergedMap.values());
+            saveImplantsToStorage(mergedImplants);
+
+            if(missingOnCloud.length > 0){
+              Promise.all(
+                missingOnCloud.map(item =>
+                  db.collection('implants').doc(item.id).set(toFirestoreImplantData(item), { merge: true })
+                )
+              ).catch(err => {
+                console.warn('Sync local->firebase impianti non completata:', err);
+              });
+            }
+
             if(document.getElementById('implantsModal').classList.contains('active')){
               renderImplantsList();
             }
