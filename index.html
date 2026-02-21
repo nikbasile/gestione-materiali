@@ -1530,6 +1530,11 @@
       element.style.padding = '20px';
       element.style.fontFamily = 'Arial, sans-serif';
       element.style.backgroundColor = '#fff';
+      element.style.width = '1100px';
+      element.style.position = 'fixed';
+      element.style.left = '-99999px';
+      element.style.top = '0';
+      element.style.zIndex = '-1';
 
       // Header
       const header = document.createElement('div');
@@ -1614,8 +1619,18 @@
         html2canvas: { scale: 2 },
         jsPDF: { orientation: 'landscape', unit: 'mm', format: 'a4' }
       };
-      html2pdf().set(opt).from(element).save();
-      showAlert('✓ PDF Materiali scaricato con successo', 'info');
+      document.body.appendChild(element);
+      try {
+        await html2pdf().set(opt).from(element).save();
+        showAlert('✓ PDF Materiali scaricato con successo', 'info');
+      } catch (err) {
+        console.error('Errore export PDF materiali:', err);
+        showAlert('Errore durante export PDF materiali', 'warn');
+      } finally {
+        if(element.parentNode){
+          element.parentNode.removeChild(element);
+        }
+      }
     }
 
     async function downloadImplantsPDF(){
