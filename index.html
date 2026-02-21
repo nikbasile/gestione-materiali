@@ -879,6 +879,7 @@
                 <th>Nome materiale</th>
                 <th>Quantità</th>
                 <th>Prezzo (€)</th>
+                <th>Totale netto (€)</th>
                 <th>IVA %</th>
                 <th>IVA (€)</th>
                 <th>Categoria</th>
@@ -3615,6 +3616,13 @@
       priceInput.className = 'pdf-import-price';
       priceInput.value = data.price !== undefined ? data.price : '';
 
+      const totalNetInput = document.createElement('input');
+      totalNetInput.type = 'number';
+      totalNetInput.min = '0';
+      totalNetInput.step = '0.01';
+      totalNetInput.className = 'pdf-import-total-net';
+      totalNetInput.value = data.totalNet !== undefined ? data.totalNet : '';
+
       const ivaPercentInput = document.createElement('input');
       ivaPercentInput.type = 'number';
       ivaPercentInput.min = '0';
@@ -3638,7 +3646,7 @@
       removeBtn.textContent = 'Rimuovi';
       removeBtn.onclick = () => tr.remove();
 
-      const cells = [descInput, materialNameInput, qtyInput, priceInput, ivaPercentInput, ivaAmountInput, categorySelect, removeBtn];
+      const cells = [descInput, materialNameInput, qtyInput, priceInput, totalNetInput, ivaPercentInput, ivaAmountInput, categorySelect, removeBtn];
       cells.forEach(c => {
         const td = document.createElement('td');
         td.appendChild(c);
@@ -3648,6 +3656,7 @@
       const updateIva = () => updateImportRowIva(tr);
       qtyInput.addEventListener('input', updateIva);
       priceInput.addEventListener('input', updateIva);
+      totalNetInput.addEventListener('input', updateIva);
       ivaPercentInput.addEventListener('input', updateIva);
       updateIva();
 
@@ -3734,9 +3743,10 @@
         const description = match[2].replace(/\s{2,}/g, ' ').trim();
         const quantity = parseInt(match[3], 10);
         const unitNet = parseFloat(match[6].replace(',', '.'));
+        const totalNet = parseFloat(match[7].replace(',', '.'));
         const ivaPercent = parseFloat(match[8].replace(',', '.'));
         if (!description || quantity <= 0) return;
-        items.push({ name: `${code} ${description}`, quantity, price: unitNet, ivaPercent, category: '' });
+        items.push({ name: `${code} ${description}`, quantity, price: unitNet, totalNet, ivaPercent, category: '' });
       });
 
       return items;
@@ -3799,9 +3809,11 @@
     function updateImportRowIva(row) {
       const qty = parseFloat(row.querySelector('.pdf-import-qty')?.value) || 0;
       const price = parseFloat(row.querySelector('.pdf-import-price')?.value) || 0;
+      const totalNet = parseFloat(row.querySelector('.pdf-import-total-net')?.value) || 0;
       const ivaPercent = parseFloat(row.querySelector('.pdf-import-iva-percent')?.value) || 0;
       const ivaAmountInput = row.querySelector('.pdf-import-iva-amount');
-      const ivaAmount = (qty * price) * (ivaPercent / 100);
+      const base = totalNet > 0 ? totalNet : (qty * price);
+      const ivaAmount = base * (ivaPercent / 100);
       if (ivaAmountInput) ivaAmountInput.value = ivaAmount ? ivaAmount.toFixed(2) : '';
     }
 
