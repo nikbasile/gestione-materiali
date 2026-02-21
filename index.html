@@ -1734,7 +1734,7 @@
         return;
       }
 
-      const headers = ['Tipo', 'Azienda', 'Modello', 'Ø', 'L', 'Data Ordine', 'Scadenza', 'Prezzo (€)', 'Quantità'];
+      const headers = ['Tipo', 'Azienda', 'Modello', 'Ø', 'L', 'Ordine', 'Scadenza', 'Prezzo', 'Qta'];
       const rows = implants.map(implant => {
         const orderDate = implant.orderDate ? new Date(implant.orderDate).toLocaleDateString() : '-';
         const expiry = implant.expiry ? new Date(implant.expiry) : null;
@@ -1766,7 +1766,7 @@
         headers,
         rows,
         summaryLines,
-        [14, 16, 20, 8, 8, 14, 14, 10, 8]
+        [18, 20, 24, 6, 6, 12, 14, 10, 6]
       );
       showAlert('✓ PDF Impianti scaricato con successo', 'info');
     }
