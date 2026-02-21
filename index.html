@@ -867,6 +867,10 @@
             <input type="file" id="pdfImportFile" accept="application/pdf" onchange="handlePdfImportFile(event)" />
           </label>
           <button type="button" class="pdf-import-addrow" onclick="addImportRow()">➕ Riga manuale</button>
+          <div style="display:flex;flex-direction:column;gap:6px;min-width:220px">
+            <label for="pdfImportDistributor" style="font-weight:600;color:#003d7a;font-size:12px;text-transform:uppercase;letter-spacing:0.4px">Distributore (import)</label>
+            <input id="pdfImportDistributor" type="text" placeholder="Es. Dental Leader" list="distributorNameList" />
+          </div>
         </div>
         <div class="pdf-import-raw">
           <label for="pdfImportRaw">Testo estratto (facoltativo)</label>
@@ -892,6 +896,7 @@
           </table>
         </div>
         <datalist id="materialNameList"></datalist>
+        <datalist id="distributorNameList"></datalist>
         <div class="pdf-import-buttons">
           <button type="button" class="pdf-import-btn cancel" onclick="closePdfImportModal()">Annulla</button>
           <button type="button" class="pdf-import-btn submit" onclick="applyPdfImportRows()">Importa nell'ordine</button>
@@ -3645,7 +3650,14 @@
       document.getElementById('pdfImportFile').value = '';
       document.getElementById('pdfImportRaw').value = '';
       document.getElementById('pdfImportTableBody').innerHTML = '';
+      const distInput = document.getElementById('pdfImportDistributor');
+      if (distInput) {
+        const orderDist = document.getElementById('orderDistributor')?.value || '';
+        const orderDistCustom = document.getElementById('orderDistributorCustom')?.value || '';
+        distInput.value = orderDist === 'Other' ? orderDistCustom : orderDist;
+      }
       renderMaterialDatalist();
+      renderDistributorDatalist();
     }
 
     function closePdfImportModal() {
@@ -3673,6 +3685,19 @@
       materials.forEach(m => {
         const opt = document.createElement('option');
         opt.value = m.name;
+        list.appendChild(opt);
+      });
+    }
+
+    function renderDistributorDatalist() {
+      const list = document.getElementById('distributorNameList');
+      if (!list) return;
+      const materials = getMaterialsForImport();
+      const distributors = Array.from(new Set(materials.map(m => m.distributor).filter(Boolean))).sort();
+      list.innerHTML = '';
+      distributors.forEach(d => {
+        const opt = document.createElement('option');
+        opt.value = d;
         list.appendChild(opt);
       });
     }
@@ -3879,6 +3904,9 @@
       const materials = getMaterialsForImport();
       const orderDate = document.getElementById('orderDate')?.value || new Date().toISOString().split('T')[0];
       const orderDistributor = document.getElementById('orderDistributor')?.value || '';
+      const orderDistributorCustom = document.getElementById('orderDistributorCustom')?.value || '';
+      const importDistributor = document.getElementById('pdfImportDistributor')?.value || '';
+      const finalDistributor = importDistributor || (orderDistributor === 'Other' ? orderDistributorCustom : orderDistributor);
 
       rows.forEach(row => {
         const materialName = row.querySelector('.pdf-import-name')?.value || '';
@@ -3899,7 +3927,7 @@
             skipped += 1;
             return;
           }
-          materialId = createMaterialFromImport(materialName, category, orderDate, orderDistributor, company);
+          materialId = createMaterialFromImport(materialName, category, orderDate, finalDistributor, company);
           if (materialId) {
             materials.push({ id: materialId, name: materialName, category });
             renderMaterialDatalist();
