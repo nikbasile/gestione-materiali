@@ -488,6 +488,7 @@
     const APP_VERSION = '2026-02-20-fix-local-first-3';
     console.log('App version:', APP_VERSION);
     let firebaseReady = true;
+    let realtimeListenersStarted = false;
     if (db && typeof db.enablePersistence === 'function') {
       db.enablePersistence({ synchronizeTabs: true }).catch(err => {
         console.warn('Persistenza offline Firebase non attiva:', err && err.message ? err.message : err);
@@ -502,6 +503,7 @@
         });
       } else {
         console.log('Login anonimo riuscito:', user.uid);
+        startRealtimeListeners();
       }
     });
 
@@ -1350,60 +1352,75 @@
       }
     }
 
-    // Listen realtime with Firebase fallback to localStorage
-    try {
-      db.collection('materials').orderBy('name').onSnapshot(
-        snapshot => {
-          saveToLocalStorage(snapshot.docs);
-          allDocs = loadFromLocalStorage().map(d=>({id: d.id, data: ()=>d}));
-          initCategoryFilters();
-          renderFilteredMaterials();
-          checkAndNotify(allDocs);
-        },
-        error => {
-          console.warn('Firebase error, usando localStorage:', error);
-          loadMaterialsFromStorage();
-        }
-      );
-    } catch(err) {
-      firebaseReady = false;
-      console.warn('Firebase init error, usando localStorage:', err);
-      loadMaterialsFromStorage();
-    }
+    function startRealtimeListeners(){
+      if(realtimeListenersStarted) return;
+      realtimeListenersStarted = true;
 
-    // Listen realtime for implants
-    try {
-      db.collection('implants').onSnapshot(
-        snapshot => {
-          const implants = snapshot.docs.map(doc => {
-            const data = doc.data();
-            return {
-              id: doc.id,
-              type: data.type,
-              company: data.company,
-              model: data.model,
-              kitComponents: data.kitComponents,
-              diameter: data.diameter,
-              length: data.length,
-              orderDate: data.orderDate && data.orderDate.toDate ? data.orderDate.toDate().toISOString() : data.orderDate,
-              expiry: data.expiry && data.expiry.toDate ? data.expiry.toDate().toISOString() : data.expiry,
-              price: data.price,
-              quantity: data.quantity,
-              createdAt: data.createdAt && data.createdAt.toDate ? data.createdAt.toDate().toISOString() : data.createdAt
-            };
-          });
-          saveImplantsToStorage(implants);
-          // Forza aggiornamento UI se il modale è aperto
-          if(document.getElementById('implantsModal').classList.contains('active')){
-            renderImplantsList();
+      // Listen realtime with Firebase fallback to localStorage
+      try {
+        db.collection('materials').orderBy('name').onSnapshot(
+          snapshot => {
+            saveToLocalStorage(snapshot.docs);
+            allDocs = loadFromLocalStorage().map(d=>({id: d.id, data: ()=>d}));
+            initCategoryFilters();
+            renderFilteredMaterials();
+            checkAndNotify(allDocs);
+          },
+          error => {
+            console.warn('Firebase error, usando localStorage:', error);
+            loadMaterialsFromStorage();
           }
-        },
-        error => {
-          console.warn('Firebase error for implants, usando localStorage:', error);
-        }
-      );
-    } catch(err) {
-      console.warn('Firebase init error for implants, usando localStorage:', err);
+        );
+      } catch(err) {
+        firebaseReady = false;
+        console.warn('Firebase init error, usando localStorage:', err);
+        loadMaterialsFromStorage();
+      }
+
+      // Listen realtime for implants
+      try {
+        db.collection('implants').onSnapshot(
+          snapshot => {
+            const implants = snapshot.docs.map(doc => {
+              const data = doc.data();
+              return {
+                id: doc.id,
+                type: data.type,
+                company: data.company,
+                model: data.model,
+                kitComponents: data.kitComponents,
+                diameter: data.diameter,
+                length: data.length,
+                orderDate: data.orderDate && data.orderDate.toDate ? data.orderDate.toDate().toISOString() : data.orderDate,
+                expiry: data.expiry && data.expiry.toDate ? data.expiry.toDate().toISOString() : data.expiry,
+                price: data.price,
+                quantity: data.quantity,
+                createdAt: data.createdAt && data.createdAt.toDate ? data.createdAt.toDate().toISOString() : data.createdAt
+              };
+            });
+            saveImplantsToStorage(implants);
+            if(document.getElementById('implantsModal').classList.contains('active')){
+              renderImplantsList();
+            }
+          },
+          error => {
+            console.warn('Firebase error for implants, usando localStorage:', error);
+          }
+        );
+      } catch(err) {
+        console.warn('Firebase init error for implants, usando localStorage:', err);
+      }
+
+      // keep allMaterials updated for exports
+      try {
+        db.collection('materials').orderBy('name').onSnapshot(snapshot=>{
+          allMaterials = snapshot.docs.map(doc=>({id: doc.id, ...doc.data()}));
+        }, ()=>{
+          allMaterials = loadFromLocalStorage();
+        });
+      } catch(err) {
+        allMaterials = loadFromLocalStorage();
+      }
     }
     
     // Gestione visibilità input azienda e distributore personalizzati
@@ -1493,16 +1510,8 @@
 
     let allMaterials = []; // store materials for PDF export
 
-    // listen to materials and keep allMaterials updated
-    if(firebaseReady && typeof db !== 'undefined') {
-      db.collection('materials').orderBy('name').onSnapshot(snapshot=>{
-        allMaterials = snapshot.docs.map(doc=>({id: doc.id, ...doc.data()}));
-      }, ()=>{
-        allMaterials = loadFromLocalStorage();
-      });
-    } else {
-      allMaterials = loadFromLocalStorage();
-    }
+    // fallback iniziale in attesa dei listener realtime
+    allMaterials = loadFromLocalStorage();
 
     function generateTablePDF(title, filename, headers, rows, summaryLines, columnWidths){
       const JsPdfCtor = (window.jspdf && window.jspdf.jsPDF) || window.jsPDF || null;
