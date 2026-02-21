@@ -635,7 +635,21 @@
 
     function loadImplantsFromStorage(){
       const saved = localStorage.getItem('magazzino_implants');
-      return saved ? JSON.parse(saved) : [];
+      const implants = saved ? JSON.parse(saved) : [];
+      if(!Array.isArray(implants)) return [];
+      let changed = false;
+      const normalized = implants.map(item => {
+        if(item && item.id) return item;
+        changed = true;
+        return {
+          ...item,
+          id: (window.crypto && window.crypto.randomUUID ? window.crypto.randomUUID() : '_implant_' + Date.now() + '_' + Math.floor(Math.random() * 100000))
+        };
+      });
+      if(changed){
+        saveImplantsToStorage(normalized);
+      }
+      return normalized;
     }
 
     function saveImplantsToStorage(implants){
@@ -655,6 +669,21 @@
         implantData.createdAt = new Date(implantData.createdAt);
       }
       return implantData;
+    }
+
+    async function syncLocalImplantsToFirebase(){
+      if(!firebaseReady || typeof db === 'undefined') return;
+      try {
+        const localImplants = loadImplantsFromStorage();
+        if(!localImplants || localImplants.length === 0) return;
+        await Promise.all(
+          localImplants
+            .filter(item => item && item.id)
+            .map(item => db.collection('implants').doc(item.id).set(toFirestoreImplantData(item), { merge: true }))
+        );
+      } catch(err){
+        console.warn('Sync locale impianti verso Firebase non riuscita:', err);
+      }
     }
 
     // Gestione opzioni dinamiche per modelli e nomenclature
@@ -911,6 +940,7 @@
       populateKitComponentsSelect();
       initImplantFilters();
       renderImplantsList();
+      syncLocalImplantsToFirebase();
     }
 
     function closeImplantsModal(){
@@ -1465,6 +1495,8 @@
       } catch(err) {
         allMaterials = loadFromLocalStorage();
       }
+
+      syncLocalImplantsToFirebase();
     }
     
     // Gestione visibilità input azienda e distributore personalizzati
