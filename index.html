@@ -565,6 +565,11 @@
         }
     }
 
+    // Funzione per convertire in Title Case (iniziali maiuscole)
+    function toTitleCase(str) {
+      return str.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+    }
+
     // Auto-fill categoria e azienda quando si completa il nome materiale
     let autoFillTimeout;
     document.getElementById('name').addEventListener('input', function() {
@@ -575,9 +580,26 @@
         if(materialName.length < 3) return;
         
         const materials = loadFromLocalStorage();
-        const match = materials.find(m => m.name && m.name.toLowerCase() === materialName.toLowerCase());
+        const lowerName = materialName.toLowerCase();
+        
+        // Prima cerca match esatto
+        let match = materials.find(m => m.name && m.name.toLowerCase() === lowerName);
+        
+        // Se non trova match esatto, cerca match parziale/simile
+        if(!match) {
+          match = materials.find(m => {
+            if(!m.name) return false;
+            const existingName = m.name.toLowerCase();
+            // Match se uno contiene l'altro (errori di digitazione parziali)
+            return existingName.includes(lowerName) || lowerName.includes(existingName);
+          });
+        }
         
         if(match) {
+          // Correggi il nome con la versione corretta in Title Case
+          const correctedName = toTitleCase(match.name);
+          document.getElementById('name').value = correctedName;
+          
           // Auto-fill categoria
           if(match.category) {
             document.getElementById('category').value = match.category;
@@ -599,14 +621,14 @@
             }
           }
         }
-      }, 500); // Attiva dopo 500ms dalla fine della digitazione
+      }, 600); // Attiva dopo 600ms dalla fine della digitazione
     });
 
     addForm.addEventListener('submit', async e=>{
       e.preventDefault();
       console.log('Form submitted');
       
-      const name = document.getElementById('name').value.trim();
+      const name = toTitleCase(document.getElementById('name').value.trim());
       const orderDate = document.getElementById('orderDate').value;
       const expiry = document.getElementById('expiry').value;
       const price = parseFloat(document.getElementById('price').value) || 0;
@@ -741,8 +763,9 @@
       tr.querySelector('.editable-name').addEventListener('click', () => {
         const newName = prompt('Modifica nome materiale:', data.name);
         if(newName && newName.trim() && newName !== data.name) {
-          data.name = newName.trim();
-          updateMaterialFields(doc.id, { name: newName.trim() });
+          const formattedName = toTitleCase(newName.trim());
+          data.name = formattedName;
+          updateMaterialFields(doc.id, { name: formattedName });
         }
       });
       return tr;
