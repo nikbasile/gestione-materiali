@@ -279,7 +279,7 @@
       </button>
 
       <button onclick="openReportModal()" style="background:linear-gradient(135deg,#1976d2 0%,#0d47a1 100%);color:#fff;padding:12px 20px;font-size:15px;border:none;border-radius:8px;cursor:pointer;font-weight:600;box-shadow:0 4px 12px rgba(13,71,161,0.35);transition:all 0.2s;display:flex;align-items:center;gap:6px">
-        📊 Report Economici
+        📊 Analisi Spese
       </button>
 
       <div style="display:flex;gap:12px;align-items:center;margin-left:auto;flex-wrap:wrap">
@@ -456,7 +456,7 @@
       <!-- Dropdown Scarica Dati Impianti -->
       <div style="margin:16px 0;display:flex;gap:10px;align-items:center;position:relative">
         <button class="action-menu-btn" onclick="toggleActionMenu('implantsMenu')">📥 Scarica Dati ▼</button>
-        <button class="action-menu-btn" onclick="openImplantsReportModal()" style="background-color:#1976d2">📊 Report Impianti</button>
+        <button class="action-menu-btn" onclick="openImplantsReportModal()" style="background-color:#1976d2">📊 Analisi Spese Impianti</button>
         <div id="implantsMenu" class="action-menu" style="display:none;position:absolute;background:white;border:1px solid #ddd;border-radius:8px;box-shadow:0 4px 8px rgba(0,0,0,0.1);z-index:100;min-width:250px;top:40px;left:0">
           <button class="menu-item" onclick="downloadImplantsPDF()">📄 Scarica PDF Impianti</button>
           <button class="menu-item" onclick="exportImplantsCSV()">📊 Scarica CSV Impianti</button>
@@ -515,11 +515,11 @@
   </div>
   </div>
 
-  <!-- Report Economici Modal -->
+  <!-- Analisi Spese Modal -->
   <div id="reportModal">
     <div class="report-modal-content">
       <div class="report-header">
-        <h2>📊 Report Economici Materiali</h2>
+        <h2>📊 Analisi Spese Materiali</h2>
         <button class="report-close" onclick="closeReportModal()">×</button>
       </div>
       <div class="report-body">
@@ -612,7 +612,7 @@
   <div id="implantsReportModal">
     <div class="report-modal-content">
       <div class="report-header">
-        <h2>📊 Report Economici Impianti</h2>
+        <h2>📊 Analisi Spese Impianti</h2>
         <button class="report-close" onclick="closeImplantsReportModal()">×</button>
       </div>
       <div class="report-body">
@@ -2509,7 +2509,7 @@
       renderImplantsList();
     });
 
-    // ===== REPORT ECONOMICI FUNCTIONS =====
+    // ===== ANALISI SPESE FUNCTIONS =====
     let reportCharts = { trend: null, distribution: null };
 
     function openReportModal() {
