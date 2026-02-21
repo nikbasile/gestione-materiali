@@ -470,6 +470,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script>
     // --- Firebase Configuration ---
     const firebaseConfig = {
@@ -1504,7 +1505,7 @@
     }
 
     function generateTablePDF(title, filename, headers, rows, summaryLines){
-      const JsPdfCtor = window.jspdf && window.jspdf.jsPDF ? window.jspdf.jsPDF : null;
+      const JsPdfCtor = (window.jspdf && window.jspdf.jsPDF) || window.jsPDF || null;
       if(!JsPdfCtor){
         showAlert('Libreria PDF non disponibile', 'warn');
         return;
