@@ -565,29 +565,41 @@
         }
     }
 
-    // Auto-fill azienda quando si inserisce il nome materiale
+    // Auto-fill categoria e azienda quando si completa il nome materiale
+    let autoFillTimeout;
     document.getElementById('name').addEventListener('input', function() {
-      const materialName = this.value.trim().toLowerCase();
-      if(materialName.length < 3) return; // Attiva solo dopo 3 caratteri
+      clearTimeout(autoFillTimeout);
+      const materialName = this.value.trim();
       
-      const materials = loadFromLocalStorage();
-      const match = materials.find(m => m.name && m.name.toLowerCase().includes(materialName));
-      
-      if(match && match.company) {
-        const companySelect = document.getElementById('companySelect');
-        const companyInput = document.getElementById('company');
+      autoFillTimeout = setTimeout(() => {
+        if(materialName.length < 3) return;
         
-        // Cerca se l'azienda è nelle opzioni predefinite
-        const option = Array.from(companySelect.options).find(opt => opt.value === match.company);
-        if(option) {
-          companySelect.value = match.company;
-          companyInput.style.display = 'none';
-        } else {
-          companySelect.value = 'Other';
-          companyInput.value = match.company;
-          companyInput.style.display = '';
+        const materials = loadFromLocalStorage();
+        const match = materials.find(m => m.name && m.name.toLowerCase() === materialName.toLowerCase());
+        
+        if(match) {
+          // Auto-fill categoria
+          if(match.category) {
+            document.getElementById('category').value = match.category;
+          }
+          
+          // Auto-fill azienda
+          if(match.company) {
+            const companySelect = document.getElementById('companySelect');
+            const companyInput = document.getElementById('company');
+            
+            const option = Array.from(companySelect.options).find(opt => opt.value === match.company);
+            if(option) {
+              companySelect.value = match.company;
+              companyInput.style.display = 'none';
+            } else {
+              companySelect.value = 'Other';
+              companyInput.value = match.company;
+              companyInput.style.display = '';
+            }
+          }
         }
-      }
+      }, 500); // Attiva dopo 500ms dalla fine della digitazione
     });
 
     addForm.addEventListener('submit', async e=>{
