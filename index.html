@@ -1547,13 +1547,15 @@
       }
 
       function drawTableHeader(){
-        doc.setFillColor(0, 61, 122);
-        doc.setTextColor(255, 255, 255);
+        doc.setFillColor(232, 240, 248);
+        doc.setTextColor(0, 61, 122);
+        doc.setDrawColor(200, 210, 220);
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(8);
         headers.forEach((header, index) => {
           const x = margin + (index * colWidth);
           doc.rect(x, y, colWidth, rowHeight, 'F');
+          doc.rect(x, y, colWidth, rowHeight);
           doc.text(fitText(header, colWidth - 2), x + 1, y + 4);
         });
         y += rowHeight;
@@ -1607,12 +1609,24 @@
       const visibleRows = Array.from(document.querySelectorAll('#list tr'));
       const allMaterials = visibleRows.map(row => {
         const cells = row.querySelectorAll('td');
+        const statusCell = cells[2];
+        const statusBadge = statusCell ? statusCell.querySelector('span') : null;
+        const statusTitle = statusBadge ? (statusBadge.getAttribute('title') || '').trim() : '';
+        const statusSymbol = statusBadge ? (statusBadge.textContent || '').trim() : '';
+        let expiryStatus = statusTitle;
+        if(!expiryStatus){
+          if(statusSymbol === '🔴') expiryStatus = 'Rosso';
+          else if(statusSymbol === '🟡') expiryStatus = 'Giallo';
+          else if(statusSymbol === '🟢') expiryStatus = 'Verde';
+          else if(statusSymbol === '⚪') expiryStatus = 'Senza scadenza';
+          else expiryStatus = (statusCell?.textContent || '-').trim() || '-';
+        }
         const qtyText = (cells[6]?.textContent || '0').replace(/[^\d-]/g, '');
         const priceRaw = (cells[3]?.textContent || '0').replace(/[^\d,.-]/g, '').replace(',', '.');
         return {
           name: (cells[0]?.textContent || '-').trim(),
           orderDate: (cells[1]?.textContent || '-').trim(),
-          expiryStatus: (cells[2]?.textContent || '-').trim(),
+          expiryStatus: expiryStatus,
           priceText: (cells[3]?.textContent || '€ 0.00').trim(),
           distributor: (cells[4]?.textContent || '-').trim(),
           company: (cells[5]?.textContent || '-').trim(),
