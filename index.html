@@ -1467,9 +1467,29 @@
         });
       }
 
+      // Se nessun filtro è impostato, includi tutti i dati
       if(filtered.length === 0){
-        showAlert('Nessun materiale da esportare con i filtri selezionati', 'warn');
-        return;
+        const hasActiveFilters = currentFilter !== 'Tutti' || 
+                                 currentCompanyFilter !== 'Tutte' || 
+                                 currentDistributorFilter !== 'Tutti' || 
+                                 currentExpiryFilter !== 'Tutte' || 
+                                 currentQuantityFilter !== 'Tutte';
+        
+        if(hasActiveFilters){
+          showAlert('Nessun materiale da esportare con i filtri selezionati', 'warn');
+          return;
+        } else {
+          // Nessun filtro attivo - carica tutto da localStorage come fallback
+          const allMaterialsStorage = loadFromLocalStorage();
+          if(allMaterialsStorage.length === 0){
+            showAlert('Nessun materiale da esportare', 'warn');
+            return;
+          }
+          // Converti in oggetti con .data() come da Firestore
+          filtered = allMaterialsStorage.map(m => ({
+            data: () => m
+          }));
+        }
       }
 
       const allMaterials = filtered.map(d=>d.data());
@@ -1612,9 +1632,24 @@
         });
       }
 
+      // Se nessun filtro è impostato, includi tutti i dati
       if(implants.length === 0){
-        showAlert('Nessun impianto da esportare con i filtri selezionati', 'warn');
-        return;
+        const hasActiveFilters = currentImplantTypeFilter !== 'Tutti' || 
+                                 currentImplantCompanyFilter !== 'Tutte' || 
+                                 currentImplantModelFilter !== 'Tutti' || 
+                                 currentImplantExpiryFilter !== 'Tutte';
+        
+        if(hasActiveFilters){
+          showAlert('Nessun impianto da esportare con i filtri selezionati', 'warn');
+          return;
+        } else {
+          // Nessun filtro attivo - carica tutto da localStorage come fallback
+          implants = loadImplantsFromStorage();
+          if(implants.length === 0){
+            showAlert('Nessun impianto da esportare', 'warn');
+            return;
+          }
+        }
       }
 
       const element = document.createElement('div');
