@@ -545,26 +545,41 @@
       localStorage.setItem('magazzino_implants', JSON.stringify(implants));
     }
 
-    // Gestione opzioni dinamiche per modelli
+    // Gestione opzioni dinamiche per modelli e nomenclature
     function loadImplantModels(){
       const saved = localStorage.getItem('implant_models');
-      return saved ? JSON.parse(saved) : ['BLX', 'BLT', 'SLActive', 'Roxolid', 'NC', 'RC', 'RB', 'RN'];
+      return saved ? JSON.parse(saved) : ['BLT', 'BL', 'BLX'];
     }
 
-    function saveImplantModel(model){
+    function loadImplantNomenclatures(){
+      const saved = localStorage.getItem('implant_nomenclatures');
+      return saved ? JSON.parse(saved) : ['RN', 'RB', 'NC', 'RC'];
+    }
+
+    function saveImplantModel(model, type){
       if(!model || model.trim() === '') return;
-      const models = loadImplantModels();
       const trimmedModel = model.trim();
+      
+      // Determina se è un impianto o una componente
+      const isComponent = type === 'Vite tappo' || type === 'Vite di guarigione';
+      const storageKey = isComponent ? 'implant_nomenclatures' : 'implant_models';
+      const saved = localStorage.getItem(storageKey);
+      const models = saved ? JSON.parse(saved) : [];
+      
       if(!models.includes(trimmedModel)){
         models.push(trimmedModel);
         models.sort();
-        localStorage.setItem('implant_models', JSON.stringify(models));
+        localStorage.setItem(storageKey, JSON.stringify(models));
       }
     }
 
     function populateImplantModelSelect(){
       const select = document.getElementById('implantModel');
-      const models = loadImplantModels();
+      const type = document.getElementById('implantType').value;
+      
+      // Carica la lista appropriata in base al tipo
+      const isComponent = type === 'Vite tappo' || type === 'Vite di guarigione';
+      const models = isComponent ? loadImplantNomenclatures() : loadImplantModels();
       
       // Mantieni solo l'opzione vuota
       select.innerHTML = '<option value="">-- Seleziona o scrivi sotto --</option>';
@@ -1346,6 +1361,9 @@
       modelGroup.style.display = (isImplant || isScrew) ? '' : 'none';
       document.getElementById('implantDiameterGroup').style.display = isImplant ? '' : 'none';
       document.getElementById('implantLengthGroup').style.display = isImplant ? '' : 'none';
+      
+      // Ricarica le opzioni appropriate
+      populateImplantModelSelect();
     });
 
     // Submit form impianti
@@ -1362,9 +1380,9 @@
         model = document.getElementById('implantModel').value;
       }
       
-      // Salva il modello nelle opzioni per usi futuri
+      // Salva il modello/nomenclatura nelle opzioni per usi futuri
       if(model) {
-        saveImplantModel(model);
+        saveImplantModel(model, type);
       }
       
       let diameter = document.getElementById('implantDiameter').value;
