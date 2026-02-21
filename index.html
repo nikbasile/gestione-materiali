@@ -224,6 +224,9 @@
 
     <div class="action-buttons">
       <button class="export" onclick="downloadPDF()">📥 Scarica PDF</button>
+      <button class="export" onclick="exportBackup()" style="background:#2196F3">💾 Backup Dati</button>
+      <button class="export" onclick="document.getElementById('importFile').click()" style="background:#4CAF50">📂 Importa Backup</button>
+      <input type="file" id="importFile" accept=".json" style="display:none" onchange="importBackup(event)" />
       <button id="implantsBtn" class="implants-btn" style="display:none">🔩 Gestione Impianti</button>
     </div>
 
@@ -1532,6 +1535,150 @@
       };
       html2pdf().set(opt).from(element).save();
       showAlert('✓ PDF scaricato con successo', 'info');
+    }
+
+    // --- BACKUP & RESTORE ---
+    function exportBackup(){
+      const materials = loadFromLocalStorage();
+      const implants = loadImplantsFromStorage();
+      const implantModels = loadImplantModels();
+      const implantNomenclatures = loadImplantNomenclatures();
+      const kitComponents = loadKitComponents();
+      
+      const backup = {
+        version: '1.0',
+        exportDate: new Date().toISOString(),
+        data: {
+          materials: materials,
+          implants: implants,
+          implantModels: implantModels,
+          implantNomenclatures: implantNomenclatures,
+          kitComponents: kitComponents
+        }
+      };
+      
+      const dataStr = JSON.stringify(backup, null, 2);
+      const dataBlob = new Blob([dataStr], {type: 'application/json'});
+      const url = URL.createObjectURL(dataBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'backup_magazzino_' + new Date().toISOString().split('T')[0] + '.json';
+      link.click();
+      URL.revokeObjectURL(url);
+      showAlert('✓ Backup scaricato con successo', 'info');
+    }
+    
+    function importBackup(event){
+      const file = event.target.files[0];
+      if(!file){
+        return;
+      }
+      
+      const reader = new FileReader();
+      reader.onload = function(e){
+        try {
+          const backup = JSON.parse(e.target.result);
+          
+          if(!backup.data){
+            showAlert('File di backup non valido', 'warn');
+            return;
+          }
+          
+          if(!confirm('ATTENZIONE: Importando il backup, tutti i dati correnti verranno sostituiti. Continuare?')){
+            return;
+          }
+          
+          // Importa materiali
+          if(backup.data.materials && Array.isArray(backup.data.materials)){
+            localStorage.setItem('magazzino', JSON.stringify(backup.data.materials));
+          }
+          
+          // Importa impianti
+          if(backup.data.implants && Array.isArray(backup.data.implants)){
+            localStorage.setItem('magazzino_implants', JSON.stringify(backup.data.implants));
+          }
+          
+          // Importa modelli
+          if(backup.data.implantModels && Array.isArray(backup.data.implantModels)){
+            localStorage.setItem('implant_models', JSON.stringify(backup.data.implantModels));
+          }
+          
+          // Importa nomenclature
+          if(backup.data.implantNomenclatures && Array.isArray(backup.data.implantNomenclatures)){
+            localStorage.setItem('implant_nomenclatures', JSON.stringify(backup.data.implantNomenclatures));
+          }
+          
+          // Importa componenti kit
+          if(backup.data.kitComponents && Array.isArray(backup.data.kitComponents)){
+            localStorage.setItem('kit_components', JSON.stringify(backup.data.kitComponents));
+          }
+          
+          // Sincronizza con Firebase se disponibile
+          if(firebaseReady && typeof db !== 'undefined'){
+            // Sincronizza materiali
+            if(backup.data.materials){
+              backup.data.materials.forEach(async material => {
+                try {
+                  const materialData = {...material};
+                  delete materialData.id;
+                  if(materialData.orderDate && typeof materialData.orderDate === 'string'){
+                    materialData.orderDate = new Date(materialData.orderDate);
+                  }
+                  if(materialData.expiry && typeof materialData.expiry === 'string'){
+                    materialData.expiry = new Date(materialData.expiry);
+                  }
+                  if(materialData.createdAt && typeof materialData.createdAt === 'string'){
+                    materialData.createdAt = new Date(materialData.createdAt);
+                  }
+                  if(materialData.updatedAt && typeof materialData.updatedAt === 'string'){
+                    materialData.updatedAt = new Date(materialData.updatedAt);
+                  }
+                  await db.collection('materials').doc(material.id).set(materialData);
+                } catch(err){
+                  console.warn('Errore sync materiale:', err);
+                }
+              });
+            }
+            
+            // Sincronizza impianti
+            if(backup.data.implants){
+              backup.data.implants.forEach(async implant => {
+                try {
+                  const implantData = {...implant};
+                  delete implantData.id;
+                  if(implantData.orderDate && typeof implantData.orderDate === 'string'){
+                    implantData.orderDate = new Date(implantData.orderDate);
+                  }
+                  if(implantData.expiry && typeof implantData.expiry === 'string'){
+                    implantData.expiry = new Date(implantData.expiry);
+                  }
+                  if(implantData.createdAt && typeof implantData.createdAt === 'string'){
+                    implantData.createdAt = new Date(implantData.createdAt);
+                  }
+                  await db.collection('implants').doc(implant.id).set(implantData);
+                } catch(err){
+                  console.warn('Errore sync impianto:', err);
+                }
+              });
+            }
+          }
+          
+          showAlert('✓ Backup importato con successo! Ricarica la pagina.', 'info');
+          
+          // Ricarica la pagina dopo 2 secondi
+          setTimeout(() => {
+            window.location.reload();
+          }, 2000);
+          
+        } catch(err) {
+          console.error('Errore importazione backup:', err);
+          showAlert('Errore durante l\'importazione del backup', 'warn');
+        }
+      };
+      
+      reader.readAsText(file);
+      // Reset input file
+      event.target.value = '';
     }
 
     // --- IMPLANTS EVENT LISTENERS ---
