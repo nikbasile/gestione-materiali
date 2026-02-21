@@ -688,8 +688,8 @@
         <td data-label="Data ordine">${orderDate ? orderDate.toLocaleDateString() : '-'}</td>
         <td data-label="Scadenza" style="text-align:center;white-space:nowrap;">${statusHtml}</td>
         <td data-label="Prezzo">€ ${Number(data.price).toFixed(2)}</td>
-        <td data-label="Distributore"><span class="editable-distributor" style="cursor:pointer;text-decoration:underline;">${escapeHtml(data.distributor||'-')}</span></td>
-        <td data-label="Azienda"><span class="editable-company" style="cursor:pointer;text-decoration:underline;">${escapeHtml(data.company||'-')}</span></td>
+        <td data-label="Distributore">${escapeHtml(data.distributor||'-')}</td>
+        <td data-label="Azienda">${escapeHtml(data.company||'-')}</td>
         <td data-label="Quantità" style="text-align:center;">${lowBadge}</td>
         <td data-label="Azioni" style="white-space:nowrap;padding:8px;">
           <button data-id="${doc.id}" class="btn-action btn-inc" title="Aggiungi 1">+</button>
@@ -701,28 +701,12 @@
       tr.querySelector('.btn-inc').addEventListener('click', (e)=>{e.preventDefault(); changeQuantity(doc.id, 1)});
       tr.querySelector('.btn-dec').addEventListener('click', (e)=>{e.preventDefault(); changeQuantity(doc.id, -1)});
       tr.querySelector('.btn-del').addEventListener('click', (e)=>{e.preventDefault(); deleteItem(doc.id)});
-      // Permetti modifica distributore
-      tr.querySelector('.editable-distributor').addEventListener('click', async () => {
-        const current = data.distributor || '';
-        const selected = promptSelectOrCustom('Modifica distributore (scegli o scrivi):', DISTRIBUTOR_OPTIONS, current);
-        if(selected === null) return;
-        data.distributor = selected;
-        await updateMaterialFields(doc.id, { distributor: selected });
-      });
       tr.querySelector('.editable-name').addEventListener('click', () => {
         const newName = prompt('Modifica nome materiale:', data.name);
         if(newName && newName.trim() && newName !== data.name) {
           data.name = newName.trim();
           updateMaterialFields(doc.id, { name: newName.trim() });
         }
-      });
-      // Permetti modifica azienda
-      tr.querySelector('.editable-company').addEventListener('click', async () => {
-        const current = data.company || '';
-        const selected = promptSelectOrCustom('Modifica azienda (scegli o scrivi):', COMPANY_OPTIONS, current);
-        if(selected === null) return;
-        data.company = selected;
-        await updateMaterialFields(doc.id, { company: selected });
       });
       return tr;
     }
