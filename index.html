@@ -119,6 +119,31 @@
       .report-content{grid-template-columns:1fr}
       .report-chart-container{height:350px}
     }
+
+    /* Consumption Modal Styles */
+    #consumptionModal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:10000;overflow-y:auto;padding:20px}
+    #consumptionModal.active{display:flex;align-items:flex-start;justify-content:center}
+    .consumption-modal-content{background:#fff;border-radius:12px;max-width:700px;width:100%;margin:20px auto;box-shadow:0 8px 32px rgba(0,0,0,0.3)}
+    .consumption-header{background:linear-gradient(135deg,#f57c00 0%,#e65100 100%);color:#fff;padding:20px;border-radius:12px 12px 0 0;display:flex;justify-content:space-between;align-items:center}
+    .consumption-header h2{margin:0;font-size:22px}
+    .consumption-close{background:transparent;color:#fff;border:2px solid #fff;width:36px;height:36px;border-radius:50%;font-size:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s}
+    .consumption-close:hover{background:#fff;color:#f57c00}
+    .consumption-body{padding:24px}
+    .consumption-form{display:flex;flex-direction:column;gap:16px}
+    .consumption-group{display:flex;flex-direction:column;gap:8px}
+    .consumption-group label{font-weight:600;color:#003d7a;font-size:13px;text-transform:uppercase}
+    .consumption-group select,.consumption-group input{padding:10px 12px;border:1px solid #d0dce6;border-radius:6px;font-size:14px}
+    .consumption-preview{background:#f0f4f8;padding:16px;border-radius:8px;border-left:4px solid #f57c00;margin-top:12px}
+    .consumption-preview-title{font-weight:600;color:#003d7a;margin-bottom:8px}
+    .consumption-preview-line{display:flex;justify-content:space-between;padding:6px 0;font-size:14px}
+    .consumption-preview-line strong{color:#f57c00}
+    .consumption-buttons{display:flex;gap:12px;margin-top:20px}
+    .consumption-btn{flex:1;padding:12px;font-weight:600;border:none;border-radius:6px;cursor:pointer;transition:all 0.2s}
+    .consumption-btn.cancel{background:#e0e0e0;color:#333}
+    .consumption-btn.cancel:hover{background:#bdbdbd}
+    .consumption-btn.confirm{background:#f57c00;color:#fff}
+    .consumption-btn.confirm:hover{background:#e65100}
+    .batch-info{background:#fff3e0;padding:12px;border-radius:6px;margin-top:12px;border-left:3px solid #f57c00}
     .header-content{min-width:0}
     
     .implants-btn{background:#ff6b35;margin-left:10px}
@@ -280,6 +305,10 @@
 
       <button onclick="openReportModal()" style="background:linear-gradient(135deg,#1976d2 0%,#0d47a1 100%);color:#fff;padding:12px 20px;font-size:15px;border:none;border-radius:8px;cursor:pointer;font-weight:600;box-shadow:0 4px 12px rgba(13,71,161,0.35);transition:all 0.2s;display:flex;align-items:center;gap:6px">
         📊 Analisi Spese
+      </button>
+
+      <button onclick="openConsumptionModal()" style="background:linear-gradient(135deg,#f57c00 0%,#e65100 100%);color:#fff;padding:12px 20px;font-size:15px;border:none;border-radius:8px;cursor:pointer;font-weight:600;box-shadow:0 4px 12px rgba(230,81,0,0.35);transition:all 0.2s;display:flex;align-items:center;gap:6px">
+        📉 Registra Consumo
       </button>
 
       <div style="display:flex;gap:12px;align-items:center;margin-left:auto;flex-wrap:wrap">
@@ -608,6 +637,49 @@
     </div>
   </div>
 
+  <!-- Consumo Materiale Modal -->
+  <div id="consumptionModal">
+    <div class="consumption-modal-content">
+      <div class="consumption-header">
+        <h2>📉 Registra Consumo Materiale</h2>
+        <button class="consumption-close" onclick="closeConsumptionModal()">×</button>
+      </div>
+      <div class="consumption-body">
+        <form class="consumption-form" id="consumptionForm">
+          <div class="consumption-group">
+            <label for="consumptionMaterial">Materiale</label>
+            <select id="consumptionMaterial" required onchange="updateConsumptionPreview()">
+              <option value="">-- Seleziona materiale --</option>
+            </select>
+          </div>
+
+          <div class="consumption-group">
+            <label for="consumptionQuantity">Quantità da consumare (pz)</label>
+            <input id="consumptionQuantity" type="number" min="1" step="1" required onchange="updateConsumptionPreview()" />
+          </div>
+
+          <div class="consumption-group">
+            <label for="consumptionDate">Data consumo</label>
+            <input id="consumptionDate" type="date" required onchange="updateConsumptionPreview()" />
+          </div>
+
+          <!-- Preview FIFO -->
+          <div class="consumption-preview">
+            <div class="consumption-preview-title">📋 Preview Riduzione FIFO</div>
+            <div id="consumptionPreviewContent" style="color:#666;font-size:13px;padding:8px">
+              Seleziona un materiale per visualizzare anteprima...
+            </div>
+          </div>
+
+          <div class="consumption-buttons">
+            <button type="button" class="consumption-btn cancel" onclick="closeConsumptionModal()">Annulla</button>
+            <button type="submit" class="consumption-btn confirm">✓ Conferma Consumo</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <!-- Implants Report Modal -->
   <div id="implantsReportModal">
     <div class="report-modal-content">
@@ -799,12 +871,39 @@
       if(newItem.orderDate instanceof Date) newItem.orderDate = newItem.orderDate.toISOString();
       if(newItem.expiry instanceof Date) newItem.expiry = newItem.expiry.toISOString();
       if(newItem.createdAt instanceof Date) newItem.createdAt = newItem.createdAt.toISOString();
+      
+      // Create/update batch system
+      if (!newItem.batches) {
+        newItem.batches = [];
+      }
+      
+      // Create new batch for this order
+      const batchId = 'batch_' + newItem.id.substring(0, 8) + '_' + Date.now();
+      const newBatch = {
+        batchId: batchId,
+        dataOrdine: newItem.orderDate,
+        quantità: newItem.quantity || 0,
+        quantitàRimanente: newItem.quantity || 0,
+        prezzo: newItem.price || 0,
+        scadenza: newItem.expiry
+      };
+      
       const idx = materials.findIndex(m => m.id === newItem.id);
       if (idx >= 0) {
-        materials[idx] = {...materials[idx], ...newItem};
+        // Material already exists - add new batch
+        const existing = materials[idx];
+        if (!existing.batches) existing.batches = [];
+        existing.batches.push(newBatch);
+        // Update total quantity
+        existing.quantity = existing.batches.reduce((sum, b) => sum + (b.quantitàRimanente || 0), 0);
+        existing.updatedAt = new Date().toISOString();
+        materials[idx] = existing;
       } else {
+        // New material - add batch
+        newItem.batches.push(newBatch);
         materials.push(newItem);
       }
+      
       localStorage.setItem('magazzino_materials', JSON.stringify(materials));
       return newItem.id;
     }
@@ -2899,6 +2998,169 @@
       document.getElementById('implantsReportCompanyFilter').value = 'Tutte';
       updateImplantsReportData();
     }
+
+    // ===== CONSUMO MATERIALE FUNCTIONS (FIFO SYSTEM) =====
+    
+    function openConsumptionModal() {
+      const modal = document.getElementById('consumptionModal');
+      modal.classList.add('active');
+      setTimeout(() => initConsumptionModal(), 100);
+    }
+
+    function closeConsumptionModal() {
+      const modal = document.getElementById('consumptionModal');
+      modal.classList.remove('active');
+      document.getElementById('consumptionForm').reset();
+      document.getElementById('consumptionMaterial').value = '';
+    }
+
+    function initConsumptionModal() {
+      const materials = loadFromLocalStorage();
+      const select = document.getElementById('consumptionMaterial');
+      select.innerHTML = '<option value="">-- Seleziona materiale --</option>';
+      
+      materials.forEach(m => {
+        const opt = document.createElement('option');
+        opt.value = m.id;
+        opt.textContent = m.name + ' (' + (m.quantity || 0) + ' pz disponibili)';
+        select.appendChild(opt);
+      });
+
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('consumptionDate').value = today;
+    }
+
+    function updateConsumptionPreview() {
+      const materialId = document.getElementById('consumptionMaterial').value;
+      const quantity = parseInt(document.getElementById('consumptionQuantity').value) || 0;
+      const previewDiv = document.getElementById('consumptionPreviewContent');
+
+      if (!materialId || quantity <= 0) {
+        previewDiv.innerHTML = 'Seleziona materiale e quantità per visualizzare anteprima...';
+        return;
+      }
+
+      const materials = loadFromLocalStorage();
+      const material = materials.find(m => m.id === materialId);
+      if (!material) {
+        previewDiv.innerHTML = 'Materiale non trovato';
+        return;
+      }
+
+      // Ottieni batch del materiale (ordina per data ordine, più vecchi prima)
+      const batches = (material.batches || []).sort((a, b) => new Date(a.datiOrdine) - new Date(b.dataOrdine));
+      
+      if (batches.length === 0) {
+        previewDiv.innerHTML = '⚠️ Nessun batch disponibile per questo materiale';
+        return;
+      }
+
+      // Simula riduzione FIFO
+      let remainingQty = quantity;
+      let previewHtml = '';
+      let found = false;
+
+      for (let i = 0; i < batches.length && remainingQty > 0; i++) {
+        const batch = batches[i];
+        const batchRemaining = batch.quantitàRimanente || batch.quantità || 0;
+        
+        if (batchRemaining > 0) {
+          found = true;
+          const qtyFromBatch = Math.min(remainingQty, batchRemaining);
+          const qtyAfter = batchRemaining - qtyFromBatch;
+          
+          previewHtml += `
+            <div class="consumption-preview-line">
+              <span>📦 <strong>${batch.batchId}</strong> (Ordine: ${batch.dataOrdine})</span>
+            </div>
+            <div class="consumption-preview-line">
+              <span style="margin-left:20px">Scadenza: ${batch.scadenza}</span>
+            </div>
+            <div class="consumption-preview-line">
+              <span style="margin-left:20px">Riducibile: <strong>${qtyFromBatch} pz</strong></span>
+              <strong style="color:#d32f2f">${batchRemaining} → ${qtyAfter} pz</strong>
+            </div>
+          `;
+          
+          remainingQty -= qtyFromBatch;
+        }
+      }
+
+      if (!found) {
+        previewHtml = '⚠️ Materiale esaurito';
+      } else if (remainingQty > 0) {
+        previewHtml += `<div class="consumption-preview-line" style="color:#d32f2f"><strong>⚠️ Quantità insufficiente: mancano ${remainingQty} pz</strong></div>`;
+      }
+
+      previewDiv.innerHTML = previewHtml;
+    }
+
+    document.getElementById('consumptionForm')?.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const materialId = document.getElementById('consumptionMaterial').value;
+      const quantity = parseInt(document.getElementById('consumptionQuantity').value);
+      const consumptionDate = document.getElementById('consumptionDate').value;
+
+      if (!materialId || !quantity || quantity <= 0) {
+        alert('Compila tutti i campi correttamente');
+        return;
+      }
+
+      const materials = loadFromLocalStorage();
+      const materialIdx = materials.findIndex(m => m.id === materialId);
+      if (materialIdx < 0) {
+        alert('Materiale non trovato');
+        return;
+      }
+
+      const material = materials[materialIdx];
+      let batches = (material.batches || []).sort((a, b) => new Date(a.dataOrdine) - new Date(b.dataOrdine));
+      
+      // Sistema FIFO: riduce dai batch più vecchi
+      let remainingQty = quantity;
+      let consumed = [];
+      let totalQtyBefore = 0;
+      let totalQtyAfter = 0;
+
+      for (let i = 0; i < batches.length && remainingQty > 0; i++) {
+        const batchRemaining = batches[i].quantitàRimanente || batches[i].quantità || 0;
+        if (batchRemaining > 0) {
+          totalQtyBefore += batchRemaining;
+          const qtyFromBatch = Math.min(remainingQty, batchRemaining);
+          batches[i].quantitàRimanente = batchRemaining - qtyFromBatch;
+          totalQtyAfter += batches[i].quantitàRimanente;
+          consumed.push({batchId: batches[i].batchId, quantità: qtyFromBatch});
+          remainingQty -= qtyFromBatch;
+        }
+      }
+
+      if (remainingQty > 0) {
+        alert('Quantità insufficiente nel magazzino');
+        return;
+      }
+
+      // Aggiorna batch e storico consumi
+      material.batches = batches;
+      material.quantity = (material.quantity || 0) - quantity;
+      material.consumptionHistory = material.consumptionHistory || [];
+      material.consumptionHistory.push({
+        data: consumptionDate,
+        quantità: quantity,
+        batchesConsumed: consumed,
+        timestamp: new Date().toISOString()
+      });
+
+      materials[materialIdx] = material;
+      saveToLocalStorage(materials);
+
+      // Mostra notifica di conferma
+      const batchInfo = consumed.map(c => `${c.quantità} pz da ${c.batchId}`).join(', ');
+      showAlert(`✅ Consumati ${quantity} pz da: ${batchInfo}`, 'info');
+      
+      closeConsumptionModal();
+      loadMaterialsFromStorage(); // Ricarica tabella
+    });
 
     // Mostra/nascondi pulsante Gestione Impianti in base alla categoria
     function updateImplantsButtonVisibility() {
