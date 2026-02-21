@@ -609,6 +609,19 @@
       if(item){
         item.quantity = Math.max(0, (item.quantity || 0) + delta);
         saveImplantsToStorage(implants);
+        
+        // Sync to Firebase
+        if(firebaseReady && typeof db !== 'undefined'){
+          const ref = db.collection('implants').doc(id);
+          db.runTransaction(async tx=>{
+            const doc = await tx.get(ref);
+            if(!doc.exists) return;
+            const q = Math.max(0, (doc.data().quantity || 0) + delta);
+            tx.update(ref, {quantity: q});
+          }).catch(err => {
+            console.warn('Firebase update failed for implant quantity:', err);
+          });
+        }
       }
       renderImplantsList();
     }
@@ -618,6 +631,14 @@
       const implants = loadImplantsFromStorage();
       const filtered = implants.filter(m=>m.id !== id);
       saveImplantsToStorage(filtered);
+      
+      // Sync to Firebase
+      if(firebaseReady && typeof db !== 'undefined'){
+        db.collection('implants').doc(id).delete().catch(err => {
+          console.warn('Firebase delete failed for implant:', err);
+        });
+      }
+      
       renderImplantsList();
     }
 
@@ -1093,8 +1114,27 @@
     try {
       db.collection('implants').onSnapshot(
         snapshot => {
-          const implants = snapshot.docs.map(doc => ({id: doc.id, ...doc.data()}));
+          const implants = snapshot.docs.map(doc => {
+            const data = doc.data();
+            return {
+              id: doc.id,
+              type: data.type,
+              company: data.company,
+              model: data.model,
+              diameter: data.diameter,
+              length: data.length,
+              orderDate: data.orderDate && data.orderDate.toDate ? data.orderDate.toDate().toISOString() : data.orderDate,
+              expiry: data.expiry && data.expiry.toDate ? data.expiry.toDate().toISOString() : data.expiry,
+              price: data.price,
+              quantity: data.quantity,
+              createdAt: data.createdAt && data.createdAt.toDate ? data.createdAt.toDate().toISOString() : data.createdAt
+            };
+          });
           saveImplantsToStorage(implants);
+          // Forza aggiornamento UI se il modale è aperto
+          if(document.getElementById('implantsModal').classList.contains('active')){
+            renderImplantsList();
+          }
         },
         error => {
           console.warn('Firebase error for implants, usando localStorage:', error);
