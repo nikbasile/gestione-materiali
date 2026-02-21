@@ -145,6 +145,21 @@
     .consumption-btn.confirm:hover{background:#e65100}
     .batch-info{background:#fff3e0;padding:12px;border-radius:6px;margin-top:12px;border-left:3px solid #f57c00}
 
+    /* Add Selection Modal Styles */
+    #addSelectionModal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:10001;overflow-y:auto;padding:20px}
+    #addSelectionModal.active{display:flex;align-items:center;justify-content:center}
+    .selection-modal-content{background:#fff;border-radius:12px;max-width:600px;width:100%;box-shadow:0 8px 32px rgba(0,0,0,0.3);animation:slideDown 0.3s ease}
+    .selection-header{background:linear-gradient(135deg,#1976d2 0%,#0d47a1 100%);color:#fff;padding:28px;border-radius:12px 12px 0 0;text-align:center}
+    .selection-header h2{margin:0;font-size:26px;font-weight:700}
+    .selection-header p{margin:8px 0 0 0;font-size:15px;opacity:0.95}
+    .selection-body{padding:40px;display:flex;flex-direction:column;gap:20px;align-items:center}
+    .selection-btn{width:100%;max-width:320px;padding:18px 24px;font-size:16px;font-weight:600;border:none;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:12px;transition:all 0.3s;box-shadow:0 2px 8px rgba(0,0,0,0.1)}
+    .selection-btn.order{background:linear-gradient(135deg,#388e3c 0%,#1b5e20 100%);color:#fff}
+    .selection-btn.order:hover{transform:translateY(-3px);box-shadow:0 6px 16px rgba(56,142,60,0.3)}
+    .selection-btn.material{background:linear-gradient(135deg,#1976d2 0%,#0d47a1 100%);color:#fff}
+    .selection-btn.material:hover{transform:translateY(-3px);box-shadow:0 6px 16px rgba(25,118,210,0.3)}
+    @keyframes slideDown{from{opacity:0;transform:translateY(-30px)}to{opacity:1;transform:translateY(0)}}
+
     /* Order Modal Styles */
     #orderModal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:10000;overflow-y:auto;padding:20px}
     #orderModal.active{display:flex;align-items:flex-start;justify-content:center}
@@ -352,8 +367,8 @@
         🔩 Magazzino Implantare
       </button>
 
-      <button onclick="openOrderModal()" style="background:linear-gradient(135deg,#388e3c 0%,#1b5e20 100%);color:#fff;padding:12px 20px;font-size:15px;border:none;border-radius:8px;cursor:pointer;font-weight:600;box-shadow:0 4px 12px rgba(56,142,60,0.35);transition:all 0.2s;display:flex;align-items:center;gap:6px">
-        📦 Nuovo Ordine
+      <button onclick="openAddSelectionModal()" style="background:linear-gradient(135deg,#1976d2 0%,#0d47a1 100%);color:#fff;padding:12px 20px;font-size:15px;border:none;border-radius:8px;cursor:pointer;font-weight:600;box-shadow:0 4px 12px rgba(25,118,210,0.35);transition:all 0.2s;display:flex;align-items:center;gap:6px">
+        ➕ Aggiungi
       </button>
 
       <button onclick="openReportModal()" style="background:linear-gradient(135deg,#1976d2 0%,#0d47a1 100%);color:#fff;padding:12px 20px;font-size:15px;border:none;border-radius:8px;cursor:pointer;font-weight:600;box-shadow:0 4px 12px rgba(13,71,161,0.35);transition:all 0.2s;display:flex;align-items:center;gap:6px">
@@ -686,6 +701,26 @@
             <tbody id="reportTableBody"></tbody>
           </table>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Selection Modal -->
+  <div id="addSelectionModal">
+    <div class="selection-modal-content">
+      <div class="selection-header">
+        <h2>Cosa vuoi aggiungere?</h2>
+        <p>Scegli un'opzione per iniziare</p>
+      </div>
+      <div class="selection-body">
+        <button type="button" class="selection-btn order" onclick="continueWithOrder()">
+          <span>📦</span>
+          <span>Nuovo Ordine</span>
+        </button>
+        <button type="button" class="selection-btn material" onclick="continueWithMaterial()">
+          <span>📝</span>
+          <span>Nuovo Materiale</span>
+        </button>
       </div>
     </div>
   </div>
@@ -3167,6 +3202,33 @@
 
     // ===== NUOVO ORDINE FUNCTIONS =====
     let orderArticles = [];
+
+    function openAddSelectionModal() {
+      const modal = document.getElementById('addSelectionModal');
+      modal.classList.add('active');
+    }
+    
+    function closeAddSelectionModal() {
+      const modal = document.getElementById('addSelectionModal');
+      modal.classList.remove('active');
+    }
+    
+    function continueWithOrder() {
+      closeAddSelectionModal();
+      setTimeout(() => {
+        const modal = document.getElementById('orderModal');
+        modal.classList.add('active');
+        setTimeout(() => initOrderModal(), 100);
+      }, 200);
+    }
+    
+    function continueWithMaterial() {
+      closeAddSelectionModal();
+      setTimeout(() => {
+        document.getElementById('addForm').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        document.getElementById('name').focus();
+      }, 200);
+    }
 
     function openOrderModal() {
       const modal = document.getElementById('orderModal');
