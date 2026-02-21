@@ -1429,10 +1429,50 @@
     }
 
     async function downloadMaterialsPDF(){
-      if(!allMaterials || allMaterials.length === 0){
-        showAlert('Nessun materiale da esportare', 'warn');
+      // Applica gli stessi filtri che sono visualizzati nella tabella
+      let filtered = currentFilter === 'Tutti' 
+        ? allDocs 
+        : allDocs.filter(doc=>doc.data().category === currentFilter);
+      
+      if(currentCompanyFilter !== 'Tutte'){
+        filtered = filtered.filter(doc => (doc.data().company || '') === currentCompanyFilter);
+      }
+      if(currentDistributorFilter !== 'Tutti'){
+        filtered = filtered.filter(doc => (doc.data().distributor || '') === currentDistributorFilter);
+      }
+      // Filtro scadenza
+      if(currentExpiryFilter !== 'Tutte'){
+        const now = new Date();
+        filtered = filtered.filter(doc => {
+          const data = doc.data();
+          if(!data.expiry) return false;
+          const expiry = data.expiry && data.expiry.toDate ? data.expiry.toDate() : new Date(data.expiry);
+          const days = Math.ceil((expiry - now) / (1000*60*60*24));
+          const mesi = days / 30.44;
+          if(days < 0) return currentExpiryFilter === 'Rosso';
+          if(mesi < 3) return currentExpiryFilter === 'Rosso';
+          if(mesi < 6) return currentExpiryFilter === 'Giallo';
+          return currentExpiryFilter === 'Verde';
+        });
+      }
+      // Filtro quantità
+      if(currentQuantityFilter !== 'Tutte'){
+        filtered = filtered.filter(doc => {
+          const data = doc.data();
+          const soglia = data.lowStockThreshold || 2;
+          if(currentQuantityFilter === 'Rosso') return (data.quantity||0) < soglia;
+          if(currentQuantityFilter === 'Giallo') return (data.quantity||0) == soglia;
+          if(currentQuantityFilter === 'Verde') return (data.quantity||0) > soglia;
+          return true;
+        });
+      }
+
+      if(filtered.length === 0){
+        showAlert('Nessun materiale da esportare con i filtri selezionati', 'warn');
         return;
       }
+
+      const allMaterials = filtered.map(d=>d.data());
 
       const element = document.createElement('div');
       element.style.padding = '20px';
@@ -1523,7 +1563,7 @@
       summary.style.fontSize = '11px';
       summary.style.color = '#7f8c8d';
       summary.innerHTML = `
-        <p style="margin:5px 0"><strong>Totale materiali:</strong> ${allMaterials.length}</p>
+        <p style="margin:5px 0"><strong>Totale materiali (filtrati):</strong> ${allMaterials.length}</p>
         <p style="margin:5px 0"><strong>Valore totale:</strong> € ${allMaterials.reduce((sum, m)=>(sum + (parseFloat(m.price)||0) * (m.quantity||0)), 0).toFixed(2)}</p>
       `;
       element.appendChild(summary);
@@ -1541,9 +1581,39 @@
     }
 
     async function downloadImplantsPDF(){
-      const implants = loadImplantsFromStorage();
-      if(!implants || implants.length === 0){
-        showAlert('Nessun impianto da esportare', 'warn');
+      // Applica gli stessi filtri che sono visualizzati nella tabella impianti
+      let implants = loadImplantsFromStorage();
+      const now = new Date();
+      
+      // Applica filtri
+      if(currentImplantTypeFilter !== 'Tutti'){
+        implants = implants.filter(i => i.type === currentImplantTypeFilter);
+      }
+      if(currentImplantCompanyFilter !== 'Tutte'){
+        implants = implants.filter(i => i.company === currentImplantCompanyFilter);
+      }
+      if(currentImplantModelFilter !== 'Tutti'){
+        implants = implants.filter(i => i.model === currentImplantModelFilter);
+      }
+      if(currentImplantExpiryFilter !== 'Tutte'){
+        implants = implants.filter(i => {
+          if(!i.expiry) return currentImplantExpiryFilter === 'Tutte';
+          const expiry = new Date(i.expiry);
+          const days = daysBetween(now, expiry);
+          const mesi = days / 30.44;
+          
+          switch(currentImplantExpiryFilter){
+            case 'Scaduti': return days < 0;
+            case '< 3 mesi': return days >= 0 && mesi < 3;
+            case '< 6 mesi': return days >= 0 && mesi < 6;
+            case '> 6 mesi': return mesi >= 6;
+            default: return true;
+          }
+        });
+      }
+
+      if(implants.length === 0){
+        showAlert('Nessun impianto da esportare con i filtri selezionati', 'warn');
         return;
       }
 
@@ -1589,7 +1659,6 @@
 
       // Table body
       const tbody = document.createElement('tbody');
-      const now = new Date();
       implants.forEach(implant=>{
         const tr = document.createElement('tr');
         tr.style.borderBottom = '1px solid #ddd';
@@ -1641,7 +1710,7 @@
       summary.style.fontSize = '11px';
       summary.style.color = '#7f8c8d';
       summary.innerHTML = `
-        <p style="margin:5px 0"><strong>Totale impianti:</strong> ${implants.length}</p>
+        <p style="margin:5px 0"><strong>Totale impianti (filtrati):</strong> ${implants.length}</p>
         <p style="margin:5px 0"><strong>Valore totale:</strong> € ${implants.reduce((sum, i)=>(sum + (parseFloat(i.price)||0) * (i.quantity||0)), 0).toFixed(2)}</p>
       `;
       element.appendChild(summary);
