@@ -76,9 +76,16 @@
     .header-content h1{margin:0;padding:0;font-size:32px}
     .header-content .studio-name{font-size:14px;color:#7f8c8d;font-weight:400}
     .table-wrapper{overflow-x:auto;-webkit-overflow-scrolling:touch}
-    .filters-row{margin-bottom:12px;display:flex;gap:18px;align-items:center;flex-wrap:wrap}
-    .filter-label{font-weight:600;color:#003d7a;font-size:14px;margin-right:8px}
-    .filter-select{padding:8px 12px;font-size:14px;border-radius:6px;border:1px solid #d0dce6;min-width:180px}
+    .filters-row{margin-bottom:20px;display:flex;gap:16px;align-items:flex-end;flex-wrap:wrap;background:linear-gradient(135deg,#f0f4f8 0%,#fff 100%);padding:18px 20px;border-radius:10px;border:1px solid #e0e8f0;box-shadow:0 2px 6px rgba(0,61,122,0.05)}
+    .filter-label{font-weight:700;color:#003d7a;font-size:12px;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.6px;display:flex;align-items:center;gap:6px}
+    .filter-label::before{display:inline-block;width:6px;height:6px;border-radius:50%;background:#0066cc}
+    .filter-select{padding:9px 14px;font-size:14px;border-radius:8px;border:1.5px solid #d0dce6;min-width:190px;background:#fff;color:#2c3e50;font-weight:500;transition:all 0.2s;box-shadow:0 1px 2px rgba(0,0,0,0.04);cursor:pointer}
+    .filter-select:hover{border-color:#0066cc;box-shadow:0 2px 8px rgba(0,102,204,0.12)}
+    .filter-select:focus{outline:none;border-color:#0066cc;box-shadow:0 0 0 3px rgba(0,102,204,0.15)}
+    
+    .filters-reset-btn{padding:9px 18px;font-size:13px;font-weight:600;background:#fff;color:#d32f2f;border:1.5px solid #d32f2f;border-radius:8px;cursor:pointer;transition:all 0.2s;text-transform:uppercase;letter-spacing:0.5px}
+    .filters-reset-btn:hover{background:#d32f2f;color:#fff}
+    .filters-reset-btn.hidden{display:none}
     .header-content{min-width:0}
     
     .implants-btn{background:#ff6b35;margin-left:10px}
@@ -97,8 +104,9 @@
       .header-content h1{font-size:24px;line-height:1.2}
       .action-buttons{justify-content:stretch}
       .action-buttons button{width:100%}
-      .filters-row{gap:12px}
-      .filters-row > div{flex:1 1 220px}
+      .filters-row{gap:12px;padding:14px 16px}
+      .filters-row > div{flex:1 1 180px}
+      .filter-select{min-width:160px}
     }
 
     @media (max-width:700px){
@@ -114,10 +122,12 @@
       .category-btn{padding:10px 8px;font-size:13px}
       .action-buttons{margin-bottom:14px}
       .action-buttons button{font-size:13px;padding:10px 12px}
-      .filters-row{display:grid;grid-template-columns:1fr;gap:10px}
-      .filters-row > div{min-width:0}
-      .filter-label{display:block;margin-right:0;margin-bottom:6px;font-size:13px}
-      .filter-select{display:block;width:100%;min-width:0;font-size:13px;padding:9px 10px}
+      .filters-row{flex-direction:column;gap:10px;padding:12px 14px}
+      .filters-row > div{width:100%}
+      .filter-label{display:flex;align-items:center;margin-right:0;margin-bottom:6px;font-size:12px}
+      .filter-label::before{width:5px;height:5px}
+      .filter-select{display:block;width:100%;min-width:0;font-size:13px;padding:9px 10px;border-radius:6px}
+      .filters-reset-btn{width:100%;padding:10px 14px;font-size:12px}
 
       table{border:none;box-shadow:none;background:transparent}
       thead{display:none}
@@ -258,36 +268,37 @@
     </div>
 
     <div class="filters-row">
-            <div>
-              <label for="expiryFilterSelect" class="filter-label">Filtra per scadenza:</label>
-              <select id="expiryFilterSelect" class="filter-select">
-                <option value="Tutte">Tutte</option>
-                <option value="Rosso">Rosso (entro 3 mesi)</option>
-                <option value="Giallo">Giallo (entro 6 mesi)</option>
-                <option value="Verde">Verde (oltre 6 mesi)</option>
-              </select>
-            </div>
-            <div>
-              <label for="quantityFilterSelect" class="filter-label">Filtra per quantità:</label>
-              <select id="quantityFilterSelect" class="filter-select">
-                <option value="Tutte">Tutte</option>
-                <option value="Rosso">Rosso (sotto soglia)</option>
-                <option value="Giallo">Giallo (uguale soglia)</option>
-                <option value="Verde">Verde (sopra soglia)</option>
-              </select>
-            </div>
       <div>
-        <label for="companyFilterSelect" class="filter-label">Filtra per azienda:</label>
+        <label for="expiryFilterSelect" class="filter-label">📅 Scadenza</label>
+        <select id="expiryFilterSelect" class="filter-select">
+          <option value="Tutte">Tutte</option>
+          <option value="Rosso">🔴 Entro 3 mesi</option>
+          <option value="Giallo">🟡 Entro 6 mesi</option>
+          <option value="Verde">🟢 Oltre 6 mesi</option>
+        </select>
+      </div>
+      <div>
+        <label for="quantityFilterSelect" class="filter-label">📦 Quantità</label>
+        <select id="quantityFilterSelect" class="filter-select">
+          <option value="Tutte">Tutte</option>
+          <option value="Rosso">🔴 Sotto soglia</option>
+          <option value="Giallo">🟡 Uguale soglia</option>
+          <option value="Verde">🟢 Sopra soglia</option>
+        </select>
+      </div>
+      <div>
+        <label for="companyFilterSelect" class="filter-label">🏢 Azienda</label>
         <select id="companyFilterSelect" class="filter-select">
           <option value="Tutte">Tutte</option>
         </select>
       </div>
       <div>
-        <label for="distributorFilterSelect" class="filter-label">Filtra per distributore:</label>
+        <label for="distributorFilterSelect" class="filter-label">🚚 Distributore</label>
         <select id="distributorFilterSelect" class="filter-select">
           <option value="Tutti">Tutti</option>
         </select>
       </div>
+      <button id="resetFiltersBtn" class="filters-reset-btn hidden">⟲ Azzera Filtri</button>
     </div>
     <div class="table-wrapper">
       <table>
@@ -1095,6 +1106,7 @@
       initCategoryFilters();
       renderFilteredMaterials();
       checkAndNotify(allDocs);
+      updateResetButtonVisibility();
     }
 
     function renderFilteredMaterials(){
@@ -1152,6 +1164,7 @@
               quantityFilterSelect.addEventListener('change', function() {
                 currentQuantityFilter = this.value;
                 renderFilteredMaterials();
+                updateResetButtonVisibility();
               });
             }
         // Gestione filtro scadenza da select
@@ -1160,6 +1173,7 @@
           expiryFilterSelect.addEventListener('change', function() {
             currentExpiryFilter = this.value;
             renderFilteredMaterials();
+            updateResetButtonVisibility();
           });
         }
     }
@@ -1520,6 +1534,7 @@
       companyFilterSelect.addEventListener('change', function() {
         currentCompanyFilter = this.value;
         renderFilteredMaterials();
+        updateResetButtonVisibility();
       });
     }
     // Gestione filtro distributore da select
@@ -1527,6 +1542,42 @@
       distributorFilterSelect.addEventListener('change', function() {
         currentDistributorFilter = this.value;
         renderFilteredMaterials();
+        updateResetButtonVisibility();
+      });
+    }
+
+    // Funzione per controllare visualizzazione pulsante reset
+    function updateResetButtonVisibility() {
+      const resetBtn = document.getElementById('resetFiltersBtn');
+      const hasActiveFilters = 
+        currentExpiryFilter !== 'Tutte' ||
+        currentQuantityFilter !== 'Tutte' ||
+        currentCompanyFilter !== 'Tutte' ||
+        currentDistributorFilter !== 'Tutti';
+      
+      if (hasActiveFilters) {
+        resetBtn.classList.remove('hidden');
+      } else {
+        resetBtn.classList.add('hidden');
+      }
+    }
+
+    // Reset filtri
+    const resetBtn = document.getElementById('resetFiltersBtn');
+    if (resetBtn) {
+      resetBtn.addEventListener('click', function() {
+        document.getElementById('expiryFilterSelect').value = 'Tutte';
+        document.getElementById('quantityFilterSelect').value = 'Tutte';
+        document.getElementById('companyFilterSelect').value = 'Tutte';
+        document.getElementById('distributorFilterSelect').value = 'Tutti';
+        
+        currentExpiryFilter = 'Tutte';
+        currentQuantityFilter = 'Tutte';
+        currentCompanyFilter = 'Tutte';
+        currentDistributorFilter = 'Tutti';
+        
+        renderFilteredMaterials();
+        updateResetButtonVisibility();
       });
     }
 
