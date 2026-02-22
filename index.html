@@ -3507,6 +3507,30 @@
       companyInput.placeholder = 'Azienda';
       companyInput.className = 'article-company';
 
+      const vatRateSelect = document.createElement('select');
+      vatRateSelect.className = 'article-vat';
+      vatRateSelect.innerHTML = '<option value="22" selected>22%</option><option value="10">10%</option><option value="4">4%</option>';
+
+      const categorySelect = document.createElement('select');
+      categorySelect.className = 'article-category';
+      categorySelect.innerHTML = '<option value="">-- Categoria (se nuovo) --</option>';
+      const CATEGORIES = ['Strumentario','Consumabili Generici','Monouso','Disinfezione e Sterilizzazione','Chirurgia','Endodonzia','Conservativa e Protesi','Frese e Lucidatura','Anestesia e Farmaci','Impronte e Laboratorio','Radiografia e Fotografia','Profilassi e Igiene Orale','Ortodonzia'];
+      CATEGORIES.forEach(cat => {
+        const opt = document.createElement('option');
+        opt.value = cat;
+        opt.textContent = cat;
+        if (cat === 'Consumabili Generici') opt.selected = true;
+        categorySelect.appendChild(opt);
+      });
+
+      const lowStockInput = document.createElement('input');
+      lowStockInput.type = 'number';
+      lowStockInput.min = '1';
+      lowStockInput.step = '1';
+      lowStockInput.value = '2';
+      lowStockInput.placeholder = 'Soglia';
+      lowStockInput.className = 'article-lowstock';
+
       const descriptionInput = document.createElement('input');
       descriptionInput.type = 'text';
       descriptionInput.className = 'article-desc';
@@ -3546,11 +3570,29 @@
       expiryFieldWrapper.innerHTML = '<label>📅 Scadenza</label>';
       expiryFieldWrapper.appendChild(expiryInput);
 
+      const vatFieldWrapper = document.createElement('div');
+      vatFieldWrapper.className = 'article-field';
+      vatFieldWrapper.innerHTML = '<label>IVA %</label>';
+      vatFieldWrapper.appendChild(vatRateSelect);
+
+      const categoryFieldWrapper = document.createElement('div');
+      categoryFieldWrapper.className = 'article-field';
+      categoryFieldWrapper.innerHTML = '<label>Categoria</label>';
+      categoryFieldWrapper.appendChild(categorySelect);
+
+      const lowStockFieldWrapper = document.createElement('div');
+      lowStockFieldWrapper.className = 'article-field';
+      lowStockFieldWrapper.innerHTML = '<label>Soglia Bassa</label>';
+      lowStockFieldWrapper.appendChild(lowStockInput);
+
       row.appendChild(matFieldWrapper);
       row.appendChild(qtyFieldWrapper);
       row.appendChild(priceFieldWrapper);
       row.appendChild(companyFieldWrapper);
       row.appendChild(expiryFieldWrapper);
+      row.appendChild(vatFieldWrapper);
+      row.appendChild(categoryFieldWrapper);
+      row.appendChild(lowStockFieldWrapper);
       row.appendChild(descriptionInput);
       row.appendChild(removeBtn);
 
@@ -3565,6 +3607,9 @@
       const priceInput = row.querySelector('.article-price');
       const companyInput = row.querySelector('.article-company');
       const expiryInput = row.querySelector('.article-expiry');
+      const vatSelect = row.querySelector('.article-vat');
+      const categorySelect = row.querySelector('.article-category');
+      const lowStockInput = row.querySelector('.article-lowstock');
       const descInput = row.querySelector('.article-desc');
       
       if (data.materialId) {
@@ -3583,6 +3628,9 @@
       if (data.price !== undefined) priceInput.value = data.price;
       if (data.company) companyInput.value = data.company;
       if (data.expiry) expiryInput.value = data.expiry;
+      if (data.vatRate !== undefined) vatSelect.value = data.vatRate;
+      if (data.category) categorySelect.value = data.category;
+      if (data.lowStockThreshold !== undefined) lowStockInput.value = data.lowStockThreshold;
       if (data.description) descInput.value = data.description;
       return row;
     }
@@ -3962,11 +4010,14 @@
         const price = parseFloat(row.querySelector('.article-price')?.value) || 0;
         const company = row.querySelector('.article-company')?.value || '';
         const expiry = row.querySelector('.article-expiry')?.value;
+        const vatRate = parseInt(row.querySelector('.article-vat')?.value) || 22;
+        const category = row.querySelector('.article-category')?.value || 'Consumabili Generici';
+        const lowStockThreshold = parseInt(row.querySelector('.article-lowstock')?.value) || 2;
         const description = row.querySelector('.article-desc')?.value || '';
 
         // Accetta sia materiali esistenti (con ID) che nuovi (solo nome)
         if ((materialId || materialName) && quantity > 0) {
-          articles.push({ materialId, materialName, quantity, price, company, expiry, description });
+          articles.push({ materialId, materialName, quantity, price, company, expiry, vatRate, category, lowStockThreshold, description });
         }
       });
 
@@ -3987,13 +4038,13 @@
           // Estrai nome pulito (rimuovi eventuale parte " (Categoria)")
           let cleanName = article.materialName.trim();
           const matchCat = cleanName.match(/^(.+?)\s*\(([^)]+)\)$/);
-          let category = 'Consumabili Generici';
+          let category = article.category || 'Consumabili Generici';
           if (matchCat) {
             cleanName = matchCat[1].trim();
             category = matchCat[2].trim();
           }
           
-          // Crea nuovo materiale
+          // Crea nuovo materiale con tutti i dati dall'articolo
           materialId = window.crypto && window.crypto.randomUUID ? window.crypto.randomUUID() : ('m_' + Date.now() + '_' + Math.floor(Math.random()*100000));
           const newMaterial = {
             id: materialId,
@@ -4004,10 +4055,10 @@
             orderDate: new Date(orderDate),
             expiry: article.expiry ? new Date(article.expiry) : null,
             price: article.price || 0,
-            vatRate: 22,
+            vatRate: article.vatRate || 22,
             quantity: 0,
             batches: [],
-            lowStockThreshold: 2,
+            lowStockThreshold: article.lowStockThreshold || 2,
             notifyDays: 30,
             createdAt: new Date(),
             updatedAt: new Date()
