@@ -364,17 +364,19 @@
       Le notifiche compaiono in alto nella pagina ogni volta che si verifica una di queste condizioni.
     </div>
 
-    <div id="categoryFilters" class="category-filters"></div>
-
     <!-- Pulsanti Principali -->
     <div class="action-dropdown-container" style="margin:20px 0;display:flex;gap:16px;align-items:center;flex-wrap:wrap;justify-content:space-between">
+      <button id="materialsBtn" class="implants-btn-main" onclick="openMaterialsWarehouse()" style="background:linear-gradient(135deg,#0066cc 0%,#003d7a 100%);color:#fff;padding:12px 20px;font-size:15px;border:none;border-radius:8px;cursor:pointer;font-weight:600;box-shadow:0 4px 12px rgba(0,61,122,0.35);transition:all 0.2s;display:flex;align-items:center;gap:6px">
+        📦 Magazzino Materiali
+      </button>
+
       <!-- Pulsante Magazzino Implantare con grafica distintiva -->
       <button id="implantsBtn" class="implants-btn-main" onclick="openImplantsModal()" style="background:linear-gradient(135deg,#2E7D32 0%,#1B5E20 100%);color:#fff;padding:12px 20px;font-size:15px;border:none;border-radius:8px;cursor:pointer;font-weight:600;box-shadow:0 4px 12px rgba(27,94,32,0.35);transition:all 0.2s;display:flex;align-items:center;gap:6px">
         🔩 Magazzino Implantare
       </button>
 
       <button onclick="openAddSelectionModal()" style="background:linear-gradient(135deg,#1976d2 0%,#0d47a1 100%);color:#fff;padding:12px 20px;font-size:15px;border:none;border-radius:8px;cursor:pointer;font-weight:600;box-shadow:0 4px 12px rgba(25,118,210,0.35);transition:all 0.2s;display:flex;align-items:center;gap:6px">
-        ➕ Aggiungi
+        ➕ Aggiungi Nuovo Materiale/Ordine
       </button>
 
       <button onclick="openReportModal()" style="background:linear-gradient(135deg,#1976d2 0%,#0d47a1 100%);color:#fff;padding:12px 20px;font-size:15px;border:none;border-radius:8px;cursor:pointer;font-weight:600;box-shadow:0 4px 12px rgba(13,71,161,0.35);transition:all 0.2s;display:flex;align-items:center;gap:6px">
@@ -407,7 +409,9 @@
       </div>
     </div>
 
-    <div class="filters-row">
+    <div id="categoryFilters" class="category-filters"></div>
+
+    <div id="materialsFilters" class="filters-row">
       <div>
         <label for="expiryFilterSelect" class="filter-label">📅 Scadenza</label>
         <select id="expiryFilterSelect" class="filter-select">
@@ -3277,6 +3281,33 @@
         modal.classList.add('active');
         setupMaterialCustomFields();
       }, 200);
+    }
+
+    function openMaterialsWarehouse() {
+      currentFilter = 'Tutti';
+      currentCompanyFilter = 'Tutte';
+      currentDistributorFilter = 'Tutti';
+      currentExpiryFilter = 'Tutte';
+      currentQuantityFilter = 'Tutte';
+
+      const expiryFilterSelect = document.getElementById('expiryFilterSelect');
+      const quantityFilterSelect = document.getElementById('quantityFilterSelect');
+      const companyFilterSelectEl = document.getElementById('companyFilterSelect');
+      const distributorFilterSelectEl = document.getElementById('distributorFilterSelect');
+
+      if (expiryFilterSelect) expiryFilterSelect.value = 'Tutte';
+      if (quantityFilterSelect) quantityFilterSelect.value = 'Tutte';
+      if (companyFilterSelectEl) companyFilterSelectEl.value = 'Tutte';
+      if (distributorFilterSelectEl) distributorFilterSelectEl.value = 'Tutti';
+
+      updateCategoryFilters();
+      renderFilteredMaterials();
+      updateResetButtonVisibility();
+
+      const target = document.getElementById('materialsFilters') || document.querySelector('.table-wrapper');
+      if (target && typeof target.scrollIntoView === 'function') {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
     }
 
     function openMaterialModal() {
