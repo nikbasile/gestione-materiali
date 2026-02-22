@@ -803,22 +803,21 @@
                 <button type="button" class="import-article-btn" onclick="openPdfImportModal()">📄 Importa PDF</button>
               </div>
             </div>
-            <div id="articlesContainer" style="display:flex;flex-direction:column;border:1px solid #d0dce6;border-radius:8px;max-height:600px;background:#fff;overflow:hidden">
-              <table style="width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed">
+            <div id="articlesContainer" style="border:1px solid #d0dce6;border-radius:8px;max-height:600px;background:#fff;overflow-y:auto">
+              <table style="width:100%;border-collapse:collapse;font-size:12px">
                 <thead style="position:sticky;top:0;background:#f0f4f8;z-index:10">
                   <tr style="background:#f0f4f8;border-bottom:2px solid #d0dce6">
-                    <th style="padding:4px 6px;text-align:left;font-weight:600;color:#003d7a;border-right:1px solid #e0e8f0;flex:1">Materiale</th>
-                    <th style="padding:4px 6px;text-align:center;font-weight:600;color:#003d7a;border-right:1px solid #e0e8f0;width:45px">Qtà</th>
-                    <th style="padding:4px 6px;text-align:center;font-weight:600;color:#003d7a;border-right:1px solid #e0e8f0;width:60px">Prezzo</th>
-                    <th style="padding:4px 6px;text-align:left;font-weight:600;color:#003d7a;border-right:1px solid #e0e8f0;width:80px">Azienda</th>
-                    <th style="padding:4px 6px;text-align:center;font-weight:600;color:#003d7a;border-right:1px solid #e0e8f0;width:60px">Scad.</th>
-                    <th style="padding:4px 6px;text-align:center;font-weight:600;color:#003d7a;border-right:1px solid #e0e8f0;width:45px">IVA</th>
-                    <th style="padding:4px 6px;text-align:left;font-weight:600;color:#003d7a;border-right:1px solid #e0e8f0;width:100px">Categoria</th>
-                    <th style="padding:4px 6px;text-align:center;font-weight:600;color:#003d7a;border-right:1px solid #e0e8f0;width:40px">Soglia</th>
-                    <th style="padding:4px 6px;text-align:center;font-weight:600;color:#003d7a;width:40px">Azioni</th>
+                    <th style="padding:6px 8px;text-align:left;font-weight:600;color:#003d7a;border:1px solid #d0dce6;white-space:nowrap">Materiale</th>
+                    <th style="padding:6px 8px;text-align:center;font-weight:600;color:#003d7a;border:1px solid #d0dce6;white-space:nowrap;width:50px">Qtà</th>
+                    <th style="padding:6px 8px;text-align:center;font-weight:600;color:#003d7a;border:1px solid #d0dce6;white-space:nowrap;width:70px">Prezzo</th>
+                    <th style="padding:6px 8px;text-align:center;font-weight:600;color:#003d7a;border:1px solid #d0dce6;white-space:nowrap;width:80px">Tipo</th>
+                    <th style="padding:6px 8px;text-align:left;font-weight:600;color:#003d7a;border:1px solid #d0dce6;white-space:nowrap;width:90px">Azienda</th>
+                    <th style="padding:6px 8px;text-align:center;font-weight:600;color:#003d7a;border:1px solid #d0dce6;white-space:nowrap;width:50px">IVA %</th>
+                    <th style="padding:6px 8px;text-align:left;font-weight:600;color:#003d7a;border:1px solid #d0dce6;white-space:nowrap;width:120px">Categoria</th>
+                    <th style="padding:6px 8px;text-align:center;font-weight:600;color:#003d7a;border:1px solid #d0dce6;white-space:nowrap;width:60px">Azioni</th>
                   </tr>
                 </thead>
-                <tbody id="articlesContainerBody" style="display:block;overflow-y:auto"></tbody>
+                <tbody id="articlesContainerBody"></tbody>
               </table>
             </div>
           </div>
@@ -3530,13 +3529,26 @@
       priceInput.style.borderRadius = '3px';
       priceInput.style.textAlign = 'center';
 
-      const expiryInput = document.createElement('input');
-      expiryInput.type = 'date';
-      expiryInput.className = 'article-expiry';
-      expiryInput.style.width = '100%';
-      expiryInput.style.padding = '4px 5px';
-      expiryInput.style.border = '1px solid #d0dce6';
-      expiryInput.style.borderRadius = '3px';
+      const priceTypeSelect = document.createElement('select');
+      priceTypeSelect.className = 'article-pricetype';
+      priceTypeSelect.innerHTML = '<option value="totale" selected>Totale</option><option value="unitario">Unitario</option>';
+      priceTypeSelect.style.width = '100%';
+      priceTypeSelect.style.padding = '4px 5px';
+      priceTypeSelect.style.border = '1px solid #d0dce6';
+      priceTypeSelect.style.borderRadius = '3px';
+      
+      // Calcola il prezzo quando cambia il tipo
+      const updatePriceTypeDisplay = () => {
+        if (quantityInput.value && priceInput.value) {
+          if (priceTypeSelect.value === 'unitario') {
+            priceInput.value = (parseFloat(priceInput.value) * parseFloat(quantityInput.value)).toFixed(2);
+          } else {
+            priceInput.value = (parseFloat(priceInput.value) / parseFloat(quantityInput.value)).toFixed(2);
+          }
+        }
+      };
+      priceTypeSelect.addEventListener('change', updatePriceTypeDisplay);
+      quantityInput.addEventListener('change', updatePriceTypeDisplay);
 
       const companyInput = document.createElement('input');
       companyInput.type = 'text';
@@ -3572,19 +3584,6 @@
       categorySelect.style.border = '1px solid #d0dce6';
       categorySelect.style.borderRadius = '3px';
 
-      const lowStockInput = document.createElement('input');
-      lowStockInput.type = 'number';
-      lowStockInput.min = '1';
-      lowStockInput.step = '1';
-      lowStockInput.value = '2';
-      lowStockInput.placeholder = 'Soglia';
-      lowStockInput.className = 'article-lowstock';
-      lowStockInput.style.width = '100%';
-      lowStockInput.style.padding = '4px 5px';
-      lowStockInput.style.border = '1px solid #d0dce6';
-      lowStockInput.style.borderRadius = '3px';
-      lowStockInput.style.textAlign = 'center';
-
       const descriptionInput = document.createElement('input');
       descriptionInput.type = 'text';
       descriptionInput.className = 'article-desc';
@@ -3619,18 +3618,19 @@
       const tdPrice = document.createElement('td');
       tdPrice.style.padding = '4px 5px';
       tdPrice.style.border = '1px solid #e0e8f0';
+      tdPrice.style.textAlign = 'center';
       tdPrice.appendChild(priceInput);
+
+      const tdPriceType = document.createElement('td');
+      tdPriceType.style.padding = '4px 5px';
+      tdPriceType.style.border = '1px solid #e0e8f0';
+      tdPriceType.style.textAlign = 'center';
+      tdPriceType.appendChild(priceTypeSelect);
 
       const tdCompany = document.createElement('td');
       tdCompany.style.padding = '4px 5px';
       tdCompany.style.border = '1px solid #e0e8f0';
       tdCompany.appendChild(companyInput);
-
-      const tdExpiry = document.createElement('td');
-      tdExpiry.style.padding = '4px 5px';
-      tdExpiry.style.border = '1px solid #e0e8f0';
-      tdExpiry.style.textAlign = 'center';
-      tdExpiry.appendChild(expiryInput);
 
       const tdVat = document.createElement('td');
       tdVat.style.padding = '4px 5px';
@@ -3643,12 +3643,6 @@
       tdCategory.style.border = '1px solid #e0e8f0';
       tdCategory.appendChild(categorySelect);
 
-      const tdLowStock = document.createElement('td');
-      tdLowStock.style.padding = '4px 5px';
-      tdLowStock.style.border = '1px solid #e0e8f0';
-      tdLowStock.style.textAlign = 'center';
-      tdLowStock.appendChild(lowStockInput);
-
       const tdActions = document.createElement('td');
       tdActions.style.padding = '4px 5px';
       tdActions.style.border = '1px solid #e0e8f0';
@@ -3658,11 +3652,10 @@
       tr.appendChild(tdMat);
       tr.appendChild(tdQty);
       tr.appendChild(tdPrice);
+      tr.appendChild(tdPriceType);
       tr.appendChild(tdCompany);
-      tr.appendChild(tdExpiry);
       tr.appendChild(tdVat);
       tr.appendChild(tdCategory);
-      tr.appendChild(tdLowStock);
       tr.appendChild(tdActions);
       tr.appendChild(descriptionInput);
 
@@ -3675,11 +3668,10 @@
       const materialInput = row.querySelector('.article-material');
       const qtyInput = row.querySelector('.article-qty');
       const priceInput = row.querySelector('.article-price');
+      const priceTypeSelect = row.querySelector('.article-pricetype');
       const companyInput = row.querySelector('.article-company');
-      const expiryInput = row.querySelector('.article-expiry');
       const vatSelect = row.querySelector('.article-vat');
       const categorySelect = row.querySelector('.article-category');
-      const lowStockInput = row.querySelector('.article-lowstock');
       const descInput = row.querySelector('.article-desc');
       
       if (data.materialId) {
@@ -3696,11 +3688,10 @@
       
       if (data.quantity !== undefined) qtyInput.value = data.quantity;
       if (data.price !== undefined) priceInput.value = data.price;
+      if (data.priceType) priceTypeSelect.value = data.priceType;
       if (data.company) companyInput.value = data.company;
-      if (data.expiry) expiryInput.value = data.expiry;
       if (data.vatRate !== undefined) vatSelect.value = data.vatRate;
       if (data.category) categorySelect.value = data.category;
-      if (data.lowStockThreshold !== undefined) lowStockInput.value = data.lowStockThreshold;
       if (data.description) descInput.value = data.description;
       return row;
     }
@@ -4083,16 +4074,15 @@
         const materialName = materialInputEl?.value || '';
         const quantity = parseInt(row.querySelector('.article-qty')?.value) || 0;
         const price = parseFloat(row.querySelector('.article-price')?.value) || 0;
+        const priceType = row.querySelector('.article-pricetype')?.value || 'totale';
         const company = row.querySelector('.article-company')?.value || '';
-        const expiry = row.querySelector('.article-expiry')?.value;
         const vatRate = parseInt(row.querySelector('.article-vat')?.value) || 22;
         const category = row.querySelector('.article-category')?.value || 'Consumabili Generici';
-        const lowStockThreshold = parseInt(row.querySelector('.article-lowstock')?.value) || 2;
         const description = row.querySelector('.article-desc')?.value || '';
 
         // Accetta sia materiali esistenti (con ID) che nuovi (solo nome)
         if ((materialId || materialName) && quantity > 0) {
-          articles.push({ materialId, materialName, quantity, price, company, expiry, vatRate, category, lowStockThreshold, description });
+          articles.push({ materialId, materialName, quantity, price, priceType, company, vatRate, category, description });
         }
       });
 
