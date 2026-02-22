@@ -12,6 +12,12 @@ Deploy:
 - Abilitare Firestore nel progetto Firebase.
 - Per Netlify: creare un nuovo sito e caricare il singolo file `index.html` (o collegare un repository Git).
 
+Deploy automatico da GitHub a Firebase Hosting:
+- Workflow già pronta in `.github/workflows/deploy-firebase-hosting.yml` (trigger su push in `main`).
+- Crea in GitHub il secret repository: `FIREBASE_SERVICE_ACCOUNT_GESTIONE_MATERIALI_DI_CONSUMO`.
+- Valore del secret: JSON dell'account di servizio Firebase con permessi Hosting Admin (e Firestore se necessario).
+- Dopo aver aggiunto il secret, ogni push su `main` pubblica automaticamente su Firebase Hosting (canale `live`).
+
 Note importanti:
 - `index.html` usa la build compat di Firebase per semplicità. Per produzione valutare l'uso del SDK modulare e regole di sicurezza Firestore.
 - Le chiavi di Firebase (apiKey ecc.) vanno tenute con attenzione. Le regole Firestore devono essere configurate per limitare l'accesso.

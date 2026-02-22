@@ -243,6 +243,7 @@
     .pdf-import-table td{padding:10px;border-bottom:1px solid #eef2f6}
     .pdf-import-table input,.pdf-import-table select{width:100%;padding:8px 10px;border:1px solid #d0dce6;border-radius:6px;font-size:13px}
     .pdf-import-table input[readonly]{background:#f4f7fb;color:#003d7a}
+    .pdf-import-table th:nth-child(1),.pdf-import-table td:nth-child(1){min-width:280px}
     .pdf-import-remove{background:#c62828;color:#fff;border:none;border-radius:6px;padding:8px 10px;cursor:pointer;font-weight:600;font-size:12px}
     .pdf-import-buttons{display:flex;gap:12px;margin-top:16px}
     .pdf-import-btn{flex:1;padding:12px;font-weight:600;border:none;border-radius:6px;cursor:pointer;transition:all 0.2s;font-size:13px;text-transform:uppercase;letter-spacing:0.4px}
@@ -880,7 +881,7 @@
           <table class="pdf-import-table">
             <thead>
               <tr>
-                <th>Nome materiale</th>
+                <th>Nome e descrizione materiale</th>
                 <th>Descrizione (opz.)</th>
                 <th>Quantità</th>
                 <th>Prezzo (€)</th>
