@@ -3450,19 +3450,38 @@
     function addArticleRow() {
       const materials = loadFromLocalStorage();
       const rowId = 'article_' + Date.now() + '_' + Math.random();
+      const datalistId = 'datalist_' + rowId;
       
       const row = document.createElement('div');
       row.className = 'article-row';
       row.id = rowId;
       
-      const materialSelect = document.createElement('select');
-      materialSelect.className = 'article-material';
-      materialSelect.innerHTML = '<option value="">-- Seleziona materiale --</option>';
+      // Cambiato da select a input con datalist per permettere editing libero
+      const materialInput = document.createElement('input');
+      materialInput.type = 'text';
+      materialInput.className = 'article-material';
+      materialInput.placeholder = 'Nome materiale o seleziona...';
+      materialInput.setAttribute('list', datalistId);
+      materialInput.setAttribute('data-material-id', '');
+      
+      // Crea datalist con materiali esistenti
+      const datalist = document.createElement('datalist');
+      datalist.id = datalistId;
       materials.forEach(m => {
         const opt = document.createElement('option');
-        opt.value = m.id;
-        opt.textContent = m.name + ' (' + m.category + ')';
-        materialSelect.appendChild(opt);
+        opt.value = m.name + ' (' + m.category + ')';
+        opt.setAttribute('data-id', m.id);
+        datalist.appendChild(opt);
+      });
+      
+      // Quando seleziona da datalist, salva l'ID
+      materialInput.addEventListener('input', function() {
+        const selectedOption = Array.from(datalist.options).find(opt => opt.value === this.value);
+        if (selectedOption) {
+          this.setAttribute('data-material-id', selectedOption.getAttribute('data-id'));
+        } else {
+          this.setAttribute('data-material-id', '');
+        }
       });
 
       const quantityInput = document.createElement('input');
@@ -3504,7 +3523,8 @@
       const matFieldWrapper = document.createElement('div');
       matFieldWrapper.className = 'article-field';
       matFieldWrapper.innerHTML = '<label>Materiale</label>';
-      matFieldWrapper.appendChild(materialSelect);
+      matFieldWrapper.appendChild(materialInput);
+      matFieldWrapper.appendChild(datalist);
 
       const qtyFieldWrapper = document.createElement('div');
       qtyFieldWrapper.className = 'article-field';
@@ -3540,13 +3560,25 @@
 
     function addArticleRowWithData(data) {
       const row = addArticleRow();
-      const materialSelect = row.querySelector('.article-material');
+      const materialInput = row.querySelector('.article-material');
       const qtyInput = row.querySelector('.article-qty');
       const priceInput = row.querySelector('.article-price');
       const companyInput = row.querySelector('.article-company');
       const expiryInput = row.querySelector('.article-expiry');
       const descInput = row.querySelector('.article-desc');
-      if (data.materialId) materialSelect.value = data.materialId;
+      
+      if (data.materialId) {
+        // Trova il materiale e imposta il nome nell'input
+        const materials = loadFromLocalStorage();
+        const material = materials.find(m => m.id === data.materialId);
+        if (material) {
+          materialInput.value = material.name + ' (' + material.category + ')';
+          materialInput.setAttribute('data-material-id', data.materialId);
+        }
+      } else if (data.materialName) {
+        materialInput.value = data.materialName;
+      }
+      
       if (data.quantity !== undefined) qtyInput.value = data.quantity;
       if (data.price !== undefined) priceInput.value = data.price;
       if (data.company) companyInput.value = data.company;
@@ -3923,15 +3955,18 @@
 
       const articles = [];
       document.querySelectorAll('#articlesContainer .article-row').forEach(row => {
-        const materialId = row.querySelector('.article-material')?.value;
+        const materialInputEl = row.querySelector('.article-material');
+        const materialId = materialInputEl?.getAttribute('data-material-id') || '';
+        const materialName = materialInputEl?.value || '';
         const quantity = parseInt(row.querySelector('.article-qty')?.value) || 0;
         const price = parseFloat(row.querySelector('.article-price')?.value) || 0;
         const company = row.querySelector('.article-company')?.value || '';
         const expiry = row.querySelector('.article-expiry')?.value;
         const description = row.querySelector('.article-desc')?.value || '';
 
-        if (materialId && quantity > 0) {
-          articles.push({ materialId, quantity, price, company, expiry, description });
+        // Accetta sia materiali esistenti (con ID) che nuovi (solo nome)
+        if ((materialId || materialName) && quantity > 0) {
+          articles.push({ materialId, materialName, quantity, price, company, expiry, description });
         }
       });
 
@@ -3945,13 +3980,48 @@
       const orderId = 'ord_' + Date.now();
 
       articles.forEach(article => {
-        const matIdx = materials.findIndex(m => m.id === article.materialId);
+        let materialId = article.materialId;
+        
+        // Se non c'è materialId, crea un nuovo materiale
+        if (!materialId && article.materialName) {
+          // Estrai nome pulito (rimuovi eventuale parte " (Categoria)")
+          let cleanName = article.materialName.trim();
+          const matchCat = cleanName.match(/^(.+?)\s*\(([^)]+)\)$/);
+          let category = 'Consumabili Generici';
+          if (matchCat) {
+            cleanName = matchCat[1].trim();
+            category = matchCat[2].trim();
+          }
+          
+          // Crea nuovo materiale
+          materialId = window.crypto && window.crypto.randomUUID ? window.crypto.randomUUID() : ('m_' + Date.now() + '_' + Math.floor(Math.random()*100000));
+          const newMaterial = {
+            id: materialId,
+            name: cleanName,
+            category: category,
+            distributor: distributor,
+            company: article.company || '',
+            orderDate: new Date(orderDate),
+            expiry: article.expiry ? new Date(article.expiry) : null,
+            price: article.price || 0,
+            vatRate: 22,
+            quantity: 0,
+            batches: [],
+            lowStockThreshold: 2,
+            notifyDays: 30,
+            createdAt: new Date(),
+            updatedAt: new Date()
+          };
+          materials.push(newMaterial);
+        }
+        
+        const matIdx = materials.findIndex(m => m.id === materialId);
         if (matIdx >= 0) {
           const material = materials[matIdx];
           if (!material.batches) material.batches = [];
 
           // Crea nuovo batch
-          const batchId = 'batch_' + orderId.substring(0, 8) + '_' + article.materialId.substring(0, 8);
+          const batchId = 'batch_' + orderId.substring(0, 8) + '_' + materialId.substring(0, 8);
           const newBatch = {
             batchId: batchId,
             ordinoId: orderId,
