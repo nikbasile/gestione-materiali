@@ -804,7 +804,7 @@
               </div>
             </div>
             <div id="articlesContainer" style="border:1px solid #d0dce6;border-radius:8px;max-height:700px;background:#fff;overflow-y:auto">
-              <table style="width:100%;border-collapse:collapse;font-size:11px">
+              <table style="width:100%;border-collapse:collapse;font-size:11px;table-layout:fixed">
                 <thead style="position:sticky;top:0;background:#f0f4f8;z-index:10">
                   <tr style="background:#f0f4f8;border-bottom:2px solid #d0dce6">
                     <th style="padding:4px 5px;text-align:left;font-weight:600;color:#003d7a;border:1px solid #d0dce6;white-space:nowrap">Materiale</th>
@@ -3606,52 +3606,52 @@
       // Crea celle di tabella
       const tdMat = document.createElement('td');
       tdMat.style.padding = '4px 5px';
-      tdMat.style.border = '1px solid #e0e8f0';
+      tdMat.style.border = '1px solid #d0dce6';
       tdMat.appendChild(materialInput);
       tdMat.appendChild(datalist);
 
       const tdQty = document.createElement('td');
       tdQty.style.padding = '4px 5px';
-      tdQty.style.border = '1px solid #e0e8f0';
+      tdQty.style.border = '1px solid #d0dce6';
       tdQty.style.width = '40px';
       tdQty.appendChild(quantityInput);
 
       const tdPrice = document.createElement('td');
       tdPrice.style.padding = '4px 5px';
-      tdPrice.style.border = '1px solid #e0e8f0';
+      tdPrice.style.border = '1px solid #d0dce6';
       tdPrice.style.width = '60px';
       tdPrice.style.textAlign = 'center';
       tdPrice.appendChild(priceInput);
 
       const tdPriceType = document.createElement('td');
       tdPriceType.style.padding = '4px 5px';
-      tdPriceType.style.border = '1px solid #e0e8f0';
+      tdPriceType.style.border = '1px solid #d0dce6';
       tdPriceType.style.width = '70px';
       tdPriceType.style.textAlign = 'center';
       tdPriceType.appendChild(priceTypeSelect);
 
       const tdCompany = document.createElement('td');
       tdCompany.style.padding = '4px 5px';
-      tdCompany.style.border = '1px solid #e0e8f0';
+      tdCompany.style.border = '1px solid #d0dce6';
       tdCompany.style.width = '80px';
       tdCompany.appendChild(companyInput);
 
       const tdVat = document.createElement('td');
       tdVat.style.padding = '4px 5px';
-      tdVat.style.border = '1px solid #e0e8f0';
+      tdVat.style.border = '1px solid #d0dce6';
       tdVat.style.width = '45px';
       tdVat.style.textAlign = 'center';
       tdVat.appendChild(vatRateSelect);
 
       const tdCategory = document.createElement('td');
       tdCategory.style.padding = '4px 5px';
-      tdCategory.style.border = '1px solid #e0e8f0';
+      tdCategory.style.border = '1px solid #d0dce6';
       tdCategory.style.width = '110px';
       tdCategory.appendChild(categorySelect);
 
       const tdActions = document.createElement('td');
       tdActions.style.padding = '4px 5px';
-      tdActions.style.border = '1px solid #e0e8f0';
+      tdActions.style.border = '1px solid #d0dce6';
       tdActions.style.width = '55px';
       tdActions.style.textAlign = 'center';
       tdActions.appendChild(removeBtn);
