@@ -365,52 +365,54 @@
     </div>
 
     <!-- Pulsanti Principali -->
-    <!-- Prima fila: Aggiungi a sinistra, Analisi e Consumo a destra -->
-    <div style="margin:20px 0;display:flex;gap:12px;align-items:center;justify-content:space-between">
-      <button onclick="openAddSelectionModal()" style="background:linear-gradient(135deg,#1976d2 0%,#0d47a1 100%);color:#fff;padding:12px 20px;font-size:15px;border:none;border-radius:8px;cursor:pointer;font-weight:600;box-shadow:0 4px 12px rgba(25,118,210,0.35);transition:all 0.2s;display:flex;align-items:center;gap:6px">
-        ➕ Aggiungi Nuovo Materiale/Ordine
-      </button>
-
-      <div style="display:flex;gap:12px;align-items:center">
-        <button onclick="openReportModal()" style="background:linear-gradient(135deg,#1976d2 0%,#0d47a1 100%);color:#fff;padding:12px 20px;font-size:15px;border:none;border-radius:8px;cursor:pointer;font-weight:600;box-shadow:0 4px 12px rgba(13,71,161,0.35);transition:all 0.2s;display:flex;align-items:center;gap:6px">
-          📊 Analisi Spese
+    <div style="background:linear-gradient(135deg,#f0f4f8 0%,#fff 100%);padding:18px 20px;border-radius:10px;border:1px solid #e0e8f0;box-shadow:0 2px 6px rgba(0,61,122,0.05);margin-bottom:20px">
+      <!-- Prima fila: Aggiungi a sinistra, Analisi e Consumo a destra -->
+      <div style="display:flex;gap:12px;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <button onclick="openAddSelectionModal()" style="background:linear-gradient(135deg,#1976d2 0%,#0d47a1 100%);color:#fff;padding:12px 20px;font-size:15px;border:none;border-radius:8px;cursor:pointer;font-weight:600;box-shadow:0 4px 12px rgba(25,118,210,0.35);transition:all 0.2s;display:flex;align-items:center;gap:6px">
+          ➕ Aggiungi Nuovo Materiale/Ordine
         </button>
 
-        <button onclick="openConsumptionModal()" style="background:linear-gradient(135deg,#f57c00 0%,#e65100 100%);color:#fff;padding:12px 20px;font-size:15px;border:none;border-radius:8px;cursor:pointer;font-weight:600;box-shadow:0 4px 12px rgba(230,81,0,0.35);transition:all 0.2s;display:flex;align-items:center;gap:6px">
-          📉 Registra Consumo
-        </button>
-      </div>
-    </div>
+        <div style="display:flex;gap:12px;align-items:center">
+          <button onclick="openReportModal()" style="background:linear-gradient(135deg,#1976d2 0%,#0d47a1 100%);color:#fff;padding:12px 20px;font-size:15px;border:none;border-radius:8px;cursor:pointer;font-weight:600;box-shadow:0 4px 12px rgba(13,71,161,0.35);transition:all 0.2s;display:flex;align-items:center;gap:6px">
+            📊 Analisi Spese
+          </button>
 
-    <!-- Seconda fila: Magazzini a sinistra, Scarica e Backup a destra -->
-    <div style="margin:0 0 20px 0;display:flex;gap:12px;align-items:center;justify-content:space-between">
-      <div style="display:flex;gap:12px;align-items:center">
-        <button id="materialsBtn" class="implants-btn-main" onclick="openMaterialsWarehouse()" style="background:linear-gradient(135deg,#0066cc 0%,#003d7a 100%);color:#fff;padding:12px 20px;font-size:15px;border:none;border-radius:8px;cursor:pointer;font-weight:600;box-shadow:0 4px 12px rgba(0,61,122,0.35);transition:all 0.2s;display:flex;align-items:center;gap:6px">
-          📦 Magazzino Materiali
-        </button>
-
-        <button id="implantsBtn" class="implants-btn-main" onclick="openImplantsModal()" style="background:linear-gradient(135deg,#2E7D32 0%,#1B5E20 100%);color:#fff;padding:12px 20px;font-size:15px;border:none;border-radius:8px;cursor:pointer;font-weight:600;box-shadow:0 4px 12px rgba(27,94,32,0.35);transition:all 0.2s;display:flex;align-items:center;gap:6px">
-          🔩 Magazzino Implantare
-        </button>
+          <button onclick="openConsumptionModal()" style="background:linear-gradient(135deg,#f57c00 0%,#e65100 100%);color:#fff;padding:12px 20px;font-size:15px;border:none;border-radius:8px;cursor:pointer;font-weight:600;box-shadow:0 4px 12px rgba(230,81,0,0.35);transition:all 0.2s;display:flex;align-items:center;gap:6px">
+            📉 Registra Consumo
+          </button>
+        </div>
       </div>
 
-      <div style="display:flex;gap:12px;align-items:center">
-        <!-- Pulsante Scarica Dati Materiali -->
-        <div style="position:relative">
-          <button class="action-menu-btn" onclick="toggleActionMenu('downloadMenu')">📥 Scarica Dati ▼</button>
-          <div id="downloadMenu" class="action-menu" style="display:none;position:absolute;background:white;border:1px solid #ddd;border-radius:8px;box-shadow:0 4px 8px rgba(0,0,0,0.1);z-index:100;min-width:250px;top:40px;left:0">
-            <button class="menu-item" onclick="downloadMaterialsPDF()">📄 PDF Materiali</button>
-            <button class="menu-item" onclick="exportMaterialsCSV()">📊 CSV Materiali</button>
-          </div>
+      <!-- Seconda fila: Magazzini a sinistra, Scarica e Backup a destra -->
+      <div style="display:flex;gap:12px;align-items:center;justify-content:space-between">
+        <div style="display:flex;gap:12px;align-items:center">
+          <button id="materialsBtn" class="implants-btn-main" onclick="openMaterialsWarehouse()" style="background:linear-gradient(135deg,#0066cc 0%,#003d7a 100%);color:#fff;padding:12px 20px;font-size:15px;border:none;border-radius:8px;cursor:pointer;font-weight:600;box-shadow:0 4px 12px rgba(0,61,122,0.35);transition:all 0.2s;display:flex;align-items:center;gap:6px">
+            📦 Magazzino Materiali
+          </button>
+
+          <button id="implantsBtn" class="implants-btn-main" onclick="openImplantsModal()" style="background:linear-gradient(135deg,#2E7D32 0%,#1B5E20 100%);color:#fff;padding:12px 20px;font-size:15px;border:none;border-radius:8px;cursor:pointer;font-weight:600;box-shadow:0 4px 12px rgba(27,94,32,0.35);transition:all 0.2s;display:flex;align-items:center;gap:6px">
+            🔩 Magazzino Implantare
+          </button>
         </div>
 
-        <!-- Pulsante Backup -->
-        <div style="position:relative">
-          <button class="action-menu-btn" onclick="toggleActionMenu('backupMenu')">💾 Backup ▼</button>
-          <div id="backupMenu" class="action-menu" style="display:none;position:absolute;background:white;border:1px solid #ddd;border-radius:8px;box-shadow:0 4px 8px rgba(0,0,0,0.1);z-index:100;min-width:250px;top:40px;right:0;left:auto">
-            <button class="menu-item" onclick="exportBackup()">📥 Esporta Backup Completo</button>
-            <button class="menu-item" onclick="document.getElementById('importFile').click()">📤 Importa Backup</button>
-            <input type="file" id="importFile" accept=".json" style="display:none" onchange="importBackup(event)" />
+        <div style="display:flex;gap:12px;align-items:center">
+          <!-- Pulsante Scarica Dati Materiali -->
+          <div style="position:relative">
+            <button class="action-menu-btn" onclick="toggleActionMenu('downloadMenu')">📥 Scarica Dati ▼</button>
+            <div id="downloadMenu" class="action-menu" style="display:none;position:absolute;background:white;border:1px solid #ddd;border-radius:8px;box-shadow:0 4px 8px rgba(0,0,0,0.1);z-index:100;min-width:250px;top:40px;left:0">
+              <button class="menu-item" onclick="downloadMaterialsPDF()">📄 PDF Materiali</button>
+              <button class="menu-item" onclick="exportMaterialsCSV()">📊 CSV Materiali</button>
+            </div>
+          </div>
+
+          <!-- Pulsante Backup -->
+          <div style="position:relative">
+            <button class="action-menu-btn" onclick="toggleActionMenu('backupMenu')">💾 Backup ▼</button>
+            <div id="backupMenu" class="action-menu" style="display:none;position:absolute;background:white;border:1px solid #ddd;border-radius:8px;box-shadow:0 4px 8px rgba(0,0,0,0.1);z-index:100;min-width:250px;top:40px;right:0;left:auto">
+              <button class="menu-item" onclick="exportBackup()">📥 Esporta Backup Completo</button>
+              <button class="menu-item" onclick="document.getElementById('importFile').click()">📤 Importa Backup</button>
+              <input type="file" id="importFile" accept=".json" style="display:none" onchange="importBackup(event)" />
+            </div>
           </div>
         </div>
       </div>
