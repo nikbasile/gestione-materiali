@@ -364,62 +364,6 @@
       Le notifiche compaiono in alto nella pagina ogni volta che si verifica una di queste condizioni.
     </div>
 
-    <form id="addForm">
-      <div class="form-group"><label>Nome materiale</label><input id="name" placeholder="Es. Cemento composito" required /></div>
-      <div class="form-group"><label>📅 Data Ordine</label><input id="orderDate" type="date" required /></div>
-      <div class="form-group"><label>⏰ Data Scadenza</label><input id="expiry" type="date" required /></div>
-      <div class="form-group"><label>Prezzo (€)</label><input id="price" type="number" step="0.01" placeholder="0.00" /></div>
-      <div class="form-group"><label>IVA (%)</label><select id="vatRate"><option value="22" selected>22%</option><option value="10">10%</option><option value="4">4%</option></select></div>
-      <div class="form-group"><label>Quantità</label><input id="quantity" type="number" min="0" value="1" required /></div>
-      <div class="form-group"><label>🗂️ Categoria</label><select id="category" required><option value="">-- Seleziona --</option><option value="Strumentario">Strumentario</option><option value="Consumabili Generici">Consumabili Generici</option><option value="Monouso">Monouso</option><option value="Disinfezione e Sterilizzazione">Disinfezione e Sterilizzazione</option><option value="Chirurgia">Chirurgia</option><option value="Endodonzia">Endodonzia</option><option value="Conservativa e Protesi">Conservativa e Protesi</option><option value="Frese e Lucidatura">Frese e Lucidatura</option><option value="Anestesia e Farmaci">Anestesia e Farmaci</option><option value="Impronte e Laboratorio">Impronte e Laboratorio</option><option value="Radiografia e Fotografia">Radiografia e Fotografia</option><option value="Profilassi e Igiene Orale">Profilassi e Igiene Orale</option><option value="Ortodonzia">Ortodonzia</option></select></div>
-
-      <div class="form-group"><label>🚚 Distributore</label>
-        <select id="distributorSelect" required>
-          <option value="">-- Seleziona --</option>
-          <option value="Dental Leader">Dental Leader</option>
-          <option value="Gherò">Gherò</option>
-          <option value="Revello">Revello</option>
-          <option value="Dentitalia">Dentitalia</option>
-          <option value="Dental Trey">Dental Trey</option>
-          <option value="Umbra">Umbra</option>
-          <option value="Eli Dent">Eli Dent</option>
-          <option value="Non disponibile">Non disponibile</option>
-          <option value="Other">Altro...</option>
-        </select>
-        <input id="distributor" placeholder="Distributore personalizzato" style="display:none;margin-top:6px" />
-      </div>
-      <div class="form-group"><label>🏢 Azienda</label>
-        <select id="companySelect">
-          <option value="">-- Seleziona --</option>
-          <option value="3M">3M</option>
-          <option value="Ivoclar">Ivoclar</option>
-          <option value="GC">GC</option>
-          <option value="Dentsply Sirona">Dentsply Sirona</option>
-          <option value="Coltene">Coltene</option>
-          <option value="Kerr">Kerr</option>
-          <option value="Voco">Voco</option>
-          <option value="Septodont">Septodont</option>
-          <option value="Zhermack">Zhermack</option>
-          <option value="DMG">DMG</option>
-          <option value="VOCO">VOCO</option>
-          <option value="Other">Altro...</option>
-        </select>
-        <input id="company" placeholder="Azienda personalizzata" style="display:none;margin-top:6px" />
-      </div>
-      <div class="form-group"><label>Soglia quantità bassa</label>
-        <select id="lowStockThreshold">
-          <option value="1">1</option>
-          <option value="2">2 (default)</option>
-          <option value="3">3</option>
-          <option value="4">4</option>
-          <option value="5">5</option>
-          <option value="Other">Altro...</option>
-        </select>
-        <input id="lowStockThresholdCustom" type="number" min="1" step="1" placeholder="Personalizzato" style="display:none;margin-top:6px" />
-      </div>
-      <button type="submit" style="grid-column:span 1;align-self:flex-end">Aggiungi materiale</button>
-    </form>
-    
     <div id="categoryFilters" class="category-filters"></div>
 
     <!-- Pulsanti Principali -->
@@ -1081,7 +1025,6 @@
       }
     });
 
-    const addForm = document.getElementById('addForm');
     const listEl = document.getElementById('list');
     const alertsEl = document.getElementById('alerts');
     const categoryFiltersEl = document.getElementById('categoryFilters');
@@ -1773,50 +1716,6 @@
       return str.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
     }
 
-    // Auto-fill categoria e azienda quando si completa il nome materiale
-    let autoFillTimeout;
-    document.getElementById('name').addEventListener('input', function() {
-      clearTimeout(autoFillTimeout);
-      const materialName = this.value.trim();
-      
-      autoFillTimeout = setTimeout(() => {
-        if(materialName.length < 3) return;
-        
-        const materials = loadFromLocalStorage();
-        const lowerName = materialName.toLowerCase();
-        
-        // Match solo esatto per evitare sovrascritture su nomi simili
-        const match = materials.find(m => m.name && m.name.toLowerCase() === lowerName);
-        
-        if(match) {
-          // Correggi il nome con la versione corretta in Title Case
-          const correctedName = toTitleCase(match.name);
-          document.getElementById('name').value = correctedName;
-          
-          // Auto-fill categoria
-          if(match.category) {
-            document.getElementById('category').value = match.category;
-          }
-          
-          // Auto-fill azienda
-          if(match.company) {
-            const companySelect = document.getElementById('companySelect');
-            const companyInput = document.getElementById('company');
-            
-            const option = Array.from(companySelect.options).find(opt => opt.value === match.company);
-            if(option) {
-              companySelect.value = match.company;
-              companyInput.style.display = 'none';
-            } else {
-              companySelect.value = 'Other';
-              companyInput.value = match.company;
-              companyInput.style.display = '';
-            }
-          }
-        }
-      }, 600); // Attiva dopo 600ms dalla fine della digitazione
-    });
-
     let modalAutoFillTimeout;
     document.getElementById('matName').addEventListener('input', function() {
       clearTimeout(modalAutoFillTimeout);
@@ -1867,92 +1766,6 @@
           setupMaterialCustomFields();
         }
       }, 600);
-    });
-
-    addForm.addEventListener('submit', async e=>{
-      e.preventDefault();
-      console.log('Form submitted');
-      
-      const name = toTitleCase(document.getElementById('name').value.trim());
-      const orderDate = document.getElementById('orderDate').value;
-      const expiry = document.getElementById('expiry').value;
-      const price = parseFloat(document.getElementById('price').value) || 0;
-      const vatRate = parseInt(document.getElementById('vatRate').value, 10) || 22;
-      const quantity = parseInt(document.getElementById('quantity').value,10) || 0;
-      const category = document.getElementById('category').value.trim();
-        let distributor = document.getElementById('distributorSelect').value;
-        if(distributor === 'Other') {
-          distributor = document.getElementById('distributor').value.trim();
-        }
-        let company = document.getElementById('companySelect').value;
-        if(company === 'Other') {
-          company = document.getElementById('company').value.trim();
-        }
-      const notifyDays = 30;
-      let lowStockThreshold = document.getElementById('lowStockThreshold').value;
-      if(lowStockThreshold === 'Other') {
-        lowStockThreshold = parseInt(document.getElementById('lowStockThresholdCustom').value,10) || 2;
-      } else {
-        lowStockThreshold = parseInt(lowStockThreshold,10) || 2;
-      }
-          // Gestione visibilità input soglia personalizzata
-          document.getElementById('lowStockThreshold').addEventListener('change', function() {
-            if(this.value === 'Other') {
-              document.getElementById('lowStockThresholdCustom').style.display = '';
-            } else {
-              document.getElementById('lowStockThresholdCustom').style.display = 'none';
-            }
-          });
-      
-      if(!name || !orderDate || !expiry || !category) {
-        console.log('Missing fields:', {name, orderDate, expiry, category});
-        return;
-      }
-      
-      const newData = {
-        name, 
-        orderDate: new Date(orderDate), 
-        expiry: new Date(expiry), 
-        price, 
-        vatRate,
-        quantity, 
-        category, 
-          distributor, 
-          company,
-        notifyDays, 
-        lowStockThreshold,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      };
-      
-      console.log('Saving material:', name);
-      
-      // ID unico condiviso tra locale e Firebase
-      const materialId = window.crypto && window.crypto.randomUUID
-        ? window.crypto.randomUUID()
-        : ('m_' + Date.now() + '_' + Math.floor(Math.random()*100000));
-
-      // Save to local storage
-      const itemId = addToLocalStorage({id: materialId, ...newData});
-      console.log('Saved with ID:', itemId);
-      
-      // Try Firebase sync (optional)
-      if(firebaseReady && typeof db !== 'undefined'){
-        try {
-          await db.collection('materials').doc(materialId).set(newData);
-        } catch(err) {
-          console.warn('Firebase unavailable:', err.message);
-          showAlert('Materiale salvato in locale. Firebase non raggiungibile.', 'warn');
-        }
-      }
-      
-      // Reset and reload
-      addForm.reset();
-      document.getElementById('quantity').value = 1;
-      showAlert('✓ ' + name + ' aggiunto', 'info');
-      
-      // Reload immediately
-      setTimeout(loadMaterialsFromStorage, 100);
     });
 
     // Material Modal Form Handler
@@ -2282,22 +2095,6 @@
       syncLocalImplantsToFirebase();
     }
     
-    // Gestione visibilità input azienda e distributore personalizzati
-    document.getElementById('companySelect').addEventListener('change', function() {
-      if(this.value === 'Other') {
-        document.getElementById('company').style.display = '';
-      } else {
-        document.getElementById('company').style.display = 'none';
-      }
-    });
-    document.getElementById('distributorSelect').addEventListener('change', function() {
-      if(this.value === 'Other') {
-        document.getElementById('distributor').style.display = '';
-      } else {
-        document.getElementById('distributor').style.display = 'none';
-      }
-    });
-
     // Gestione filtro azienda da select
     if (companyFilterSelect) {
       companyFilterSelect.addEventListener('change', function() {
