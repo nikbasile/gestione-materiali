@@ -365,21 +365,13 @@
     </div>
 
     <!-- Pulsanti Principali -->
-    <div class="action-dropdown-container" style="margin:20px 0;display:flex;gap:16px;align-items:center;flex-wrap:wrap;justify-content:space-between">
-      <button id="materialsBtn" class="implants-btn-main" onclick="openMaterialsWarehouse()" style="background:linear-gradient(135deg,#0066cc 0%,#003d7a 100%);color:#fff;padding:12px 20px;font-size:15px;border:none;border-radius:8px;cursor:pointer;font-weight:600;box-shadow:0 4px 12px rgba(0,61,122,0.35);transition:all 0.2s;display:flex;align-items:center;gap:6px">
-        📦 Magazzino Materiali
-      </button>
-
-      <!-- Pulsante Magazzino Implantare con grafica distintiva -->
-      <button id="implantsBtn" class="implants-btn-main" onclick="openImplantsModal()" style="background:linear-gradient(135deg,#2E7D32 0%,#1B5E20 100%);color:#fff;padding:12px 20px;font-size:15px;border:none;border-radius:8px;cursor:pointer;font-weight:600;box-shadow:0 4px 12px rgba(27,94,32,0.35);transition:all 0.2s;display:flex;align-items:center;gap:6px">
-        🔩 Magazzino Implantare
-      </button>
-
+    <!-- Prima fila: Aggiungi a sinistra, Analisi e Consumo a destra -->
+    <div style="margin:20px 0;display:flex;gap:12px;align-items:center;justify-content:space-between">
       <button onclick="openAddSelectionModal()" style="background:linear-gradient(135deg,#1976d2 0%,#0d47a1 100%);color:#fff;padding:12px 20px;font-size:15px;border:none;border-radius:8px;cursor:pointer;font-weight:600;box-shadow:0 4px 12px rgba(25,118,210,0.35);transition:all 0.2s;display:flex;align-items:center;gap:6px">
         ➕ Aggiungi Nuovo Materiale/Ordine
       </button>
 
-      <div style="display:flex;gap:12px;align-items:center;margin-left:auto;flex-wrap:wrap">
+      <div style="display:flex;gap:12px;align-items:center">
         <button onclick="openReportModal()" style="background:linear-gradient(135deg,#1976d2 0%,#0d47a1 100%);color:#fff;padding:12px 20px;font-size:15px;border:none;border-radius:8px;cursor:pointer;font-weight:600;box-shadow:0 4px 12px rgba(13,71,161,0.35);transition:all 0.2s;display:flex;align-items:center;gap:6px">
           📊 Analisi Spese
         </button>
@@ -387,7 +379,22 @@
         <button onclick="openConsumptionModal()" style="background:linear-gradient(135deg,#f57c00 0%,#e65100 100%);color:#fff;padding:12px 20px;font-size:15px;border:none;border-radius:8px;cursor:pointer;font-weight:600;box-shadow:0 4px 12px rgba(230,81,0,0.35);transition:all 0.2s;display:flex;align-items:center;gap:6px">
           📉 Registra Consumo
         </button>
+      </div>
+    </div>
 
+    <!-- Seconda fila: Magazzini a sinistra, Scarica e Backup a destra -->
+    <div style="margin:0 0 20px 0;display:flex;gap:12px;align-items:center;justify-content:space-between">
+      <div style="display:flex;gap:12px;align-items:center">
+        <button id="materialsBtn" class="implants-btn-main" onclick="openMaterialsWarehouse()" style="background:linear-gradient(135deg,#0066cc 0%,#003d7a 100%);color:#fff;padding:12px 20px;font-size:15px;border:none;border-radius:8px;cursor:pointer;font-weight:600;box-shadow:0 4px 12px rgba(0,61,122,0.35);transition:all 0.2s;display:flex;align-items:center;gap:6px">
+          📦 Magazzino Materiali
+        </button>
+
+        <button id="implantsBtn" class="implants-btn-main" onclick="openImplantsModal()" style="background:linear-gradient(135deg,#2E7D32 0%,#1B5E20 100%);color:#fff;padding:12px 20px;font-size:15px;border:none;border-radius:8px;cursor:pointer;font-weight:600;box-shadow:0 4px 12px rgba(27,94,32,0.35);transition:all 0.2s;display:flex;align-items:center;gap:6px">
+          🔩 Magazzino Implantare
+        </button>
+      </div>
+
+      <div style="display:flex;gap:12px;align-items:center">
         <!-- Pulsante Scarica Dati Materiali -->
         <div style="position:relative">
           <button class="action-menu-btn" onclick="toggleActionMenu('downloadMenu')">📥 Scarica Dati ▼</button>
