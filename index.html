@@ -4133,18 +4133,6 @@
       loadMaterialsFromStorage(); // Ricarica tabella
     });
 
-    // Mostra/nascondi pulsante Gestione Impianti in base alla categoria
-    function updateImplantsButtonVisibility() {
-      const btn = document.getElementById('implantsBtn');
-      btn.style.display = (currentFilter === 'Chirurgia') ? '' : 'none';
-    }
-
-    // Chiama questa funzione quando cambia il filtro categoria
-    const originalUpdateCategoryFilters = updateCategoryFilters;
-    updateCategoryFilters = function() {
-      originalUpdateCategoryFilters();
-      updateImplantsButtonVisibility();
-    };
   </script>
 </body>
 </html>
