@@ -803,22 +803,22 @@
                 <button type="button" class="import-article-btn" onclick="openPdfImportModal()">📄 Importa PDF</button>
               </div>
             </div>
-            <div id="articlesContainer" style="overflow-x:auto">
-              <table style="width:100%;border-collapse:collapse;font-size:13px">
-                <thead>
-                  <tr style="background:#f0f4f8;border:1px solid #e0e8f0">
-                    <th style="padding:10px;text-align:left;font-weight:600;color:#003d7a;border:1px solid #e0e8f0">Materiale</th>
-                    <th style="padding:10px;text-align:center;font-weight:600;color:#003d7a;border:1px solid #e0e8f0;width:80px">Qtà</th>
-                    <th style="padding:10px;text-align:center;font-weight:600;color:#003d7a;border:1px solid #e0e8f0;width:100px">Prezzo (€)</th>
-                    <th style="padding:10px;text-align:left;font-weight:600;color:#003d7a;border:1px solid #e0e8f0;width:120px">Azienda</th>
-                    <th style="padding:10px;text-align:center;font-weight:600;color:#003d7a;border:1px solid #e0e8f0;width:100px">Scadenza</th>
-                    <th style="padding:10px;text-align:center;font-weight:600;color:#003d7a;border:1px solid #e0e8f0;width:70px">IVA %</th>
-                    <th style="padding:10px;text-align:left;font-weight:600;color:#003d7a;border:1px solid #e0e8f0;width:150px">Categoria</th>
-                    <th style="padding:10px;text-align:center;font-weight:600;color:#003d7a;border:1px solid #e0e8f0;width:80px">Soglia</th>
-                    <th style="padding:10px;text-align:center;font-weight:600;color:#003d7a;border:1px solid #e0e8f0;width:100px">Azioni</th>
+            <div id="articlesContainer" style="display:flex;flex-direction:column;border:1px solid #d0dce6;border-radius:8px;max-height:600px;background:#fff;overflow:hidden">
+              <table style="width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed">
+                <thead style="position:sticky;top:0;background:#f0f4f8;z-index:10">
+                  <tr style="background:#f0f4f8;border-bottom:2px solid #d0dce6">
+                    <th style="padding:4px 6px;text-align:left;font-weight:600;color:#003d7a;border-right:1px solid #e0e8f0;flex:1">Materiale</th>
+                    <th style="padding:4px 6px;text-align:center;font-weight:600;color:#003d7a;border-right:1px solid #e0e8f0;width:45px">Qtà</th>
+                    <th style="padding:4px 6px;text-align:center;font-weight:600;color:#003d7a;border-right:1px solid #e0e8f0;width:60px">Prezzo</th>
+                    <th style="padding:4px 6px;text-align:left;font-weight:600;color:#003d7a;border-right:1px solid #e0e8f0;width:80px">Azienda</th>
+                    <th style="padding:4px 6px;text-align:center;font-weight:600;color:#003d7a;border-right:1px solid #e0e8f0;width:60px">Scad.</th>
+                    <th style="padding:4px 6px;text-align:center;font-weight:600;color:#003d7a;border-right:1px solid #e0e8f0;width:45px">IVA</th>
+                    <th style="padding:4px 6px;text-align:left;font-weight:600;color:#003d7a;border-right:1px solid #e0e8f0;width:100px">Categoria</th>
+                    <th style="padding:4px 6px;text-align:center;font-weight:600;color:#003d7a;border-right:1px solid #e0e8f0;width:40px">Soglia</th>
+                    <th style="padding:4px 6px;text-align:center;font-weight:600;color:#003d7a;width:40px">Azioni</th>
                   </tr>
                 </thead>
-                <tbody id="articlesContainerBody"></tbody>
+                <tbody id="articlesContainerBody" style="display:block;overflow-y:auto"></tbody>
               </table>
             </div>
           </div>
@@ -3482,9 +3482,9 @@
       materialInput.setAttribute('list', datalistId);
       materialInput.setAttribute('data-material-id', '');
       materialInput.style.width = '100%';
-      materialInput.style.padding = '8px';
+      materialInput.style.padding = '4px 5px';
       materialInput.style.border = '1px solid #d0dce6';
-      materialInput.style.borderRadius = '4px';
+      materialInput.style.borderRadius = '3px';
       
       // Crea datalist con materiali esistenti
       const datalist = document.createElement('datalist');
@@ -3513,9 +3513,9 @@
       quantityInput.placeholder = 'Qtà';
       quantityInput.className = 'article-qty';
       quantityInput.style.width = '100%';
-      quantityInput.style.padding = '8px';
+      quantityInput.style.padding = '4px 5px';
       quantityInput.style.border = '1px solid #d0dce6';
-      quantityInput.style.borderRadius = '4px';
+      quantityInput.style.borderRadius = '3px';
       quantityInput.style.textAlign = 'center';
 
       const priceInput = document.createElement('input');
@@ -3525,35 +3525,35 @@
       priceInput.placeholder = '€';
       priceInput.className = 'article-price';
       priceInput.style.width = '100%';
-      priceInput.style.padding = '8px';
+      priceInput.style.padding = '4px 5px';
       priceInput.style.border = '1px solid #d0dce6';
-      priceInput.style.borderRadius = '4px';
+      priceInput.style.borderRadius = '3px';
       priceInput.style.textAlign = 'center';
 
       const expiryInput = document.createElement('input');
       expiryInput.type = 'date';
       expiryInput.className = 'article-expiry';
       expiryInput.style.width = '100%';
-      expiryInput.style.padding = '8px';
+      expiryInput.style.padding = '4px 5px';
       expiryInput.style.border = '1px solid #d0dce6';
-      expiryInput.style.borderRadius = '4px';
+      expiryInput.style.borderRadius = '3px';
 
       const companyInput = document.createElement('input');
       companyInput.type = 'text';
       companyInput.placeholder = 'Azienda';
       companyInput.className = 'article-company';
       companyInput.style.width = '100%';
-      companyInput.style.padding = '8px';
+      companyInput.style.padding = '4px 5px';
       companyInput.style.border = '1px solid #d0dce6';
-      companyInput.style.borderRadius = '4px';
+      companyInput.style.borderRadius = '3px';
 
       const vatRateSelect = document.createElement('select');
       vatRateSelect.className = 'article-vat';
       vatRateSelect.innerHTML = '<option value="22" selected>22%</option><option value="10">10%</option><option value="4">4%</option>';
       vatRateSelect.style.width = '100%';
-      vatRateSelect.style.padding = '8px';
+      vatRateSelect.style.padding = '4px 5px';
       vatRateSelect.style.border = '1px solid #d0dce6';
-      vatRateSelect.style.borderRadius = '4px';
+      vatRateSelect.style.borderRadius = '3px';
 
       const categorySelect = document.createElement('select');
       categorySelect.className = 'article-category';
@@ -3568,9 +3568,9 @@
         }
       });
       categorySelect.style.width = '100%';
-      categorySelect.style.padding = '8px';
+      categorySelect.style.padding = '4px 5px';
       categorySelect.style.border = '1px solid #d0dce6';
-      categorySelect.style.borderRadius = '4px';
+      categorySelect.style.borderRadius = '3px';
 
       const lowStockInput = document.createElement('input');
       lowStockInput.type = 'number';
@@ -3580,9 +3580,9 @@
       lowStockInput.placeholder = 'Soglia';
       lowStockInput.className = 'article-lowstock';
       lowStockInput.style.width = '100%';
-      lowStockInput.style.padding = '8px';
+      lowStockInput.style.padding = '4px 5px';
       lowStockInput.style.border = '1px solid #d0dce6';
-      lowStockInput.style.borderRadius = '4px';
+      lowStockInput.style.borderRadius = '3px';
       lowStockInput.style.textAlign = 'center';
 
       const descriptionInput = document.createElement('input');
@@ -3606,51 +3606,51 @@
 
       // Crea celle di tabella
       const tdMat = document.createElement('td');
-      tdMat.style.padding = '8px';
+      tdMat.style.padding = '4px 5px';
       tdMat.style.border = '1px solid #e0e8f0';
       tdMat.appendChild(materialInput);
       tdMat.appendChild(datalist);
 
       const tdQty = document.createElement('td');
-      tdQty.style.padding = '8px';
+      tdQty.style.padding = '4px 5px';
       tdQty.style.border = '1px solid #e0e8f0';
       tdQty.appendChild(quantityInput);
 
       const tdPrice = document.createElement('td');
-      tdPrice.style.padding = '8px';
+      tdPrice.style.padding = '4px 5px';
       tdPrice.style.border = '1px solid #e0e8f0';
       tdPrice.appendChild(priceInput);
 
       const tdCompany = document.createElement('td');
-      tdCompany.style.padding = '8px';
+      tdCompany.style.padding = '4px 5px';
       tdCompany.style.border = '1px solid #e0e8f0';
       tdCompany.appendChild(companyInput);
 
       const tdExpiry = document.createElement('td');
-      tdExpiry.style.padding = '8px';
+      tdExpiry.style.padding = '4px 5px';
       tdExpiry.style.border = '1px solid #e0e8f0';
       tdExpiry.style.textAlign = 'center';
       tdExpiry.appendChild(expiryInput);
 
       const tdVat = document.createElement('td');
-      tdVat.style.padding = '8px';
+      tdVat.style.padding = '4px 5px';
       tdVat.style.border = '1px solid #e0e8f0';
       tdVat.style.textAlign = 'center';
       tdVat.appendChild(vatRateSelect);
 
       const tdCategory = document.createElement('td');
-      tdCategory.style.padding = '8px';
+      tdCategory.style.padding = '4px 5px';
       tdCategory.style.border = '1px solid #e0e8f0';
       tdCategory.appendChild(categorySelect);
 
       const tdLowStock = document.createElement('td');
-      tdLowStock.style.padding = '8px';
+      tdLowStock.style.padding = '4px 5px';
       tdLowStock.style.border = '1px solid #e0e8f0';
       tdLowStock.style.textAlign = 'center';
       tdLowStock.appendChild(lowStockInput);
 
       const tdActions = document.createElement('td');
-      tdActions.style.padding = '8px';
+      tdActions.style.padding = '4px 5px';
       tdActions.style.border = '1px solid #e0e8f0';
       tdActions.style.textAlign = 'center';
       tdActions.appendChild(removeBtn);
