@@ -803,7 +803,24 @@
                 <button type="button" class="import-article-btn" onclick="openPdfImportModal()">📄 Importa PDF</button>
               </div>
             </div>
-            <div id="articlesContainer"></div>
+            <div id="articlesContainer" style="overflow-x:auto">
+              <table style="width:100%;border-collapse:collapse;font-size:13px">
+                <thead>
+                  <tr style="background:#f0f4f8;border:1px solid #e0e8f0">
+                    <th style="padding:10px;text-align:left;font-weight:600;color:#003d7a;border:1px solid #e0e8f0">Materiale</th>
+                    <th style="padding:10px;text-align:center;font-weight:600;color:#003d7a;border:1px solid #e0e8f0;width:80px">Qtà</th>
+                    <th style="padding:10px;text-align:center;font-weight:600;color:#003d7a;border:1px solid #e0e8f0;width:100px">Prezzo (€)</th>
+                    <th style="padding:10px;text-align:left;font-weight:600;color:#003d7a;border:1px solid #e0e8f0;width:120px">Azienda</th>
+                    <th style="padding:10px;text-align:center;font-weight:600;color:#003d7a;border:1px solid #e0e8f0;width:100px">Scadenza</th>
+                    <th style="padding:10px;text-align:center;font-weight:600;color:#003d7a;border:1px solid #e0e8f0;width:70px">IVA %</th>
+                    <th style="padding:10px;text-align:left;font-weight:600;color:#003d7a;border:1px solid #e0e8f0;width:150px">Categoria</th>
+                    <th style="padding:10px;text-align:center;font-weight:600;color:#003d7a;border:1px solid #e0e8f0;width:80px">Soglia</th>
+                    <th style="padding:10px;text-align:center;font-weight:600;color:#003d7a;border:1px solid #e0e8f0;width:100px">Azioni</th>
+                  </tr>
+                </thead>
+                <tbody id="articlesContainerBody"></tbody>
+              </table>
+            </div>
           </div>
 
           <!-- Pulsanti -->
@@ -3452,17 +3469,22 @@
       const rowId = 'article_' + Date.now() + '_' + Math.random();
       const datalistId = 'datalist_' + rowId;
       
-      const row = document.createElement('div');
-      row.className = 'article-row';
-      row.id = rowId;
+      const tr = document.createElement('tr');
+      tr.className = 'article-row';
+      tr.id = rowId;
+      tr.style.borderBottom = '1px solid #e0e8f0';
       
       // Cambiato da select a input con datalist per permettere editing libero
       const materialInput = document.createElement('input');
       materialInput.type = 'text';
       materialInput.className = 'article-material';
-      materialInput.placeholder = 'Nome materiale o seleziona...';
+      materialInput.placeholder = 'Nome materiale...';
       materialInput.setAttribute('list', datalistId);
       materialInput.setAttribute('data-material-id', '');
+      materialInput.style.width = '100%';
+      materialInput.style.padding = '8px';
+      materialInput.style.border = '1px solid #d0dce6';
+      materialInput.style.borderRadius = '4px';
       
       // Crea datalist con materiali esistenti
       const datalist = document.createElement('datalist');
@@ -3488,40 +3510,67 @@
       quantityInput.type = 'number';
       quantityInput.min = '1';
       quantityInput.step = '1';
-      quantityInput.placeholder = 'Quantità';
+      quantityInput.placeholder = 'Qtà';
       quantityInput.className = 'article-qty';
+      quantityInput.style.width = '100%';
+      quantityInput.style.padding = '8px';
+      quantityInput.style.border = '1px solid #d0dce6';
+      quantityInput.style.borderRadius = '4px';
+      quantityInput.style.textAlign = 'center';
 
       const priceInput = document.createElement('input');
       priceInput.type = 'number';
       priceInput.min = '0';
       priceInput.step = '0.01';
-      priceInput.placeholder = '€ Prezzo';
+      priceInput.placeholder = '€';
       priceInput.className = 'article-price';
+      priceInput.style.width = '100%';
+      priceInput.style.padding = '8px';
+      priceInput.style.border = '1px solid #d0dce6';
+      priceInput.style.borderRadius = '4px';
+      priceInput.style.textAlign = 'center';
 
       const expiryInput = document.createElement('input');
       expiryInput.type = 'date';
       expiryInput.className = 'article-expiry';
+      expiryInput.style.width = '100%';
+      expiryInput.style.padding = '8px';
+      expiryInput.style.border = '1px solid #d0dce6';
+      expiryInput.style.borderRadius = '4px';
 
       const companyInput = document.createElement('input');
       companyInput.type = 'text';
       companyInput.placeholder = 'Azienda';
       companyInput.className = 'article-company';
+      companyInput.style.width = '100%';
+      companyInput.style.padding = '8px';
+      companyInput.style.border = '1px solid #d0dce6';
+      companyInput.style.borderRadius = '4px';
 
       const vatRateSelect = document.createElement('select');
       vatRateSelect.className = 'article-vat';
       vatRateSelect.innerHTML = '<option value="22" selected>22%</option><option value="10">10%</option><option value="4">4%</option>';
+      vatRateSelect.style.width = '100%';
+      vatRateSelect.style.padding = '8px';
+      vatRateSelect.style.border = '1px solid #d0dce6';
+      vatRateSelect.style.borderRadius = '4px';
 
       const categorySelect = document.createElement('select');
       categorySelect.className = 'article-category';
-      categorySelect.innerHTML = '<option value="">-- Categoria (se nuovo) --</option>';
+      categorySelect.innerHTML = '<option value="Consumabili Generici" selected>Consumabili Generici</option>';
       const CATEGORIES = ['Strumentario','Consumabili Generici','Monouso','Disinfezione e Sterilizzazione','Chirurgia','Endodonzia','Conservativa e Protesi','Frese e Lucidatura','Anestesia e Farmaci','Impronte e Laboratorio','Radiografia e Fotografia','Profilassi e Igiene Orale','Ortodonzia'];
       CATEGORIES.forEach(cat => {
-        const opt = document.createElement('option');
-        opt.value = cat;
-        opt.textContent = cat;
-        if (cat === 'Consumabili Generici') opt.selected = true;
-        categorySelect.appendChild(opt);
+        if (cat !== 'Consumabili Generici') {
+          const opt = document.createElement('option');
+          opt.value = cat;
+          opt.textContent = cat;
+          categorySelect.appendChild(opt);
+        }
       });
+      categorySelect.style.width = '100%';
+      categorySelect.style.padding = '8px';
+      categorySelect.style.border = '1px solid #d0dce6';
+      categorySelect.style.borderRadius = '4px';
 
       const lowStockInput = document.createElement('input');
       lowStockInput.type = 'number';
@@ -3530,6 +3579,11 @@
       lowStockInput.value = '2';
       lowStockInput.placeholder = 'Soglia';
       lowStockInput.className = 'article-lowstock';
+      lowStockInput.style.width = '100%';
+      lowStockInput.style.padding = '8px';
+      lowStockInput.style.border = '1px solid #d0dce6';
+      lowStockInput.style.borderRadius = '4px';
+      lowStockInput.style.textAlign = 'center';
 
       const descriptionInput = document.createElement('input');
       descriptionInput.type = 'text';
@@ -3540,64 +3594,80 @@
       const removeBtn = document.createElement('button');
       removeBtn.type = 'button';
       removeBtn.className = 'article-remove';
-      removeBtn.textContent = '❌ Rimuovi';
-      removeBtn.onclick = () => row.remove();
+      removeBtn.textContent = '❌';
+      removeBtn.style.padding = '6px 10px';
+      removeBtn.style.background = '#d32f2f';
+      removeBtn.style.color = '#fff';
+      removeBtn.style.border = 'none';
+      removeBtn.style.borderRadius = '4px';
+      removeBtn.style.cursor = 'pointer';
+      removeBtn.style.fontSize = '12px';
+      removeBtn.onclick = () => tr.remove();
 
-      // Crea wrapper per ogni campo
-      const matFieldWrapper = document.createElement('div');
-      matFieldWrapper.className = 'article-field';
-      matFieldWrapper.innerHTML = '<label>Materiale</label>';
-      matFieldWrapper.appendChild(materialInput);
-      matFieldWrapper.appendChild(datalist);
+      // Crea celle di tabella
+      const tdMat = document.createElement('td');
+      tdMat.style.padding = '8px';
+      tdMat.style.border = '1px solid #e0e8f0';
+      tdMat.appendChild(materialInput);
+      tdMat.appendChild(datalist);
 
-      const qtyFieldWrapper = document.createElement('div');
-      qtyFieldWrapper.className = 'article-field';
-      qtyFieldWrapper.innerHTML = '<label>Quantità (pz)</label>';
-      qtyFieldWrapper.appendChild(quantityInput);
+      const tdQty = document.createElement('td');
+      tdQty.style.padding = '8px';
+      tdQty.style.border = '1px solid #e0e8f0';
+      tdQty.appendChild(quantityInput);
 
-      const priceFieldWrapper = document.createElement('div');
-      priceFieldWrapper.className = 'article-field';
-      priceFieldWrapper.innerHTML = '<label>Prezzo (€)</label>';
-      priceFieldWrapper.appendChild(priceInput);
+      const tdPrice = document.createElement('td');
+      tdPrice.style.padding = '8px';
+      tdPrice.style.border = '1px solid #e0e8f0';
+      tdPrice.appendChild(priceInput);
 
-      const companyFieldWrapper = document.createElement('div');
-      companyFieldWrapper.className = 'article-field';
-      companyFieldWrapper.innerHTML = '<label>Azienda</label>';
-      companyFieldWrapper.appendChild(companyInput);
+      const tdCompany = document.createElement('td');
+      tdCompany.style.padding = '8px';
+      tdCompany.style.border = '1px solid #e0e8f0';
+      tdCompany.appendChild(companyInput);
 
-      const expiryFieldWrapper = document.createElement('div');
-      expiryFieldWrapper.className = 'article-field';
-      expiryFieldWrapper.innerHTML = '<label>📅 Scadenza</label>';
-      expiryFieldWrapper.appendChild(expiryInput);
+      const tdExpiry = document.createElement('td');
+      tdExpiry.style.padding = '8px';
+      tdExpiry.style.border = '1px solid #e0e8f0';
+      tdExpiry.style.textAlign = 'center';
+      tdExpiry.appendChild(expiryInput);
 
-      const vatFieldWrapper = document.createElement('div');
-      vatFieldWrapper.className = 'article-field';
-      vatFieldWrapper.innerHTML = '<label>IVA %</label>';
-      vatFieldWrapper.appendChild(vatRateSelect);
+      const tdVat = document.createElement('td');
+      tdVat.style.padding = '8px';
+      tdVat.style.border = '1px solid #e0e8f0';
+      tdVat.style.textAlign = 'center';
+      tdVat.appendChild(vatRateSelect);
 
-      const categoryFieldWrapper = document.createElement('div');
-      categoryFieldWrapper.className = 'article-field';
-      categoryFieldWrapper.innerHTML = '<label>Categoria</label>';
-      categoryFieldWrapper.appendChild(categorySelect);
+      const tdCategory = document.createElement('td');
+      tdCategory.style.padding = '8px';
+      tdCategory.style.border = '1px solid #e0e8f0';
+      tdCategory.appendChild(categorySelect);
 
-      const lowStockFieldWrapper = document.createElement('div');
-      lowStockFieldWrapper.className = 'article-field';
-      lowStockFieldWrapper.innerHTML = '<label>Soglia Bassa</label>';
-      lowStockFieldWrapper.appendChild(lowStockInput);
+      const tdLowStock = document.createElement('td');
+      tdLowStock.style.padding = '8px';
+      tdLowStock.style.border = '1px solid #e0e8f0';
+      tdLowStock.style.textAlign = 'center';
+      tdLowStock.appendChild(lowStockInput);
 
-      row.appendChild(matFieldWrapper);
-      row.appendChild(qtyFieldWrapper);
-      row.appendChild(priceFieldWrapper);
-      row.appendChild(companyFieldWrapper);
-      row.appendChild(expiryFieldWrapper);
-      row.appendChild(vatFieldWrapper);
-      row.appendChild(categoryFieldWrapper);
-      row.appendChild(lowStockFieldWrapper);
-      row.appendChild(descriptionInput);
-      row.appendChild(removeBtn);
+      const tdActions = document.createElement('td');
+      tdActions.style.padding = '8px';
+      tdActions.style.border = '1px solid #e0e8f0';
+      tdActions.style.textAlign = 'center';
+      tdActions.appendChild(removeBtn);
 
-      document.getElementById('articlesContainer').appendChild(row);
-      return row;
+      tr.appendChild(tdMat);
+      tr.appendChild(tdQty);
+      tr.appendChild(tdPrice);
+      tr.appendChild(tdCompany);
+      tr.appendChild(tdExpiry);
+      tr.appendChild(tdVat);
+      tr.appendChild(tdCategory);
+      tr.appendChild(tdLowStock);
+      tr.appendChild(tdActions);
+      tr.appendChild(descriptionInput);
+
+      document.getElementById('articlesContainerBody').appendChild(tr);
+      return tr;
     }
 
     function addArticleRowWithData(data) {
@@ -3891,7 +3961,6 @@
         return;
       }
       let imported = 0;
-      let skipped = 0;
 
       const materials = getMaterialsForImport();
       const orderDate = document.getElementById('orderDate')?.value || new Date().toISOString().split('T')[0];
@@ -3904,20 +3973,17 @@
         const materialName = row.querySelector('.pdf-import-name')?.value || '';
         const quantity = parseInt(row.querySelector('.pdf-import-qty')?.value, 10) || 0;
         const price = parseFloat(row.querySelector('.pdf-import-price')?.value) || 0;
-        const category = row.querySelector('select')?.value || '';
+        const category = row.querySelector('select')?.value || 'Consumabili Generici';
         const company = row.querySelector('.pdf-import-company')?.value || '';
 
-        if (!materialName || quantity <= 0) {
-          skipped += 1;
+        // Importa se c'è almeno il nome, anche senza quantità (sarà 0)
+        if (!materialName) {
           return;
         }
 
         let materialId = findMaterialMatch(materialName, materials);
         if (!materialId) {
-          if (!category) {
-            skipped += 1;
-            return;
-          }
+          // Crea nuovo materiale anche senza categoria specifica
           materialId = createMaterialFromImport(materialName, category, orderDate, finalDistributor, company);
           if (materialId) {
             materials.push({ id: materialId, name: materialName, category });
@@ -3925,20 +3991,29 @@
           }
         }
 
-        if (materialId && quantity > 0) {
-          addArticleRowWithData({ materialId, quantity, price, company, description: '' });
+        // Importa sempre se c'è un materialId (trovato o creato)
+        if (materialId) {
+          addArticleRowWithData({ 
+            materialId, 
+            materialName,
+            quantity: quantity > 0 ? quantity : 1, 
+            price, 
+            company, 
+            category,
+            vatRate: 22,
+            lowStockThreshold: 2,
+            description: '' 
+          });
           imported += 1;
-        } else {
-          skipped += 1;
         }
       });
 
       if (imported === 0) {
-        alert('Seleziona almeno un nome materiale e una quantita valida');
+        alert('Nessun materiale importato');
         return;
       }
       closePdfImportModal();
-      showAlert(`✓ Importati ${imported} articoli${skipped ? ', ' + skipped + ' saltati' : ''}`, 'info');
+      showAlert(`✓ Importati ${imported} articoli`, 'info');
     }
 
     function updateImportRowIva(row) {
