@@ -175,7 +175,9 @@
     .material-form-group label{font-weight:600;color:#003d7a;font-size:12px;text-transform:uppercase;letter-spacing:0.5px}
     .material-form-group input,.material-form-group select{padding:12px;border:1.5px solid #d0dce6;border-radius:8px;font-size:14px;transition:all 0.2s;background:#fff}
     .material-form-group input:focus,.material-form-group select:focus{outline:none;border-color:#1976d2;box-shadow:0 0 0 3px rgba(25,118,210,0.1);background:#f8f9fa}
-    .material-buttons{display:flex;gap:12px;margin-top:32px}
+    .material-form-group .custom-input{display:none;margin-top:6px}
+    .material-form-group.custom-open .custom-input{display:block}
+    .material-buttons{display:flex;gap:12px;margin-top:32px;grid-column:1/-1}
     .material-btn{flex:1;padding:12px;font-weight:600;border:none;border-radius:8px;cursor:pointer;transition:all 0.2s;font-size:15px;text-transform:uppercase;letter-spacing:0.5px}
     .material-btn.cancel{background:#e0e0e0;color:#333}
     .material-btn.cancel:hover{background:#bdbdbd;transform:translateY(-1px)}
@@ -799,9 +801,9 @@
           <div class="material-form-group"><label for="matPrice">Prezzo (€)</label><input id="matPrice" type="number" step="0.01" placeholder="0.00" /></div>
           <div class="material-form-group"><label for="matQuantity">Quantità</label><input id="matQuantity" type="number" min="0" value="1" required /></div>
           <div class="material-form-group"><label for="matCategory">🗂️ Categoria</label><select id="matCategory" required><option value="">-- Seleziona --</option><option value="Strumentario">Strumentario</option><option value="Consumabili Generici">Consumabili Generici</option><option value="Monouso">Monouso</option><option value="Disinfezione e Sterilizzazione">Disinfezione e Sterilizzazione</option><option value="Chirurgia">Chirurgia</option><option value="Endodonzia">Endodonzia</option><option value="Conservativa e Protesi">Conservativa e Protesi</option><option value="Frese e Lucidatura">Frese e Lucidatura</option><option value="Anestesia e Farmaci">Anestesia e Farmaci</option><option value="Impronte e Laboratorio">Impronte e Laboratorio</option><option value="Radiografia e Fotografia">Radiografia e Fotografia</option><option value="Profilassi e Igiene Orale">Profilassi e Igiene Orale</option><option value="Ortodonzia">Ortodonzia</option></select></div>
-          <div class="material-form-group"><label for="matDistributor">🚚 Distributore</label><select id="matDistributor" required><option value="">-- Seleziona --</option><option value="Dental Leader">Dental Leader</option><option value="Gherò">Gherò</option><option value="Revello">Revello</option><option value="Dentitalia">Dentitalia</option><option value="Dental Trey">Dental Trey</option><option value="Umbra">Umbra</option><option value="Eli Dent">Eli Dent</option><option value="Non disponibile">Non disponibile</option><option value="Other">Altro...</option></select><input id="matDistributorCustom" placeholder="Distributore personalizzato" style="display:none;margin-top:6px" /></div>
-          <div class="material-form-group"><label for="matCompany">🏢 Azienda</label><select id="matCompany"><option value="">-- Seleziona --</option><option value="3M">3M</option><option value="Ivoclar">Ivoclar</option><option value="GC">GC</option><option value="Dentsply Sirona">Dentsply Sirona</option><option value="Coltene">Coltene</option><option value="Kerr">Kerr</option><option value="Voco">Voco</option><option value="Septodont">Septodont</option><option value="Zhermack">Zhermack</option><option value="DMG">DMG</option><option value="VOCO">VOCO</option><option value="Other">Altro...</option></select><input id="matCompanyCustom" placeholder="Azienda personalizzata" style="display:none;margin-top:6px" /></div>
-          <div class="material-form-group"><label for="matLowStock">Soglia quantità bassa</label><select id="matLowStock"><option value="1">1</option><option value="2" selected>2 (default)</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="Other">Altro...</option></select><input id="matLowStockCustom" type="number" min="1" step="1" placeholder="Personalizzato" style="display:none;margin-top:6px" /></div>
+          <div class="material-form-group"><label for="matDistributor">🚚 Distributore</label><select id="matDistributor" required><option value="">-- Seleziona --</option><option value="Dental Leader">Dental Leader</option><option value="Gherò">Gherò</option><option value="Revello">Revello</option><option value="Dentitalia">Dentitalia</option><option value="Dental Trey">Dental Trey</option><option value="Umbra">Umbra</option><option value="Eli Dent">Eli Dent</option><option value="Non disponibile">Non disponibile</option><option value="Other">Altro...</option></select><input id="matDistributorCustom" class="custom-input" placeholder="Distributore personalizzato" /></div>
+          <div class="material-form-group"><label for="matCompany">🏢 Azienda</label><select id="matCompany"><option value="">-- Seleziona --</option><option value="3M">3M</option><option value="Ivoclar">Ivoclar</option><option value="GC">GC</option><option value="Dentsply Sirona">Dentsply Sirona</option><option value="Coltene">Coltene</option><option value="Kerr">Kerr</option><option value="Voco">Voco</option><option value="Septodont">Septodont</option><option value="Zhermack">Zhermack</option><option value="DMG">DMG</option><option value="VOCO">VOCO</option><option value="Other">Altro...</option></select><input id="matCompanyCustom" class="custom-input" placeholder="Azienda personalizzata" /></div>
+          <div class="material-form-group"><label for="matLowStock">Soglia quantità bassa</label><select id="matLowStock"><option value="1">1</option><option value="2" selected>2 (default)</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="Other">Altro...</option></select><input id="matLowStockCustom" class="custom-input" type="number" min="1" step="1" placeholder="Personalizzato" /></div>
           <div class="material-buttons"><button type="button" class="material-btn cancel" onclick="closeMaterialModal()">Annulla</button><button type="submit" class="material-btn submit">✓ Aggiungi</button></div>
         </form>
       </div>
@@ -1781,18 +1783,8 @@
         const materials = loadFromLocalStorage();
         const lowerName = materialName.toLowerCase();
         
-        // Prima cerca match esatto
-        let match = materials.find(m => m.name && m.name.toLowerCase() === lowerName);
-        
-        // Se non trova match esatto, cerca match parziale/simile
-        if(!match) {
-          match = materials.find(m => {
-            if(!m.name) return false;
-            const existingName = m.name.toLowerCase();
-            // Match se uno contiene l'altro (errori di digitazione parziali)
-            return existingName.includes(lowerName) || lowerName.includes(existingName);
-          });
-        }
+        // Match solo esatto per evitare sovrascritture su nomi simili
+        const match = materials.find(m => m.name && m.name.toLowerCase() === lowerName);
         
         if(match) {
           // Correggi il nome con la versione corretta in Title Case
@@ -1834,14 +1826,7 @@
         const materials = loadFromLocalStorage();
         const lowerName = materialName.toLowerCase();
 
-        let match = materials.find(m => m.name && m.name.toLowerCase() === lowerName);
-        if(!match) {
-          match = materials.find(m => {
-            if(!m.name) return false;
-            const existingName = m.name.toLowerCase();
-            return existingName.includes(lowerName) || lowerName.includes(existingName);
-          });
-        }
+        const match = materials.find(m => m.name && m.name.toLowerCase() === lowerName);
 
         if(match) {
           document.getElementById('matName').value = toTitleCase(match.name);
@@ -3512,12 +3497,16 @@
       const lowStockInput = document.getElementById('matLowStockCustom');
       if (!distSelect || !distInput || !companySelect || !companyInput || !lowStockSelect || !lowStockInput) return;
 
+      const distGroup = distSelect.closest('.material-form-group');
+      const companyGroup = companySelect.closest('.material-form-group');
+      const lowStockGroup = lowStockSelect.closest('.material-form-group');
+
       distSelect.onchange = () => {
         if (distSelect.value === 'Other') {
-          distInput.style.display = '';
+          if (distGroup) distGroup.classList.add('custom-open');
           distInput.required = true;
         } else {
-          distInput.style.display = 'none';
+          if (distGroup) distGroup.classList.remove('custom-open');
           distInput.required = false;
           distInput.value = '';
         }
@@ -3525,19 +3514,19 @@
 
       companySelect.onchange = () => {
         if (companySelect.value === 'Other') {
-          companyInput.style.display = '';
+          if (companyGroup) companyGroup.classList.add('custom-open');
         } else {
-          companyInput.style.display = 'none';
+          if (companyGroup) companyGroup.classList.remove('custom-open');
           companyInput.value = '';
         }
       };
 
       lowStockSelect.onchange = () => {
         if (lowStockSelect.value === 'Other') {
-          lowStockInput.style.display = '';
+          if (lowStockGroup) lowStockGroup.classList.add('custom-open');
           lowStockInput.required = true;
         } else {
-          lowStockInput.style.display = 'none';
+          if (lowStockGroup) lowStockGroup.classList.remove('custom-open');
           lowStockInput.required = false;
           lowStockInput.value = '';
         }
