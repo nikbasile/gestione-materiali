@@ -882,7 +882,6 @@
             <thead>
               <tr>
                 <th>Nome e descrizione materiale</th>
-                <th>Descrizione (opz.)</th>
                 <th>Quantità</th>
                 <th>Prezzo (€)</th>
                 <th>Totale netto (€)</th>
@@ -3714,12 +3713,6 @@
       materialNameInput.setAttribute('list', 'materialNameList');
       materialNameInput.value = data.name || '';
 
-      const descInput = document.createElement('input');
-      descInput.type = 'text';
-      descInput.className = 'pdf-import-desc';
-      descInput.placeholder = 'Note opzionali';
-      descInput.value = data.description || '';
-
       const qtyInput = document.createElement('input');
       qtyInput.type = 'number';
       qtyInput.min = '1';
@@ -3768,7 +3761,7 @@
       removeBtn.textContent = 'Rimuovi';
       removeBtn.onclick = () => tr.remove();
 
-      const cells = [materialNameInput, descInput, qtyInput, priceInput, totalNetInput, ivaPercentInput, ivaAmountInput, companyInput, categorySelect, removeBtn];
+      const cells = [materialNameInput, qtyInput, priceInput, totalNetInput, ivaPercentInput, ivaAmountInput, companyInput, categorySelect, removeBtn];
       cells.forEach(c => {
         const td = document.createElement('td');
         td.appendChild(c);
@@ -3911,7 +3904,6 @@
 
       rows.forEach(row => {
         const materialName = row.querySelector('.pdf-import-name')?.value || '';
-        const description = row.querySelector('.pdf-import-desc')?.value || '';
         const quantity = parseInt(row.querySelector('.pdf-import-qty')?.value, 10) || 0;
         const price = parseFloat(row.querySelector('.pdf-import-price')?.value) || 0;
         const category = row.querySelector('select')?.value || '';
@@ -3936,7 +3928,7 @@
         }
 
         if (materialId && quantity > 0) {
-          addArticleRowWithData({ materialId, quantity, price, company, description });
+          addArticleRowWithData({ materialId, quantity, price, company, description: '' });
           imported += 1;
         } else {
           skipped += 1;
