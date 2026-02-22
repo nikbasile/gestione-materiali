@@ -794,14 +794,14 @@
       <div class="material-body">
         <form id="materialForm" class="material-form">
           <div class="material-form-group"><label for="matName">Nome materiale</label><input id="matName" placeholder="Es. Cemento composito" required /></div>
-          <div class="material-form-group"><label for="matOrderDate">Data Ordine</label><input id="matOrderDate" type="date" required /></div>
-          <div class="material-form-group"><label for="matExpiry">Data Scadenza</label><input id="matExpiry" type="date" required /></div>
+          <div class="material-form-group"><label for="matOrderDate">📅 Data Ordine</label><input id="matOrderDate" type="date" required /></div>
+          <div class="material-form-group"><label for="matExpiry">⏰ Data Scadenza</label><input id="matExpiry" type="date" required /></div>
           <div class="material-form-group"><label for="matPrice">Prezzo (€)</label><input id="matPrice" type="number" step="0.01" placeholder="0.00" /></div>
           <div class="material-form-group"><label for="matQuantity">Quantità</label><input id="matQuantity" type="number" min="0" value="1" required /></div>
-          <div class="material-form-group"><label for="matCategory">Categoria</label><select id="matCategory" required><option value="">-- Seleziona --</option><option value="Strumentario">Strumentario</option><option value="Consumabili Generici">Consumabili Generici</option><option value="Monouso">Monouso</option><option value="Disinfezione e Sterilizzazione">Disinfezione e Sterilizzazione</option><option value="Chirurgia">Chirurgia</option><option value="Endodonzia">Endodonzia</option><option value="Conservativa e Protesi">Conservativa e Protesi</option><option value="Frese e Lucidatura">Frese e Lucidatura</option><option value="Anestesia e Farmaci">Anestesia e Farmaci</option><option value="Impronte e Laboratorio">Impronte e Laboratorio</option><option value="Radiografia e Fotografia">Radiografia e Fotografia</option><option value="Profilassi e Igiene Orale">Profilassi e Igiene Orale</option><option value="Ortodonzia">Ortodonzia</option></select></div>
-          <div class="material-form-group"><label for="matDistributor">Distributore</label><select id="matDistributor" required><option value="">-- Seleziona --</option><option value="Dental Leader">Dental Leader</option><option value="Gherò">Gherò</option><option value="Revello">Revello</option><option value="Dentitalia">Dentitalia</option><option value="Dental Trey">Dental Trey</option><option value="Umbra">Umbra</option><option value="Eli Dent">Eli Dent</option><option value="Non disponibile">Non disponibile</option><option value="Other">Altro...</option></select><input id="matDistributorCustom" placeholder="Distributore personalizzato" style="display:none;margin-top:6px" /></div>
-          <div class="material-form-group"><label for="matCompany">Azienda</label><select id="matCompany"><option value="">-- Seleziona --</option><option value="3M">3M</option><option value="Ivoclar">Ivoclar</option><option value="GC">GC</option><option value="Dentsply Sirona">Dentsply Sirona</option><option value="Coltene">Coltene</option><option value="Kerr">Kerr</option><option value="Voco">Voco</option><option value="Septodont">Septodont</option><option value="Zhermack">Zhermack</option><option value="DMG">DMG</option><option value="VOCO">VOCO</option><option value="Other">Altro...</option></select><input id="matCompanyCustom" placeholder="Azienda personalizzata" style="display:none;margin-top:6px" /></div>
-          <div class="material-form-group"><label for="matLowStock">Soglia quantità bassa</label><select id="matLowStock"><option value="1">1</option><option value="2" selected>2 (default)</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="Other">Altro...</option></select></div>
+          <div class="material-form-group"><label for="matCategory">🗂️ Categoria</label><select id="matCategory" required><option value="">-- Seleziona --</option><option value="Strumentario">Strumentario</option><option value="Consumabili Generici">Consumabili Generici</option><option value="Monouso">Monouso</option><option value="Disinfezione e Sterilizzazione">Disinfezione e Sterilizzazione</option><option value="Chirurgia">Chirurgia</option><option value="Endodonzia">Endodonzia</option><option value="Conservativa e Protesi">Conservativa e Protesi</option><option value="Frese e Lucidatura">Frese e Lucidatura</option><option value="Anestesia e Farmaci">Anestesia e Farmaci</option><option value="Impronte e Laboratorio">Impronte e Laboratorio</option><option value="Radiografia e Fotografia">Radiografia e Fotografia</option><option value="Profilassi e Igiene Orale">Profilassi e Igiene Orale</option><option value="Ortodonzia">Ortodonzia</option></select></div>
+          <div class="material-form-group"><label for="matDistributor">🚚 Distributore</label><select id="matDistributor" required><option value="">-- Seleziona --</option><option value="Dental Leader">Dental Leader</option><option value="Gherò">Gherò</option><option value="Revello">Revello</option><option value="Dentitalia">Dentitalia</option><option value="Dental Trey">Dental Trey</option><option value="Umbra">Umbra</option><option value="Eli Dent">Eli Dent</option><option value="Non disponibile">Non disponibile</option><option value="Other">Altro...</option></select><input id="matDistributorCustom" placeholder="Distributore personalizzato" style="display:none;margin-top:6px" /></div>
+          <div class="material-form-group"><label for="matCompany">🏢 Azienda</label><select id="matCompany"><option value="">-- Seleziona --</option><option value="3M">3M</option><option value="Ivoclar">Ivoclar</option><option value="GC">GC</option><option value="Dentsply Sirona">Dentsply Sirona</option><option value="Coltene">Coltene</option><option value="Kerr">Kerr</option><option value="Voco">Voco</option><option value="Septodont">Septodont</option><option value="Zhermack">Zhermack</option><option value="DMG">DMG</option><option value="VOCO">VOCO</option><option value="Other">Altro...</option></select><input id="matCompanyCustom" placeholder="Azienda personalizzata" style="display:none;margin-top:6px" /></div>
+          <div class="material-form-group"><label for="matLowStock">Soglia quantità bassa</label><select id="matLowStock"><option value="1">1</option><option value="2" selected>2 (default)</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="Other">Altro...</option></select><input id="matLowStockCustom" type="number" min="1" step="1" placeholder="Personalizzato" style="display:none;margin-top:6px" /></div>
           <div class="material-buttons"><button type="button" class="material-btn cancel" onclick="closeMaterialModal()">Annulla</button><button type="submit" class="material-btn submit">✓ Aggiungi</button></div>
         </form>
       </div>
@@ -1823,6 +1823,65 @@
       }, 600); // Attiva dopo 600ms dalla fine della digitazione
     });
 
+    let modalAutoFillTimeout;
+    document.getElementById('matName').addEventListener('input', function() {
+      clearTimeout(modalAutoFillTimeout);
+      const materialName = this.value.trim();
+
+      modalAutoFillTimeout = setTimeout(() => {
+        if(materialName.length < 3) return;
+
+        const materials = loadFromLocalStorage();
+        const lowerName = materialName.toLowerCase();
+
+        let match = materials.find(m => m.name && m.name.toLowerCase() === lowerName);
+        if(!match) {
+          match = materials.find(m => {
+            if(!m.name) return false;
+            const existingName = m.name.toLowerCase();
+            return existingName.includes(lowerName) || lowerName.includes(existingName);
+          });
+        }
+
+        if(match) {
+          document.getElementById('matName').value = toTitleCase(match.name);
+
+          if(match.category) {
+            document.getElementById('matCategory').value = match.category;
+          }
+
+          if(match.company) {
+            const companySelect = document.getElementById('matCompany');
+            const companyInput = document.getElementById('matCompanyCustom');
+            const option = Array.from(companySelect.options).find(opt => opt.value === match.company);
+            if(option) {
+              companySelect.value = match.company;
+              companyInput.style.display = 'none';
+            } else {
+              companySelect.value = 'Other';
+              companyInput.value = match.company;
+              companyInput.style.display = '';
+            }
+          }
+
+          if(match.distributor) {
+            const distSelect = document.getElementById('matDistributor');
+            const distInput = document.getElementById('matDistributorCustom');
+            const option = Array.from(distSelect.options).find(opt => opt.value === match.distributor);
+            if(option) {
+              distSelect.value = match.distributor;
+              distInput.style.display = 'none';
+            } else {
+              distSelect.value = 'Other';
+              distInput.value = match.distributor;
+              distInput.style.display = '';
+            }
+          }
+          setupMaterialCustomFields();
+        }
+      }, 600);
+    });
+
     addForm.addEventListener('submit', async e=>{
       e.preventDefault();
       console.log('Form submitted');
@@ -1924,7 +1983,12 @@
       if (company === 'Other') {
         company = document.getElementById('matCompanyCustom').value.trim();
       }
-      const lowStockThreshold = parseInt(document.getElementById('matLowStock').value,10) || 2;
+      let lowStockThreshold = document.getElementById('matLowStock').value;
+      if(lowStockThreshold === 'Other') {
+        lowStockThreshold = parseInt(document.getElementById('matLowStockCustom').value,10) || 2;
+      } else {
+        lowStockThreshold = parseInt(lowStockThreshold,10) || 2;
+      }
       const notifyDays = 30;
       
       if(!name || !orderDate || !expiry || !category || !distributor) {
@@ -3423,6 +3487,7 @@
       setTimeout(() => {
         const modal = document.getElementById('materialModal');
         modal.classList.add('active');
+        setupMaterialCustomFields();
       }, 200);
     }
 
@@ -3443,7 +3508,9 @@
       const distInput = document.getElementById('matDistributorCustom');
       const companySelect = document.getElementById('matCompany');
       const companyInput = document.getElementById('matCompanyCustom');
-      if (!distSelect || !distInput || !companySelect || !companyInput) return;
+      const lowStockSelect = document.getElementById('matLowStock');
+      const lowStockInput = document.getElementById('matLowStockCustom');
+      if (!distSelect || !distInput || !companySelect || !companyInput || !lowStockSelect || !lowStockInput) return;
 
       distSelect.onchange = () => {
         if (distSelect.value === 'Other') {
@@ -3465,8 +3532,20 @@
         }
       };
 
+      lowStockSelect.onchange = () => {
+        if (lowStockSelect.value === 'Other') {
+          lowStockInput.style.display = '';
+          lowStockInput.required = true;
+        } else {
+          lowStockInput.style.display = 'none';
+          lowStockInput.required = false;
+          lowStockInput.value = '';
+        }
+      };
+
       distSelect.onchange();
       companySelect.onchange();
+      lowStockSelect.onchange();
     }
 
     function openOrderModal() {
