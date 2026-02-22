@@ -369,6 +369,7 @@
       <div class="form-group"><label>📅 Data Ordine</label><input id="orderDate" type="date" required /></div>
       <div class="form-group"><label>⏰ Data Scadenza</label><input id="expiry" type="date" required /></div>
       <div class="form-group"><label>Prezzo (€)</label><input id="price" type="number" step="0.01" placeholder="0.00" /></div>
+      <div class="form-group"><label>IVA (%)</label><select id="vatRate"><option value="22" selected>22%</option><option value="10">10%</option><option value="4">4%</option></select></div>
       <div class="form-group"><label>Quantità</label><input id="quantity" type="number" min="0" value="1" required /></div>
       <div class="form-group"><label>🗂️ Categoria</label><select id="category" required><option value="">-- Seleziona --</option><option value="Strumentario">Strumentario</option><option value="Consumabili Generici">Consumabili Generici</option><option value="Monouso">Monouso</option><option value="Disinfezione e Sterilizzazione">Disinfezione e Sterilizzazione</option><option value="Chirurgia">Chirurgia</option><option value="Endodonzia">Endodonzia</option><option value="Conservativa e Protesi">Conservativa e Protesi</option><option value="Frese e Lucidatura">Frese e Lucidatura</option><option value="Anestesia e Farmaci">Anestesia e Farmaci</option><option value="Impronte e Laboratorio">Impronte e Laboratorio</option><option value="Radiografia e Fotografia">Radiografia e Fotografia</option><option value="Profilassi e Igiene Orale">Profilassi e Igiene Orale</option><option value="Ortodonzia">Ortodonzia</option></select></div>
 
@@ -799,6 +800,7 @@
           <div class="material-form-group"><label for="matOrderDate">📅 Data Ordine</label><input id="matOrderDate" type="date" required /></div>
           <div class="material-form-group"><label for="matExpiry">⏰ Data Scadenza</label><input id="matExpiry" type="date" required /></div>
           <div class="material-form-group"><label for="matPrice">Prezzo (€)</label><input id="matPrice" type="number" step="0.01" placeholder="0.00" /></div>
+          <div class="material-form-group"><label for="matVatRate">IVA (%)</label><select id="matVatRate"><option value="22" selected>22%</option><option value="10">10%</option><option value="4">4%</option></select></div>
           <div class="material-form-group"><label for="matQuantity">Quantità</label><input id="matQuantity" type="number" min="0" value="1" required /></div>
           <div class="material-form-group"><label for="matCategory">🗂️ Categoria</label><select id="matCategory" required><option value="">-- Seleziona --</option><option value="Strumentario">Strumentario</option><option value="Consumabili Generici">Consumabili Generici</option><option value="Monouso">Monouso</option><option value="Disinfezione e Sterilizzazione">Disinfezione e Sterilizzazione</option><option value="Chirurgia">Chirurgia</option><option value="Endodonzia">Endodonzia</option><option value="Conservativa e Protesi">Conservativa e Protesi</option><option value="Frese e Lucidatura">Frese e Lucidatura</option><option value="Anestesia e Farmaci">Anestesia e Farmaci</option><option value="Impronte e Laboratorio">Impronte e Laboratorio</option><option value="Radiografia e Fotografia">Radiografia e Fotografia</option><option value="Profilassi e Igiene Orale">Profilassi e Igiene Orale</option><option value="Ortodonzia">Ortodonzia</option></select></div>
           <div class="material-form-group"><label for="matDistributor">🚚 Distributore</label><select id="matDistributor" required><option value="">-- Seleziona --</option><option value="Dental Leader">Dental Leader</option><option value="Gherò">Gherò</option><option value="Revello">Revello</option><option value="Dentitalia">Dentitalia</option><option value="Dental Trey">Dental Trey</option><option value="Umbra">Umbra</option><option value="Eli Dent">Eli Dent</option><option value="Non disponibile">Non disponibile</option><option value="Other">Altro...</option></select><input id="matDistributorCustom" class="custom-input" placeholder="Distributore personalizzato" /></div>
@@ -1875,6 +1877,7 @@
       const orderDate = document.getElementById('orderDate').value;
       const expiry = document.getElementById('expiry').value;
       const price = parseFloat(document.getElementById('price').value) || 0;
+      const vatRate = parseInt(document.getElementById('vatRate').value, 10) || 22;
       const quantity = parseInt(document.getElementById('quantity').value,10) || 0;
       const category = document.getElementById('category').value.trim();
         let distributor = document.getElementById('distributorSelect').value;
@@ -1911,6 +1914,7 @@
         orderDate: new Date(orderDate), 
         expiry: new Date(expiry), 
         price, 
+        vatRate,
         quantity, 
         category, 
           distributor, 
@@ -1958,6 +1962,7 @@
       const orderDate = document.getElementById('matOrderDate').value;
       const expiry = document.getElementById('matExpiry').value;
       const price = parseFloat(document.getElementById('matPrice').value) || 0;
+      const vatRate = parseInt(document.getElementById('matVatRate').value, 10) || 22;
       const quantity = parseInt(document.getElementById('matQuantity').value,10) || 0;
       const category = document.getElementById('matCategory').value.trim();
       let distributor = document.getElementById('matDistributor').value.trim();
@@ -1986,6 +1991,7 @@
         orderDate: new Date(orderDate), 
         expiry: new Date(expiry), 
         price, 
+        vatRate,
         quantity, 
         category, 
         distributor, 
