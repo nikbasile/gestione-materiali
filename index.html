@@ -187,7 +187,7 @@
     /* Order Modal Styles */
     #orderModal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:10000;overflow:hidden;padding:20px}
     #orderModal.active{display:flex;align-items:flex-start;justify-content:center;padding:40px 20px}
-    .order-modal-content{background:#fff;border-radius:12px;max-width:1000px;width:100%;max-height:90vh;display:flex;flex-direction:column;margin:auto;box-shadow:0 8px 32px rgba(0,0,0,0.3)}
+    .order-modal-content{background:#fff;border-radius:12px;max-width:1400px;width:100%;max-height:90vh;display:flex;flex-direction:column;margin:auto;box-shadow:0 8px 32px rgba(0,0,0,0.3)}
     .order-header{background:linear-gradient(135deg,#388e3c 0%,#1b5e20 100%);color:#fff;padding:24px;border-radius:12px 12px 0 0;display:flex;justify-content:space-between;align-items:center;font-weight:700}
     .order-header h2{margin:0;font-size:22px}
     .order-close{background:transparent;color:#fff;border:2px solid #fff;width:36px;height:36px;border-radius:50%;font-size:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s}
@@ -803,18 +803,18 @@
                 <button type="button" class="import-article-btn" onclick="openPdfImportModal()">📄 Importa PDF</button>
               </div>
             </div>
-            <div id="articlesContainer" style="border:1px solid #d0dce6;border-radius:8px;max-height:600px;background:#fff;overflow-y:auto">
-              <table style="width:100%;border-collapse:collapse;font-size:12px">
+            <div id="articlesContainer" style="border:1px solid #d0dce6;border-radius:8px;max-height:700px;background:#fff;overflow-y:auto">
+              <table style="width:100%;border-collapse:collapse;font-size:11px">
                 <thead style="position:sticky;top:0;background:#f0f4f8;z-index:10">
                   <tr style="background:#f0f4f8;border-bottom:2px solid #d0dce6">
-                    <th style="padding:6px 8px;text-align:left;font-weight:600;color:#003d7a;border:1px solid #d0dce6;white-space:nowrap">Materiale</th>
-                    <th style="padding:6px 8px;text-align:center;font-weight:600;color:#003d7a;border:1px solid #d0dce6;white-space:nowrap;width:50px">Qtà</th>
-                    <th style="padding:6px 8px;text-align:center;font-weight:600;color:#003d7a;border:1px solid #d0dce6;white-space:nowrap;width:70px">Prezzo</th>
-                    <th style="padding:6px 8px;text-align:center;font-weight:600;color:#003d7a;border:1px solid #d0dce6;white-space:nowrap;width:80px">Tipo</th>
-                    <th style="padding:6px 8px;text-align:left;font-weight:600;color:#003d7a;border:1px solid #d0dce6;white-space:nowrap;width:90px">Azienda</th>
-                    <th style="padding:6px 8px;text-align:center;font-weight:600;color:#003d7a;border:1px solid #d0dce6;white-space:nowrap;width:50px">IVA %</th>
-                    <th style="padding:6px 8px;text-align:left;font-weight:600;color:#003d7a;border:1px solid #d0dce6;white-space:nowrap;width:120px">Categoria</th>
-                    <th style="padding:6px 8px;text-align:center;font-weight:600;color:#003d7a;border:1px solid #d0dce6;white-space:nowrap;width:60px">Azioni</th>
+                    <th style="padding:4px 5px;text-align:left;font-weight:600;color:#003d7a;border:1px solid #d0dce6;white-space:nowrap">Materiale</th>
+                    <th style="padding:4px 5px;text-align:center;font-weight:600;color:#003d7a;border:1px solid #d0dce6;white-space:nowrap;width:40px">Qtà</th>
+                    <th style="padding:4px 5px;text-align:center;font-weight:600;color:#003d7a;border:1px solid #d0dce6;white-space:nowrap;width:60px">Prezzo</th>
+                    <th style="padding:4px 5px;text-align:center;font-weight:600;color:#003d7a;border:1px solid #d0dce6;white-space:nowrap;width:70px">Tipo</th>
+                    <th style="padding:4px 5px;text-align:left;font-weight:600;color:#003d7a;border:1px solid #d0dce6;white-space:nowrap;width:80px">Azienda</th>
+                    <th style="padding:4px 5px;text-align:center;font-weight:600;color:#003d7a;border:1px solid #d0dce6;white-space:nowrap;width:45px">IVA %</th>
+                    <th style="padding:4px 5px;text-align:left;font-weight:600;color:#003d7a;border:1px solid #d0dce6;white-space:nowrap;width:110px">Categoria</th>
+                    <th style="padding:4px 5px;text-align:center;font-weight:600;color:#003d7a;border:1px solid #d0dce6;white-space:nowrap;width:55px">Azioni</th>
                   </tr>
                 </thead>
                 <tbody id="articlesContainerBody"></tbody>
@@ -3481,7 +3481,7 @@
       materialInput.setAttribute('list', datalistId);
       materialInput.setAttribute('data-material-id', '');
       materialInput.style.width = '100%';
-      materialInput.style.padding = '4px 5px';
+      materialInput.style.padding = '3px 4px';
       materialInput.style.border = '1px solid #d0dce6';
       materialInput.style.borderRadius = '3px';
       
@@ -3512,7 +3512,7 @@
       quantityInput.placeholder = 'Qtà';
       quantityInput.className = 'article-qty';
       quantityInput.style.width = '100%';
-      quantityInput.style.padding = '4px 5px';
+      quantityInput.style.padding = '3px 4px';
       quantityInput.style.border = '1px solid #d0dce6';
       quantityInput.style.borderRadius = '3px';
       quantityInput.style.textAlign = 'center';
@@ -3524,7 +3524,7 @@
       priceInput.placeholder = '€';
       priceInput.className = 'article-price';
       priceInput.style.width = '100%';
-      priceInput.style.padding = '4px 5px';
+      priceInput.style.padding = '3px 4px';
       priceInput.style.border = '1px solid #d0dce6';
       priceInput.style.borderRadius = '3px';
       priceInput.style.textAlign = 'center';
@@ -3533,7 +3533,7 @@
       priceTypeSelect.className = 'article-pricetype';
       priceTypeSelect.innerHTML = '<option value="totale" selected>Totale</option><option value="unitario">Unitario</option>';
       priceTypeSelect.style.width = '100%';
-      priceTypeSelect.style.padding = '4px 5px';
+      priceTypeSelect.style.padding = '3px 4px';
       priceTypeSelect.style.border = '1px solid #d0dce6';
       priceTypeSelect.style.borderRadius = '3px';
       
@@ -3555,7 +3555,7 @@
       companyInput.placeholder = 'Azienda';
       companyInput.className = 'article-company';
       companyInput.style.width = '100%';
-      companyInput.style.padding = '4px 5px';
+      companyInput.style.padding = '3px 4px';
       companyInput.style.border = '1px solid #d0dce6';
       companyInput.style.borderRadius = '3px';
 
@@ -3563,7 +3563,7 @@
       vatRateSelect.className = 'article-vat';
       vatRateSelect.innerHTML = '<option value="22" selected>22%</option><option value="10">10%</option><option value="4">4%</option>';
       vatRateSelect.style.width = '100%';
-      vatRateSelect.style.padding = '4px 5px';
+      vatRateSelect.style.padding = '3px 4px';
       vatRateSelect.style.border = '1px solid #d0dce6';
       vatRateSelect.style.borderRadius = '3px';
 
@@ -3580,7 +3580,7 @@
         }
       });
       categorySelect.style.width = '100%';
-      categorySelect.style.padding = '4px 5px';
+      categorySelect.style.padding = '3px 4px';
       categorySelect.style.border = '1px solid #d0dce6';
       categorySelect.style.borderRadius = '3px';
 
@@ -3594,57 +3594,57 @@
       removeBtn.type = 'button';
       removeBtn.className = 'article-remove';
       removeBtn.textContent = '❌';
-      removeBtn.style.padding = '6px 10px';
+      removeBtn.style.padding = '4px 8px';
       removeBtn.style.background = '#d32f2f';
       removeBtn.style.color = '#fff';
       removeBtn.style.border = 'none';
       removeBtn.style.borderRadius = '4px';
       removeBtn.style.cursor = 'pointer';
-      removeBtn.style.fontSize = '12px';
+      removeBtn.style.fontSize = '11px';
       removeBtn.onclick = () => tr.remove();
 
       // Crea celle di tabella
       const tdMat = document.createElement('td');
-      tdMat.style.padding = '4px 5px';
+      tdMat.style.padding = '3px 4px';
       tdMat.style.border = '1px solid #e0e8f0';
       tdMat.appendChild(materialInput);
       tdMat.appendChild(datalist);
 
       const tdQty = document.createElement('td');
-      tdQty.style.padding = '4px 5px';
+      tdQty.style.padding = '3px 4px';
       tdQty.style.border = '1px solid #e0e8f0';
       tdQty.appendChild(quantityInput);
 
       const tdPrice = document.createElement('td');
-      tdPrice.style.padding = '4px 5px';
+      tdPrice.style.padding = '3px 4px';
       tdPrice.style.border = '1px solid #e0e8f0';
       tdPrice.style.textAlign = 'center';
       tdPrice.appendChild(priceInput);
 
       const tdPriceType = document.createElement('td');
-      tdPriceType.style.padding = '4px 5px';
+      tdPriceType.style.padding = '3px 4px';
       tdPriceType.style.border = '1px solid #e0e8f0';
       tdPriceType.style.textAlign = 'center';
       tdPriceType.appendChild(priceTypeSelect);
 
       const tdCompany = document.createElement('td');
-      tdCompany.style.padding = '4px 5px';
+      tdCompany.style.padding = '3px 4px';
       tdCompany.style.border = '1px solid #e0e8f0';
       tdCompany.appendChild(companyInput);
 
       const tdVat = document.createElement('td');
-      tdVat.style.padding = '4px 5px';
+      tdVat.style.padding = '3px 4px';
       tdVat.style.border = '1px solid #e0e8f0';
       tdVat.style.textAlign = 'center';
       tdVat.appendChild(vatRateSelect);
 
       const tdCategory = document.createElement('td');
-      tdCategory.style.padding = '4px 5px';
+      tdCategory.style.padding = '3px 4px';
       tdCategory.style.border = '1px solid #e0e8f0';
       tdCategory.appendChild(categorySelect);
 
       const tdActions = document.createElement('td');
-      tdActions.style.padding = '4px 5px';
+      tdActions.style.padding = '3px 4px';
       tdActions.style.border = '1px solid #e0e8f0';
       tdActions.style.textAlign = 'center';
       tdActions.appendChild(removeBtn);
