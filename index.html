@@ -202,9 +202,20 @@
     .articles-container{margin:32px 0;border:none;border-radius:0;padding:0;background:transparent;flex:1;overflow-y:auto;overflow-x:hidden;padding-right:8px}
     .articles-title{font-weight:700;color:#003d7a;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;font-size:15px;padding-bottom:14px;border-bottom:2px solid #e0e0e0;gap:12px;flex-wrap:wrap}
     .order-articles-actions{display:flex;gap:10px;flex-wrap:wrap}
-    .article-row{display:grid;grid-template-columns:minmax(220px,1.5fr) minmax(90px,0.7fr) minmax(90px,0.7fr) minmax(140px,1fr) minmax(140px,1fr) 90px;gap:14px;margin-bottom:16px;padding:18px;background:#fafbfc;border-radius:10px;border:1.5px solid #e8ecf1;align-items:flex-end;transition:all 0.3s;border-left:4px solid #388e3c}
+    #articlesContainer table{width:100%;border-collapse:collapse;table-layout:fixed;min-width:980px}
+    #articlesContainer th,#articlesContainer td{padding:6px 8px;border:1px solid #d0dce6;font-size:12px;vertical-align:middle}
+    #articlesContainer td input,#articlesContainer td select{width:100%;min-width:0}
+    #articlesContainer th:nth-child(1),#articlesContainer td:nth-child(1){width:44%}
+    #articlesContainer th:nth-child(2),#articlesContainer td:nth-child(2){width:7%}
+    #articlesContainer th:nth-child(3),#articlesContainer td:nth-child(3){width:10%}
+    #articlesContainer th:nth-child(4),#articlesContainer td:nth-child(4){width:10%}
+    #articlesContainer th:nth-child(5),#articlesContainer td:nth-child(5){width:12%}
+    #articlesContainer th:nth-child(6),#articlesContainer td:nth-child(6){width:8%}
+    #articlesContainer th:nth-child(7),#articlesContainer td:nth-child(7){width:9%}
+    #articlesContainer th:nth-child(8),#articlesContainer td:nth-child(8){width:6%}
+    .article-row{transition:background-color 0.2s}
     .article-row > *{min-width:0}
-    .article-row:hover{box-shadow:0 6px 16px rgba(0,0,0,0.1);background:#fff;border-color:#388e3c}
+    .article-row:hover{background:#f9fbfd}
     .article-field{display:flex;flex-direction:column;gap:7px}
     .article-field label{font-weight:700;color:#003d7a;font-size:11px;text-transform:uppercase;letter-spacing:0.4px}
     .article-field input,.article-field select{padding:11px 13px;border:1.5px solid #d0dce6;border-radius:7px;font-size:13px;transition:all 0.2s;width:100%;background:#fff}
@@ -290,6 +301,12 @@
       .filters-row{gap:12px;padding:14px 16px}
       .filters-row > div{flex:1 1 180px}
       .filter-select{min-width:160px}
+      .order-body{padding:18px 16px 0 16px}
+      .order-info{grid-template-columns:1fr;gap:14px;margin-bottom:20px;padding:14px}
+      .articles-title{font-size:14px;margin-bottom:12px;padding-bottom:10px}
+      #articlesContainer th,#articlesContainer td{padding:5px 6px;font-size:11px}
+      #articlesContainer table{min-width:860px}
+      .order-buttons{padding:14px 16px;margin-top:12px}
     }
 
     @media (max-width:700px){
@@ -803,18 +820,18 @@
                 <button type="button" class="import-article-btn" onclick="openPdfImportModal()">📄 Importa PDF</button>
               </div>
             </div>
-            <div id="articlesContainer" style="border:1px solid #d0dce6;border-radius:8px;max-height:700px;background:#fff;overflow-y:auto">
-              <table style="width:100%;border-collapse:collapse;font-size:11px;table-layout:fixed">
+            <div id="articlesContainer" style="border:1px solid #d0dce6;border-radius:8px;max-height:700px;background:#fff;overflow:auto">
+              <table>
                 <thead style="position:sticky;top:0;background:#f0f4f8;z-index:10">
                   <tr style="background:#f0f4f8;border-bottom:2px solid #d0dce6">
-                    <th style="padding:4px 5px;text-align:left;font-weight:600;color:#003d7a;border:1px solid #d0dce6;white-space:nowrap">Materiale</th>
-                    <th style="padding:4px 5px;text-align:center;font-weight:600;color:#003d7a;border:1px solid #d0dce6;white-space:nowrap;width:40px">Qtà</th>
-                    <th style="padding:4px 5px;text-align:center;font-weight:600;color:#003d7a;border:1px solid #d0dce6;white-space:nowrap;width:60px">Prezzo</th>
-                    <th style="padding:4px 5px;text-align:center;font-weight:600;color:#003d7a;border:1px solid #d0dce6;white-space:nowrap;width:70px">Tipo</th>
-                    <th style="padding:4px 5px;text-align:left;font-weight:600;color:#003d7a;border:1px solid #d0dce6;white-space:nowrap;width:80px">Azienda</th>
-                    <th style="padding:4px 5px;text-align:center;font-weight:600;color:#003d7a;border:1px solid #d0dce6;white-space:nowrap;width:45px">IVA %</th>
-                    <th style="padding:4px 5px;text-align:left;font-weight:600;color:#003d7a;border:1px solid #d0dce6;white-space:nowrap;width:110px">Categoria</th>
-                    <th style="padding:4px 5px;text-align:center;font-weight:600;color:#003d7a;border:1px solid #d0dce6;white-space:nowrap;width:55px">Azioni</th>
+                    <th style="text-align:left;font-weight:600;color:#003d7a;white-space:nowrap">Materiale</th>
+                    <th style="text-align:center;font-weight:600;color:#003d7a;white-space:nowrap">Qtà</th>
+                    <th style="text-align:center;font-weight:600;color:#003d7a;white-space:nowrap">Prezzo</th>
+                    <th style="text-align:center;font-weight:600;color:#003d7a;white-space:nowrap">Tipo</th>
+                    <th style="text-align:left;font-weight:600;color:#003d7a;white-space:nowrap">Azienda</th>
+                    <th style="text-align:center;font-weight:600;color:#003d7a;white-space:nowrap">IVA %</th>
+                    <th style="text-align:left;font-weight:600;color:#003d7a;white-space:nowrap">Categoria</th>
+                    <th style="text-align:center;font-weight:600;color:#003d7a;white-space:nowrap">Azioni</th>
                   </tr>
                 </thead>
                 <tbody id="articlesContainerBody"></tbody>
@@ -3414,7 +3431,7 @@
       modal.classList.remove('active');
       document.getElementById('orderForm').reset();
       orderArticles = [];
-      document.getElementById('articlesContainer').innerHTML = '';
+      document.getElementById('articlesContainerBody').innerHTML = '';
     }
 
     function initOrderModal() {
@@ -3471,7 +3488,6 @@
       const tr = document.createElement('tr');
       tr.className = 'article-row';
       tr.id = rowId;
-      tr.style.borderBottom = '1px solid #e0e8f0';
       
       // Cambiato da select a input con datalist per permettere editing libero
       const materialInput = document.createElement('input');
@@ -3609,6 +3625,7 @@
       tdMat.style.border = '1px solid #d0dce6';
       tdMat.appendChild(materialInput);
       tdMat.appendChild(datalist);
+      tdMat.appendChild(descriptionInput);
 
       const tdQty = document.createElement('td');
       tdQty.style.padding = '4px 5px';
@@ -3664,7 +3681,6 @@
       tr.appendChild(tdVat);
       tr.appendChild(tdCategory);
       tr.appendChild(tdActions);
-      tr.appendChild(descriptionInput);
 
       document.getElementById('articlesContainerBody').appendChild(tr);
       return tr;
