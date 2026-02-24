@@ -3,7 +3,9 @@
 Single-file web app per gestire i materiali di consumo di uno studio dentistico.
 
 Caratteristiche:
-- Inserimento materiali con scadenza, prezzo, quantità, distributore
+- Entrate di magazzino gestite da Nuovo Ordine e Nuovo Materiale
+- Uscite di magazzino gestite dal Registro Consumi con scarico automatico FIFO
+- Scadenza e soglia quantità gestite direttamente dalla vista Magazzino
 - Notifiche in-app e notifiche browser quando la scadenza si avvicina o il materiale è in esaurimento (<=2)
 - Salvataggio e sincronizzazione su Firebase Firestore
 

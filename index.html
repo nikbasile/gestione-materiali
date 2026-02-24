@@ -92,6 +92,10 @@
     #reportModal.active{display:flex;align-items:flex-start;justify-content:center}
     #implantsReportModal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:10000;overflow-y:auto;padding:20px}
     #implantsReportModal.active{display:flex;align-items:flex-start;justify-content:center}
+    #incomingRegisterModal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:10000;overflow-y:auto;padding:20px}
+    #incomingRegisterModal.active{display:flex;align-items:flex-start;justify-content:center}
+    #implantsIncomingRegisterModal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:10000;overflow-y:auto;padding:20px}
+    #implantsIncomingRegisterModal.active{display:flex;align-items:flex-start;justify-content:center}
     .report-modal-content{background:#fff;border-radius:12px;max-width:1400px;width:100%;margin:20px auto;box-shadow:0 8px 32px rgba(0,0,0,0.3)}
     .report-header{background:linear-gradient(135deg,#0066cc 0%,#003d7a 100%);color:#fff;padding:20px;border-radius:12px 12px 0 0;display:flex;justify-content:space-between;align-items:center}
     .report-header h2{margin:0;font-size:22px}
@@ -373,9 +377,15 @@
     </div>
     <div id="alerts"></div>
     <div class="alert info" style="margin-bottom:18px;">
+      <strong>Workflow magazzino (materiali e impianti):</strong>
+      <ul style="margin:8px 0 10px 18px; font-size:13px; color:#003d7a;">
+        <li>Entrate: usa <strong>Nuovo Ordine</strong> o <strong>Nuovo Materiale</strong> (per impianti aggiungili direttamente dal magazzino impianti)</li>
+        <li>Uscite: usa solo <strong>Registra Consumo</strong> (scarico automatico dal magazzino)</li>
+        <li>Dal magazzino puoi modificare <strong>scadenza</strong> e <strong>soglia quantità</strong> cliccando sul semaforo o sulla soglia</li>
+      </ul>
       <strong>Nota sulle notifiche:</strong> Riceverai un avviso automatico quando:
       <ul style="margin:8px 0 0 18px; font-size:13px; color:#003d7a;">
-        <li>Un materiale è scaduto o sta per scadere tra 30 giorni</li>
+        <li>Un materiale/impianto è scaduto o sta per scadere tra 30 giorni</li>
         <li>La quantità del materiale raggiunge il valore soglia impostato</li>
       </ul>
       Le notifiche compaiono in alto nella pagina ogni volta che si verifica una di queste condizioni.
@@ -396,6 +406,10 @@
 
           <button onclick="openConsumptionModal()" style="background:linear-gradient(135deg,#f57c00 0%,#e65100 100%);color:#fff;padding:12px 20px;font-size:15px;border:none;border-radius:8px;cursor:pointer;font-weight:600;box-shadow:0 4px 12px rgba(230,81,0,0.35);transition:all 0.2s;display:flex;align-items:center;gap:6px">
             📉 Registra Consumo
+          </button>
+
+          <button onclick="openIncomingRegisterModal()" style="background:linear-gradient(135deg,#43a047 0%,#2e7d32 100%);color:#fff;padding:12px 20px;font-size:15px;border:none;border-radius:8px;cursor:pointer;font-weight:600;box-shadow:0 4px 12px rgba(67,160,71,0.35);transition:all 0.2s;display:flex;align-items:center;gap:6px">
+            📥 Registro Entrate
           </button>
         </div>
       </div>
@@ -570,7 +584,7 @@
           <input id="implantOrderDate" type="date" required />
         </div>
         <div class="form-group">
-          <label>⏰ Data Scadenza</label>
+          <label>⏰ Data Scadenza (gestita dal magazzino)</label>
           <input id="implantExpiry" type="date" />
         </div>
         <div class="form-group">
@@ -590,6 +604,7 @@
       <div style="margin:16px 0;display:flex;gap:10px;align-items:center;position:relative">
         <button class="action-menu-btn" onclick="toggleActionMenu('implantsMenu')">📥 Scarica Dati ▼</button>
         <button class="action-menu-btn" onclick="openImplantsReportModal()" style="background-color:#1976d2">📊 Analisi Spese Impianti</button>
+        <button class="action-menu-btn" onclick="openImplantsIncomingRegisterModal()" style="background-color:#43a047">📥 Registro Entrate Impianti</button>
         <div id="implantsMenu" class="action-menu" style="display:none;position:absolute;background:white;border:1px solid #ddd;border-radius:8px;box-shadow:0 4px 8px rgba(0,0,0,0.1);z-index:100;min-width:250px;top:40px;left:0">
           <button class="menu-item" onclick="downloadImplantsPDF()">📄 Scarica PDF Impianti</button>
           <button class="menu-item" onclick="exportImplantsCSV()">📊 Scarica CSV Impianti</button>
@@ -741,6 +756,82 @@
     </div>
   </div>
 
+  <!-- Registro Entrate Modal -->
+  <div id="incomingRegisterModal">
+    <div class="report-modal-content">
+      <div class="report-header">
+        <h2>📥 Registro Entrate Magazzino</h2>
+        <button class="report-close" onclick="closeIncomingRegisterModal()">×</button>
+      </div>
+      <div class="report-body">
+        
+        <!-- Filtri -->
+        <div class="report-filters">
+          <div class="report-filter-group">
+            <label>Categoria</label>
+            <select id="incomingCategoryFilter" onchange="updateIncomingRegisterData()">
+              <option value="Tutti">Tutti</option>
+            </select>
+          </div>
+          <div class="report-filter-group">
+            <label>Distributore</label>
+            <select id="incomingDistributorFilter" onchange="updateIncomingRegisterData()">
+              <option value="Tutti">Tutti</option>
+            </select>
+          </div>
+          <div class="report-filter-group">
+            <label>Periodo</label>
+            <select id="incomingPeriodFilter" onchange="updateIncomingRegisterData()">
+              <option value="7">Ultimi 7 giorni</option>
+              <option value="30" selected>Ultimi 30 giorni</option>
+              <option value="90">Ultimi 90 giorni</option>
+              <option value="365">Ultimo anno</option>
+              <option value="all">Tutto</option>
+            </select>
+          </div>
+          <div class="report-filter-group" style="margin-top:24px">
+            <button onclick="resetIncomingFilters()" style="padding:8px 16px;background:#d32f2f;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:600">Azzera Filtri</button>
+          </div>
+        </div>
+
+        <!-- Statistiche -->
+        <div class="report-stats">
+          <div class="report-stat">
+            <div class="report-stat-label">Totale Entrate</div>
+            <div class="report-stat-value" id="incomingTotalCount">0</div>
+          </div>
+          <div class="report-stat">
+            <div class="report-stat-label">Quantità Totale</div>
+            <div class="report-stat-value" id="incomingTotalQuantity">0</div>
+          </div>
+          <div class="report-stat">
+            <div class="report-stat-label">Ultimo Carico</div>
+            <div class="report-stat-value" id="incomingLastDate" style="font-size:16px">--</div>
+          </div>
+        </div>
+
+        <!-- Tabella Entrate -->
+        <h3 style="color:#003d7a;margin-bottom:12px">📋 Storico Carichi</h3>
+        <div class="report-table-container">
+          <table class="report-table">
+            <thead>
+              <tr>
+                <th>Data Ordine</th>
+                <th>Categoria</th>
+                <th>Nome Materiale</th>
+                <th>Distributore</th>
+                <th>Quantità</th>
+                <th>ID Batch</th>
+                <th>Tipo</th>
+              </tr>
+            </thead>
+            <tbody id="incomingRegisterTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Add Selection Modal -->
   <div id="addSelectionModal">
     <div class="selection-modal-content">
@@ -772,7 +863,7 @@
         <form id="materialForm" class="material-form">
           <div class="material-form-group"><label for="matName">Nome materiale</label><input id="matName" placeholder="Es. Cemento composito" required /></div>
           <div class="material-form-group"><label for="matOrderDate">📅 Data Ordine</label><input id="matOrderDate" type="date" required /></div>
-          <div class="material-form-group"><label for="matExpiry">⏰ Data Scadenza</label><input id="matExpiry" type="date" required /></div>
+          <div class="material-form-group"><label for="matExpiry">⏰ Data Scadenza (gestita dal magazzino)</label><input id="matExpiry" type="date" /></div>
           <div class="material-form-group"><label for="matPrice">Prezzo (€)</label><input id="matPrice" type="number" step="0.01" placeholder="0.00" /></div>
           <div class="material-form-group"><label for="matPriceType">Tipo Prezzo</label><select id="matPriceType"><option value="unitario" selected>💰 Unitario</option><option value="totale">📦 Totale</option></select></div>
           <div class="material-form-group"><label for="matQuantity">Quantità</label><input id="matQuantity" type="number" min="0" value="1" required /></div>
@@ -780,7 +871,6 @@
           <div class="material-form-group"><label for="matCategory">🗂️ Categoria</label><select id="matCategory" required><option value="">-- Seleziona --</option><option value="Strumentario">Strumentario</option><option value="Consumabili Generici">Consumabili Generici</option><option value="Monouso">Monouso</option><option value="Disinfezione e Sterilizzazione">Disinfezione e Sterilizzazione</option><option value="Chirurgia">Chirurgia</option><option value="Endodonzia">Endodonzia</option><option value="Conservativa e Protesi">Conservativa e Protesi</option><option value="Frese e Lucidatura">Frese e Lucidatura</option><option value="Anestesia e Farmaci">Anestesia e Farmaci</option><option value="Impronte e Laboratorio">Impronte e Laboratorio</option><option value="Radiografia e Fotografia">Radiografia e Fotografia</option><option value="Profilassi e Igiene Orale">Profilassi e Igiene Orale</option><option value="Ortodonzia">Ortodonzia</option></select></div>
           <div class="material-form-group"><label for="matDistributor">🚚 Distributore</label><select id="matDistributor" required><option value="">-- Seleziona --</option><option value="Dental Leader">Dental Leader</option><option value="Gherò">Gherò</option><option value="Revello">Revello</option><option value="Dentitalia">Dentitalia</option><option value="Dental Trey">Dental Trey</option><option value="Umbra">Umbra</option><option value="Eli Dent">Eli Dent</option><option value="Non disponibile">Non disponibile</option><option value="Other">Altro...</option></select><input id="matDistributorCustom" class="custom-input" placeholder="Distributore personalizzato" /></div>
           <div class="material-form-group"><label for="matCompany">🏢 Azienda</label><select id="matCompany"><option value="">-- Seleziona --</option><option value="3M">3M</option><option value="Ivoclar">Ivoclar</option><option value="GC">GC</option><option value="Dentsply Sirona">Dentsply Sirona</option><option value="Coltene">Coltene</option><option value="Kerr">Kerr</option><option value="Voco">Voco</option><option value="Septodont">Septodont</option><option value="Zhermack">Zhermack</option><option value="DMG">DMG</option><option value="VOCO">VOCO</option><option value="Other">Altro...</option></select><input id="matCompanyCustom" class="custom-input" placeholder="Azienda personalizzata" /></div>
-          <div class="material-form-group"><label for="matLowStock">Soglia quantità bassa</label><select id="matLowStock"><option value="1">1</option><option value="2" selected>2 (default)</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="Other">Altro...</option></select><input id="matLowStockCustom" class="custom-input" type="number" min="1" step="1" placeholder="Personalizzato" /></div>
           <div class="material-buttons"><button type="button" class="material-btn cancel" onclick="closeMaterialModal()">Annulla</button><button type="submit" class="material-btn submit">✓ Aggiungi</button></div>
         </form>
       </div>
@@ -1029,6 +1119,81 @@
     </div>
   </div>
 
+  <!-- Registro Entrate Impianti Modal -->
+  <div id="implantsIncomingRegisterModal">
+    <div class="report-modal-content">
+      <div class="report-header">
+        <h2>📥 Registro Entrate Impianti</h2>
+        <button class="report-close" onclick="closeImplantsIncomingRegisterModal()">×</button>
+      </div>
+      <div class="report-body">
+        
+        <!-- Filtri -->
+        <div class="report-filters">
+          <div class="report-filter-group">
+            <label>Tipo</label>
+            <select id="implantsIncomingTypeFilter" onchange="updateImplantsIncomingRegisterData()">
+              <option value="Tutti">Tutti</option>
+            </select>
+          </div>
+          <div class="report-filter-group">
+            <label>Azienda</label>
+            <select id="implantsIncomingCompanyFilter" onchange="updateImplantsIncomingRegisterData()">
+              <option value="Tutte">Tutte</option>
+            </select>
+          </div>
+          <div class="report-filter-group">
+            <label>Periodo</label>
+            <select id="implantsIncomingPeriodFilter" onchange="updateImplantsIncomingRegisterData()">
+              <option value="7">Ultimi 7 giorni</option>
+              <option value="30" selected>Ultimi 30 giorni</option>
+              <option value="90">Ultimi 90 giorni</option>
+              <option value="365">Ultimo anno</option>
+              <option value="all">Tutto</option>
+            </select>
+          </div>
+          <div class="report-filter-group" style="margin-top:24px">
+            <button onclick="resetImplantsIncomingFilters()" style="padding:8px 16px;background:#d32f2f;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:600">Azzera Filtri</button>
+          </div>
+        </div>
+
+        <!-- Statistiche -->
+        <div class="report-stats">
+          <div class="report-stat">
+            <div class="report-stat-label">Totale Entrate</div>
+            <div class="report-stat-value" id="implantsIncomingTotalCount">0</div>
+          </div>
+          <div class="report-stat">
+            <div class="report-stat-label">Quantità Totale</div>
+            <div class="report-stat-value" id="implantsIncomingTotalQuantity">0</div>
+          </div>
+          <div class="report-stat">
+            <div class="report-stat-label">Ultimo Carico</div>
+            <div class="report-stat-value" id="implantsIncomingLastDate" style="font-size:16px">--</div>
+          </div>
+        </div>
+
+        <!-- Tabella Entrate -->
+        <h3 style="color:#003d7a;margin-bottom:12px">📋 Storico Carichi Impianti</h3>
+        <div class="report-table-container">
+          <table class="report-table">
+            <thead>
+              <tr>
+                <th>Data Ordine</th>
+                <th>Tipo</th>
+                <th>Azienda</th>
+                <th>Modello</th>
+                <th>Quantità</th>
+                <th>ID Impianto</th>
+              </tr>
+            </thead>
+            <tbody id="implantsIncomingRegisterTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
@@ -1181,7 +1346,8 @@
       const materials = loadFromLocalStorage();
       const item = materials.find(m=>m.id === id);
       if(item){
-        item.quantity = (item.quantity || 0) + delta;
+        const nextQuantity = (item.quantity || 0) + delta;
+        item.quantity = Math.max(0, nextQuantity);
         localStorage.setItem('magazzino_materials', JSON.stringify(materials));
       }
     }
@@ -1366,6 +1532,10 @@
     }
 
     function updateImplantQuantity(id, delta){
+      if(delta < 0){
+        showAlert('⚠️ Per ridurre la quantità degli impianti, usa il "Registro Uscite Impianti"', 'warn');
+        return;
+      }
       const implants = loadImplantsFromStorage();
       const item = implants.find(m=>m.id === id);
       if(item){
@@ -1398,6 +1568,41 @@
       if(firebaseReady && typeof db !== 'undefined'){
         db.collection('implants').doc(id).delete().catch(err => {
           console.warn('Firebase delete failed for implant:', err);
+        });
+      }
+      
+      renderImplantsList();
+    }
+
+    function editImplantExpiry(id){
+      const implants = loadImplantsFromStorage();
+      const implant = implants.find(i => i.id === id);
+      if(!implant) return;
+      
+      const currentExpiry = implant.expiry ? new Date(implant.expiry).toISOString().split('T')[0] : '';
+      const newExpiry = prompt('Inserisci data scadenza (YYYY-MM-DD). Lascia vuoto per rimuovere:', currentExpiry);
+      
+      if(newExpiry === null) return; // Annullato
+      
+      const expiryValue = (newExpiry || '').trim();
+      if(!expiryValue){
+        // Rimuovi scadenza
+        implant.expiry = null;
+      } else {
+        const parsed = new Date(expiryValue);
+        if(isNaN(parsed.getTime())){
+          showAlert('Data scadenza non valida. Usa formato YYYY-MM-DD.', 'warn');
+          return;
+        }
+        implant.expiry = parsed;
+      }
+      
+      saveImplantsToStorage(implants);
+      
+      // Sync to Firebase
+      if(firebaseReady && typeof db !== 'undefined'){
+        db.collection('implants').doc(id).update({ expiry: implant.expiry }).catch(err => {
+          console.warn('Firebase update failed for implant expiry:', err);
         });
       }
       
@@ -1456,21 +1661,21 @@
         const diameter = implant.diameter ? implant.diameter + ' mm' : '-';
         const length = implant.length ? implant.length + ' mm' : '-';
         
-        // Semaforo scadenza
+        // Semaforo scadenza (editabile)
         let statusHtml = '';
         if(!expiry){
-          statusHtml = '<span title="Nessuna scadenza" style="font-size:24px;cursor:help;">⚪</span>';
+          statusHtml = '<span onclick="editImplantExpiry(\''+implant.id+'\')" title="Clicca per impostare scadenza" style="font-size:24px;cursor:pointer;">⚪</span>';
         } else {
           const days = daysBetween(now, expiry);
           const mesi = days / 30.44;
           if(days < 0) {
-            statusHtml = '<span title="Scaduto il ' + expiry.toLocaleDateString() + '" style="font-size:24px;cursor:help;">🔴</span>';
+            statusHtml = '<span onclick="editImplantExpiry(\''+implant.id+'\')" title="Scaduto il ' + expiry.toLocaleDateString() + ' - Clicca per modificare" style="font-size:24px;cursor:pointer;">🔴</span>';
           } else if(mesi < 3) {
-            statusHtml = '<span title="Scade tra ' + days + ' giorni il ' + expiry.toLocaleDateString() + '" style="font-size:24px;cursor:help;">🔴</span>';
+            statusHtml = '<span onclick="editImplantExpiry(\''+implant.id+'\')" title="Scade tra ' + days + ' giorni il ' + expiry.toLocaleDateString() + ' - Clicca per modificare" style="font-size:24px;cursor:pointer;">🔴</span>';
           } else if(mesi < 6) {
-            statusHtml = '<span title="Scade tra ' + days + ' giorni il ' + expiry.toLocaleDateString() + '" style="font-size:24px;cursor:help;">🟡</span>';
+            statusHtml = '<span onclick="editImplantExpiry(\''+implant.id+'\')" title="Scade tra ' + days + ' giorni il ' + expiry.toLocaleDateString() + ' - Clicca per modificare" style="font-size:24px;cursor:pointer;">🟡</span>';
           } else {
-            statusHtml = '<span title="Scade tra ' + days + ' giorni il ' + expiry.toLocaleDateString() + '" style="font-size:24px;cursor:help;">🟢</span>';
+            statusHtml = '<span onclick="editImplantExpiry(\''+implant.id+'\')" title="Scade tra ' + days + ' giorni il ' + expiry.toLocaleDateString() + ' - Clicca per modificare" style="font-size:24px;cursor:pointer;">🟢</span>';
           }
         }
         
@@ -1496,8 +1701,6 @@
           <td data-label="Prezzo">€ ${Number(implant.price||0).toFixed(2)}</td>
           <td data-label="Quantità" style="text-align:center">${qtyBadge}</td>
           <td data-label="Azioni" style="white-space:nowrap">
-            <button class="btn-action btn-inc" onclick="updateImplantQuantity('${implant.id}', 1)" title="Aggiungi 1">+</button>
-            <button class="btn-action btn-dec" onclick="updateImplantQuantity('${implant.id}', -1)" title="Rimuovi 1">−</button>
             <button class="btn-action btn-del" onclick="deleteImplant('${implant.id}')" title="Elimina">×</button>
           </td>
         `;
@@ -1820,7 +2023,6 @@
       e.preventDefault();
       const name = toTitleCase(document.getElementById('matName').value.trim());
       const orderDate = document.getElementById('matOrderDate').value;
-      const expiry = document.getElementById('matExpiry').value;
       let price = parseFloat(document.getElementById('matPrice').value) || 0;
       const priceType = document.getElementById('matPriceType').value;
       const quantity = parseInt(document.getElementById('matQuantity').value,10) || 0;
@@ -1839,15 +2041,10 @@
       if (company === 'Other') {
         company = document.getElementById('matCompanyCustom').value.trim();
       }
-      let lowStockThreshold = document.getElementById('matLowStock').value;
-      if(lowStockThreshold === 'Other') {
-        lowStockThreshold = parseInt(document.getElementById('matLowStockCustom').value,10) || 2;
-      } else {
-        lowStockThreshold = parseInt(lowStockThreshold,10) || 2;
-      }
       const notifyDays = 30;
+      const lowStockThreshold = 2;
       
-      if(!name || !orderDate || !expiry || !category || !distributor) {
+      if(!name || !orderDate || !category || !distributor) {
         showAlert('Compila tutti i campi richiesti', 'warn');
         return;
       }
@@ -1855,7 +2052,7 @@
       const newData = {
         name, 
         orderDate: new Date(orderDate), 
-        expiry: new Date(expiry), 
+        expiry: null,
         price, 
         vatRate,
         quantity, 
@@ -1922,25 +2119,22 @@
       
       const expandBtnId = 'expand_' + doc.id;
       const batchDetailId = 'batch_' + doc.id;
+      const currentExpiryInput = expiry && !isNaN(expiry.getTime()) ? expiry.toISOString().split('T')[0] : '';
       
       tr.innerHTML = `
         <td data-label="Nome"><button class="batch-expand-btn" id="${expandBtnId}" style="margin-right:8px">▶</button><span class="editable-name" style="cursor:pointer;text-decoration:underline;">${escapeHtml(data.name)}</span></td>
         <td data-label="Data ordine">${orderDate ? orderDate.toLocaleDateString() : '-'}</td>
-        <td data-label="Scadenza" style="text-align:center;white-space:nowrap;">${statusHtml}</td>
+        <td data-label="Scadenza" style="text-align:center;white-space:nowrap;"><span class="editable-expiry" title="Modifica scadenza" style="cursor:pointer;text-decoration:underline;">${statusHtml}</span></td>
         <td data-label="Prezzo">€ ${Number(data.price).toFixed(2)}</td>
         <td data-label="Distributore">${escapeHtml(data.distributor||'-')}</td>
         <td data-label="Azienda">${escapeHtml(data.company||'-')}</td>
-        <td data-label="Quantità" style="text-align:center;">${lowBadge}</td>
+        <td data-label="Quantità" style="text-align:center;">${lowBadge}<div><span class="editable-threshold" title="Modifica soglia quantità" style="font-size:11px;color:#003d7a;cursor:pointer;text-decoration:underline;">Soglia: ${soglia}</span></div></td>
         <td data-label="Azioni" style="white-space:nowrap;padding:8px;">
-          <button data-id="${doc.id}" class="btn-action btn-inc" title="Aggiungi 1">+</button>
-          <button data-id="${doc.id}" class="btn-action btn-dec" title="Rimuovi 1">−</button>
           <button data-id="${doc.id}" class="btn-action btn-del" title="Elimina">×</button>
         </td>
       `;
       
       // attach actions
-      tr.querySelector('.btn-inc').addEventListener('click', (e)=>{e.preventDefault(); changeQuantity(doc.id, 1)});
-      tr.querySelector('.btn-dec').addEventListener('click', (e)=>{e.preventDefault(); changeQuantity(doc.id, -1)});
       tr.querySelector('.btn-del').addEventListener('click', (e)=>{e.preventDefault(); deleteItem(doc.id)});
       tr.querySelector('.editable-name').addEventListener('click', () => {
         const newName = prompt('Modifica nome materiale:', data.name);
@@ -1949,6 +2143,31 @@
           data.name = formattedName;
           updateMaterialFields(doc.id, { name: formattedName });
         }
+      });
+      tr.querySelector('.editable-expiry').addEventListener('click', () => {
+        const newExpiry = prompt('Inserisci data scadenza (YYYY-MM-DD). Lascia vuoto per rimuovere:', currentExpiryInput);
+        if (newExpiry === null) return;
+        const expiryValue = (newExpiry || '').trim();
+        if (!expiryValue) {
+          updateMaterialFields(doc.id, { expiry: null });
+          return;
+        }
+        const parsed = new Date(expiryValue);
+        if (isNaN(parsed.getTime())) {
+          showAlert('Data scadenza non valida. Usa formato YYYY-MM-DD.', 'warn');
+          return;
+        }
+        updateMaterialFields(doc.id, { expiry: parsed });
+      });
+      tr.querySelector('.editable-threshold').addEventListener('click', () => {
+        const newThresholdRaw = prompt('Inserisci soglia quantità minima (numero intero >= 1):', String(soglia));
+        if (newThresholdRaw === null) return;
+        const parsedThreshold = parseInt(newThresholdRaw, 10);
+        if (!Number.isInteger(parsedThreshold) || parsedThreshold < 1) {
+          showAlert('Soglia non valida. Inserisci un numero intero maggiore o uguale a 1.', 'warn');
+          return;
+        }
+        updateMaterialFields(doc.id, { lowStockThreshold: parsedThreshold });
       });
       
       // Expand button per batch
@@ -2022,6 +2241,10 @@
     function escapeHtml(s){ if(!s) return ''; return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[c])); }
 
     function changeQuantity(id, delta){
+      if(delta < 0){
+        showAlert('Le uscite sono gestite solo dal Registro Consumi.', 'warn');
+        return;
+      }
       updateQuantityLocalStorage(id, delta);
       loadMaterialsFromStorage(); // aggiorna subito la UI
       // Prova a sincronizzare su Firebase (opzionale)
@@ -2874,7 +3097,6 @@
       if(length === 'Other') length = document.getElementById('implantLengthCustom').value;
       
       const orderDate = document.getElementById('implantOrderDate').value;
-      const expiry = document.getElementById('implantExpiry').value;
       const price = parseFloat(document.getElementById('implantPrice').value) || 0;
       const quantity = parseInt(document.getElementById('implantQuantity').value, 10) || 0;
 
@@ -2886,7 +3108,7 @@
         diameter: diameter || null,
         length: length || null,
         orderDate: new Date(orderDate),
-        expiry: expiry ? new Date(expiry) : null,
+        expiry: null,
         price,
         quantity,
         createdAt: new Date()
@@ -3113,6 +3335,143 @@
       updateReportData();
     }
 
+    // ===== INCOMING REGISTER FUNCTIONS =====
+    function openIncomingRegisterModal() {
+      const modal = document.getElementById('incomingRegisterModal');
+      modal.classList.add('active');
+      setTimeout(() => initIncomingRegisterFilters(), 100);
+    }
+
+    function closeIncomingRegisterModal() {
+      const modal = document.getElementById('incomingRegisterModal');
+      modal.classList.remove('active');
+    }
+
+    function initIncomingRegisterFilters() {
+      const materials = loadFromLocalStorage();
+      
+      // Popola categorie
+      const categories = Array.from(new Set(materials.map(m => m.category).filter(c => c))).sort();
+      const categorySelect = document.getElementById('incomingCategoryFilter');
+      categorySelect.innerHTML = '<option value="Tutti">Tutti</option>';
+      categories.forEach(cat => {
+        const opt = document.createElement('option');
+        opt.value = cat;
+        opt.textContent = cat;
+        categorySelect.appendChild(opt);
+      });
+
+      // Popola distributori
+      const distributors = Array.from(new Set(materials.map(m => m.distributor).filter(d => d))).sort();
+      const distributorSelect = document.getElementById('incomingDistributorFilter');
+      distributorSelect.innerHTML = '<option value="Tutti">Tutti</option>';
+      distributors.forEach(dist => {
+        const opt = document.createElement('option');
+        opt.value = dist;
+        opt.textContent = dist;
+        distributorSelect.appendChild(opt);
+      });
+
+      updateIncomingRegisterData();
+    }
+
+    function getFilteredIncomingData() {
+      const materials = loadFromLocalStorage();
+      const categoryFilter = document.getElementById('incomingCategoryFilter').value;
+      const distributorFilter = document.getElementById('incomingDistributorFilter').value;
+      const periodFilter = parseInt(document.getElementById('incomingPeriodFilter').value);
+
+      // Estrai tutti i batch da tutti i materiali
+      let allBatches = [];
+      materials.forEach(m => {
+        if (m.batches && Array.isArray(m.batches)) {
+          m.batches.forEach(batch => {
+            allBatches.push({
+              materialName: m.name,
+              category: m.category,
+              distributor: m.distributor,
+              orderDate: batch.dataOrdine,
+              quantity: batch.originalQuantita || batch.quantita,
+              batchId: batch.id,
+              type: batch.type === 'order' ? 'Ordine' : 'Materiale'
+            });
+          });
+        }
+      });
+
+      // Filtra per categoria e distributore
+      allBatches = allBatches.filter(b => {
+        if (categoryFilter !== 'Tutti' && b.category !== categoryFilter) return false;
+        if (distributorFilter !== 'Tutti' && b.distributor !== distributorFilter) return false;
+        return true;
+      });
+
+      // Filtra per periodo
+      if (periodFilter !== -1 && periodFilter !== 'all') {
+        const cutoffDate = new Date();
+        cutoffDate.setDate(cutoffDate.getDate() - periodFilter);
+        allBatches = allBatches.filter(b => {
+          const batchDate = new Date(b.orderDate);
+          return batchDate >= cutoffDate;
+        });
+      }
+
+      // Ordina per data (più recenti prima)
+      allBatches.sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate));
+
+      return allBatches;
+    }
+
+    function updateIncomingRegisterData() {
+      const filtered = getFilteredIncomingData();
+      
+      // Calcola statistiche
+      const totalCount = filtered.length;
+      const totalQuantity = filtered.reduce((sum, b) => sum + (b.quantity || 0), 0);
+      const lastDate = filtered.length > 0 ? formatDate(filtered[0].orderDate) : '--';
+
+      document.getElementById('incomingTotalCount').textContent = totalCount;
+      document.getElementById('incomingTotalQuantity').textContent = totalQuantity;
+      document.getElementById('incomingLastDate').textContent = lastDate;
+
+      // Aggiorna tabella
+      updateIncomingRegisterTable(filtered);
+    }
+
+    function updateIncomingRegisterTable(filtered) {
+      const tbody = document.getElementById('incomingRegisterTableBody');
+      tbody.innerHTML = '';
+
+      filtered.forEach(b => {
+        const orderDate = formatDate(b.orderDate);
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${orderDate}</td>
+          <td>${b.category || '--'}</td>
+          <td>${b.materialName || '--'}</td>
+          <td>${b.distributor || '--'}</td>
+          <td>${b.quantity || 0}</td>
+          <td style="font-family:monospace;font-size:12px">${b.batchId ? b.batchId.substring(0, 8) : '--'}</td>
+          <td>${b.type || '--'}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      // Se nessun risultato
+      if (filtered.length === 0) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = '<td colspan="7" style="text-align:center;color:#999;padding:20px">Nessuna entrata trovata</td>';
+        tbody.appendChild(tr);
+      }
+    }
+
+    function resetIncomingFilters() {
+      document.getElementById('incomingCategoryFilter').value = 'Tutti';
+      document.getElementById('incomingDistributorFilter').value = 'Tutti';
+      document.getElementById('incomingPeriodFilter').value = '30';
+      updateIncomingRegisterData();
+    }
+
     // ===== IMPLANTS REPORT FUNCTIONS =====
     let implantsReportCharts = { trend: null, distribution: null };
 
@@ -3301,6 +3660,139 @@
       updateImplantsReportData();
     }
 
+    // ===== IMPLANTS INCOMING REGISTER FUNCTIONS =====
+    function openImplantsIncomingRegisterModal() {
+      const modal = document.getElementById('implantsIncomingRegisterModal');
+      modal.classList.add('active');
+      setTimeout(() => initImplantsIncomingRegisterFilters(), 100);
+    }
+
+    function closeImplantsIncomingRegisterModal() {
+      const modal = document.getElementById('implantsIncomingRegisterModal');
+      modal.classList.remove('active');
+    }
+
+    function initImplantsIncomingRegisterFilters() {
+      const implants = loadImplantsFromStorage();
+      
+      // Popola tipi
+      const types = Array.from(new Set(implants.map(i => i.type).filter(t => t))).sort();
+      const typeSelect = document.getElementById('implantsIncomingTypeFilter');
+      typeSelect.innerHTML = '<option value="Tutti">Tutti</option>';
+      types.forEach(type => {
+        const opt = document.createElement('option');
+        opt.value = type;
+        opt.textContent = type;
+        typeSelect.appendChild(opt);
+      });
+
+      // Popola aziende
+      const companies = Array.from(new Set(implants.map(i => i.company).filter(c => c))).sort();
+      const companySelect = document.getElementById('implantsIncomingCompanyFilter');
+      companySelect.innerHTML = '<option value="Tutte">Tutte</option>';
+      companies.forEach(comp => {
+        const opt = document.createElement('option');
+        opt.value = comp;
+        opt.textContent = comp;
+        companySelect.appendChild(opt);
+      });
+
+      updateImplantsIncomingRegisterData();
+    }
+
+    function getFilteredImplantsIncomingData() {
+      const implants = loadImplantsFromStorage();
+      const typeFilter = document.getElementById('implantsIncomingTypeFilter').value;
+      const companyFilter = document.getElementById('implantsIncomingCompanyFilter').value;
+      const periodFilter = document.getElementById('implantsIncomingPeriodFilter').value;
+
+      // Ogni impianto è un'entrata a sé
+      let allEntries = implants.map(i => ({
+        implantId: i.id,
+        type: i.type,
+        company: i.company,
+        model: i.model || i.kitComponents || '--',
+        orderDate: i.orderDate,
+        quantity: i.quantity,
+        createdAt: i.createdAt || i.orderDate
+      }));
+
+      // Filtra per tipo e azienda
+      allEntries = allEntries.filter(e => {
+        if (typeFilter !== 'Tutti' && e.type !== typeFilter) return false;
+        if (companyFilter !== 'Tutte' && e.company !== companyFilter) return false;
+        return true;
+      });
+
+      // Filtra per periodo
+      if (periodFilter !== 'all') {
+        const cutoffDate = new Date();
+        cutoffDate.setDate(cutoffDate.getDate() - parseInt(periodFilter));
+        allEntries = allEntries.filter(e => {
+          const entryDate = e.orderDate ? new Date(e.orderDate) : new Date(e.createdAt);
+          return entryDate >= cutoffDate;
+        });
+      }
+
+      // Ordina per data (più recenti prima)
+      allEntries.sort((a, b) => {
+        const dateA = a.orderDate ? new Date(a.orderDate) : new Date(a.createdAt);
+        const dateB = b.orderDate ? new Date(b.orderDate) : new Date(b.createdAt);
+        return dateB - dateA;
+      });
+
+      return allEntries;
+    }
+
+    function updateImplantsIncomingRegisterData() {
+      const filtered = getFilteredImplantsIncomingData();
+      
+      // Calcola statistiche
+      const totalCount = filtered.length;
+      const totalQuantity = filtered.reduce((sum, e) => sum + (e.quantity || 0), 0);
+      const lastDate = filtered.length > 0 ? formatDate(filtered[0].orderDate || filtered[0].createdAt) : '--';
+
+      document.getElementById('implantsIncomingTotalCount').textContent = totalCount;
+      document.getElementById('implantsIncomingTotalQuantity').textContent = totalQuantity;
+      document.getElementById('implantsIncomingLastDate').textContent = lastDate;
+
+      // Aggiorna tabella
+      updateImplantsIncomingRegisterTable(filtered);
+    }
+
+    function updateImplantsIncomingRegisterTable(filtered) {
+      const tbody = document.getElementById('implantsIncomingRegisterTableBody');
+      tbody.innerHTML = '';
+
+      filtered.forEach(e => {
+        const orderDate = formatDate(e.orderDate || e.createdAt);
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${orderDate}</td>
+          <td>${e.type || '--'}</td>
+          <td>${e.company || '--'}</td>
+          <td>${e.model}</td>
+          <td>${e.quantity || 0}</td>
+          <td style="font-family:monospace;font-size:12px">${e.implantId ? e.implantId.substring(0, 8) : '--'}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      // Se nessun risultato
+      if (filtered.length === 0) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = '<td colspan="6" style="text-align:center;color:#999;padding:20px">Nessuna entrata trovata</td>';
+        tbody.appendChild(tr);
+      }
+    }
+
+    function resetImplantsIncomingFilters() {
+      document.getElementById('implantsIncomingTypeFilter').value = 'Tutti';
+      document.getElementById('implantsIncomingCompanyFilter').value = 'Tutte';
+      document.getElementById('implantsIncomingPeriodFilter').value = '30';
+      updateImplantsIncomingRegisterData();
+    }
+
     // ===== NUOVO ORDINE FUNCTIONS =====
     let orderArticles = [];
 
@@ -3376,13 +3868,10 @@
       const distInput = document.getElementById('matDistributorCustom');
       const companySelect = document.getElementById('matCompany');
       const companyInput = document.getElementById('matCompanyCustom');
-      const lowStockSelect = document.getElementById('matLowStock');
-      const lowStockInput = document.getElementById('matLowStockCustom');
-      if (!distSelect || !distInput || !companySelect || !companyInput || !lowStockSelect || !lowStockInput) return;
+      if (!distSelect || !distInput || !companySelect || !companyInput) return;
 
       const distGroup = distSelect.closest('.material-form-group');
       const companyGroup = companySelect.closest('.material-form-group');
-      const lowStockGroup = lowStockSelect.closest('.material-form-group');
 
       distSelect.onchange = () => {
         if (distSelect.value === 'Other') {
@@ -3404,20 +3893,8 @@
         }
       };
 
-      lowStockSelect.onchange = () => {
-        if (lowStockSelect.value === 'Other') {
-          if (lowStockGroup) lowStockGroup.classList.add('custom-open');
-          lowStockInput.required = true;
-        } else {
-          if (lowStockGroup) lowStockGroup.classList.remove('custom-open');
-          lowStockInput.required = false;
-          lowStockInput.value = '';
-        }
-      };
-
       distSelect.onchange();
       companySelect.onchange();
-      lowStockSelect.onchange();
     }
 
     function openOrderModal() {
