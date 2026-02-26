@@ -136,10 +136,27 @@
     .alerts-settings-group input{padding:9px 12px;border:1px solid #d0dce6;border-radius:6px;font-size:14px}
     .alerts-settings-btn{padding:10px 14px;background:#0066cc;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:600}
     .alerts-settings-btn:hover{background:#0052a3}
+    .main-dashboard-row{display:flex;gap:12px;align-items:stretch;justify-content:space-between;flex-wrap:wrap}
+    .main-dashboard-group{display:flex;gap:12px;align-items:stretch;flex-wrap:wrap}
+    .main-dashboard-btn{width:230px !important;height:88px !important;padding:12px 16px !important;border-radius:8px !important;box-sizing:border-box;font-size:15px !important;font-weight:600 !important;display:flex !important;align-items:center !important;justify-content:center !important;gap:6px;line-height:1.15;text-align:center;white-space:normal}
+    .main-dashboard-btn .alerts-report-badge{margin-left:8px}
+    .active-status-icon{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:999px;background:linear-gradient(135deg,#ffd54f 0%,#ffb300 100%);color:#5d4037;font-weight:800;font-size:14px;line-height:1;box-shadow:0 1px 4px rgba(255,179,0,0.35)}
+    .main-dashboard-row.top-row{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));align-items:stretch}
+    .main-dashboard-row.top-row > .main-dashboard-group{display:contents}
+    .main-dashboard-row.top-row .main-dashboard-btn{width:100% !important;min-width:0}
 
     @media (max-width:1200px){
       .report-content{grid-template-columns:1fr}
       .report-chart-container{height:350px}
+      .main-dashboard-btn{width:210px !important}
+      .main-dashboard-row.top-row{grid-template-columns:repeat(4,minmax(0,1fr))}
+    }
+
+    @media (max-width:900px){
+      .main-dashboard-row,.main-dashboard-group{justify-content:center}
+      .main-dashboard-btn{width:100% !important;max-width:320px;height:72px !important}
+      .main-dashboard-row.top-row{display:flex}
+      .main-dashboard-row.top-row > .main-dashboard-group{display:flex}
     }
 
     /* Consumption Modal Styles */
@@ -424,33 +441,33 @@
     <!-- Pulsanti Principali -->
     <div style="background:linear-gradient(135deg,#f0f4f8 0%,#fff 100%);padding:18px 20px;border-radius:10px;border:1px solid #e0e8f0;box-shadow:0 2px 6px rgba(0,61,122,0.05);margin-bottom:20px">
       <!-- Prima fila: Aggiungi a sinistra, Analisi e Consumo a destra -->
-      <div style="display:flex;gap:12px;align-items:center;justify-content:space-between;margin-bottom:14px">
-        <button onclick="openAddSelectionModal()" style="background:linear-gradient(135deg,#1976d2 0%,#0d47a1 100%);color:#fff;padding:12px 20px;font-size:15px;border:none;border-radius:8px;cursor:pointer;font-weight:600;box-shadow:0 4px 12px rgba(25,118,210,0.35);transition:all 0.2s;display:flex;align-items:center;gap:6px">
+      <div class="main-dashboard-row top-row" style="margin-bottom:14px">
+        <button class="main-dashboard-btn" onclick="openAddSelectionModal()" style="background:linear-gradient(135deg,#1976d2 0%,#0d47a1 100%);color:#fff;padding:12px 20px;font-size:15px;border:none;border-radius:8px;cursor:pointer;font-weight:600;box-shadow:0 4px 12px rgba(25,118,210,0.35);transition:all 0.2s;display:flex;align-items:center;gap:6px">
           ➕ Aggiungi Nuovo Materiale/Ordine
         </button>
 
-        <div style="display:flex;gap:12px;align-items:center">
-          <button onclick="openReportModal()" style="background:linear-gradient(135deg,#1976d2 0%,#0d47a1 100%);color:#fff;padding:12px 20px;font-size:15px;border:none;border-radius:8px;cursor:pointer;font-weight:600;box-shadow:0 4px 12px rgba(13,71,161,0.35);transition:all 0.2s;display:flex;align-items:center;gap:6px">
+        <div class="main-dashboard-group">
+          <button class="main-dashboard-btn" onclick="openReportModal()" style="background:linear-gradient(135deg,#1976d2 0%,#0d47a1 100%);color:#fff;padding:12px 20px;font-size:15px;border:none;border-radius:8px;cursor:pointer;font-weight:600;box-shadow:0 4px 12px rgba(13,71,161,0.35);transition:all 0.2s;display:flex;align-items:center;gap:6px">
             📊 Analisi Spese
           </button>
 
-          <button onclick="openConsumptionModal()" style="background:linear-gradient(135deg,#f57c00 0%,#e65100 100%);color:#fff;padding:12px 20px;font-size:15px;border:none;border-radius:8px;cursor:pointer;font-weight:600;box-shadow:0 4px 12px rgba(230,81,0,0.35);transition:all 0.2s;display:flex;align-items:center;gap:6px">
+          <button class="main-dashboard-btn" onclick="openConsumptionModal()" style="background:linear-gradient(135deg,#f57c00 0%,#e65100 100%);color:#fff;padding:12px 20px;font-size:15px;border:none;border-radius:8px;cursor:pointer;font-weight:600;box-shadow:0 4px 12px rgba(230,81,0,0.35);transition:all 0.2s;display:flex;align-items:center;gap:6px">
             📉 Registra Consumo
           </button>
 
-          <button onclick="openIncomingRegisterModal()" style="background:linear-gradient(135deg,#43a047 0%,#2e7d32 100%);color:#fff;padding:12px 20px;font-size:15px;border:none;border-radius:8px;cursor:pointer;font-weight:600;box-shadow:0 4px 12px rgba(67,160,71,0.35);transition:all 0.2s;display:flex;align-items:center;gap:6px">
+          <button class="main-dashboard-btn" onclick="openIncomingRegisterModal()" style="background:linear-gradient(135deg,#43a047 0%,#2e7d32 100%);color:#fff;padding:12px 20px;font-size:15px;border:none;border-radius:8px;cursor:pointer;font-weight:600;box-shadow:0 4px 12px rgba(67,160,71,0.35);transition:all 0.2s;display:flex;align-items:center;gap:6px">
             📥 Registro Entrate
           </button>
 
-          <button onclick="openActiveUsageModal()" style="background:linear-gradient(135deg,#fbc02d 0%,#f9a825 100%);color:#3e2723;padding:12px 20px;font-size:15px;border:none;border-radius:8px;cursor:pointer;font-weight:600;box-shadow:0 4px 12px rgba(249,168,37,0.35);transition:all 0.2s;display:flex;align-items:center;gap:6px">
-            🟡 Magazzino Attivo
+          <button class="main-dashboard-btn" onclick="openActiveUsageModal()" style="background:linear-gradient(135deg,#fbc02d 0%,#f9a825 100%);color:#fff;padding:12px 20px;font-size:15px;border:none;border-radius:8px;cursor:pointer;font-weight:600;box-shadow:0 4px 12px rgba(249,168,37,0.35);transition:all 0.2s;display:flex;align-items:center;gap:6px">
+            <span class="active-status-icon">⚡</span> Magazzino Attivo
           </button>
 
-          <button onclick="openOutgoingRegisterModal()" style="background:linear-gradient(135deg,#e53935 0%,#b71c1c 100%);color:#fff;padding:12px 20px;font-size:15px;border:none;border-radius:8px;cursor:pointer;font-weight:600;box-shadow:0 4px 12px rgba(183,28,28,0.35);transition:all 0.2s;display:flex;align-items:center;gap:6px">
+          <button class="main-dashboard-btn" onclick="openOutgoingRegisterModal()" style="background:linear-gradient(135deg,#e53935 0%,#b71c1c 100%);color:#fff;padding:12px 20px;font-size:15px;border:none;border-radius:8px;cursor:pointer;font-weight:600;box-shadow:0 4px 12px rgba(183,28,28,0.35);transition:all 0.2s;display:flex;align-items:center;gap:6px">
             📤 Registro Uscite
           </button>
 
-          <button id="alertsReportBtn" onclick="openAlertsReportModal()" style="background:linear-gradient(135deg,#f57c00 0%,#e65100 100%);color:#fff;padding:12px 20px;font-size:15px;border:none;border-radius:8px;cursor:pointer;font-weight:600;box-shadow:0 4px 12px rgba(230,81,0,0.35);transition:all 0.2s;display:flex;align-items:center;gap:6px">
+          <button id="alertsReportBtn" class="main-dashboard-btn" onclick="openAlertsReportModal()" style="background:linear-gradient(135deg,#f57c00 0%,#e65100 100%);color:#fff;padding:12px 20px;font-size:15px;border:none;border-radius:8px;cursor:pointer;font-weight:600;box-shadow:0 4px 12px rgba(230,81,0,0.35);transition:all 0.2s;display:flex;align-items:center;gap:6px">
             🧾 Report Avvisi <span id="alertsReportCount" class="alerts-report-badge">0</span>
           </button>
         </div>
@@ -653,7 +670,7 @@
         <button class="action-menu-btn" onclick="openImplantsReportModal()" style="background-color:#1976d2">📊 Analisi Spese Impianti</button>
         <button class="action-menu-btn" onclick="openImplantsIncomingRegisterModal()" style="background-color:#43a047">📥 Registro Entrate Impianti</button>
         <button class="action-menu-btn" onclick="openImplantConsumptionModal()" style="background-color:#f57c00">📉 Registra Consumo Impianti</button>
-        <button class="action-menu-btn" onclick="openActiveImplantsUsageModal()" style="background-color:#fbc02d;color:#3e2723;font-weight:700">🟡 Magazzino Attivo Impianti</button>
+        <button class="action-menu-btn" onclick="openActiveImplantsUsageModal()" style="background-color:#fbc02d;color:#fff;font-weight:700"><span class="active-status-icon">⚡</span> Magazzino Attivo Impianti</button>
         <button class="action-menu-btn" onclick="openImplantsOutgoingRegisterModal()" style="background-color:#e53935">📤 Registro Uscite Impianti</button>
         <div id="implantsMenu" class="action-menu" style="display:none;position:absolute;background:white;border:1px solid #ddd;border-radius:8px;box-shadow:0 4px 8px rgba(0,0,0,0.1);z-index:100;min-width:250px;top:40px;left:0">
           <button class="menu-item" onclick="downloadImplantsPDF()">📄 Scarica PDF Impianti</button>
@@ -978,7 +995,7 @@
   <div id="activeUsageModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:10000;overflow-y:auto;padding:20px">
     <div class="report-modal-content">
       <div class="report-header" style="background:linear-gradient(135deg,#fbc02d 0%,#f9a825 100%);color:#3e2723">
-        <h2>🟡 Magazzino Attivo (Materiali in uso)</h2>
+        <h2><span class="active-status-icon">⚡</span> Magazzino Attivo (Materiali in uso)</h2>
         <button class="report-close" onclick="closeActiveUsageModal()" style="border-color:#3e2723;color:#3e2723">×</button>
       </div>
       <div class="report-body">
@@ -1543,7 +1560,7 @@
   <div id="activeImplantsUsageModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:10000;overflow-y:auto;padding:20px">
     <div class="report-modal-content">
       <div class="report-header" style="background:linear-gradient(135deg,#fbc02d 0%,#f9a825 100%);color:#3e2723">
-        <h2>🟡 Magazzino Attivo Impianti</h2>
+        <h2><span class="active-status-icon">⚡</span> Magazzino Attivo Impianti</h2>
         <button class="report-close" onclick="closeActiveImplantsUsageModal()" style="border-color:#3e2723;color:#3e2723">×</button>
       </div>
       <div class="report-body">
