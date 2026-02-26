@@ -96,6 +96,8 @@
     #incomingRegisterModal.active{display:flex;align-items:flex-start;justify-content:center}
     #implantsIncomingRegisterModal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:10000;overflow-y:auto;padding:20px}
     #implantsIncomingRegisterModal.active{display:flex;align-items:flex-start;justify-content:center}
+    #alertsReportModal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:10000;overflow-y:auto;padding:20px}
+    #alertsReportModal.active{display:flex;align-items:flex-start;justify-content:center}
     .report-modal-content{background:#fff;border-radius:12px;max-width:1400px;width:100%;margin:20px auto;box-shadow:0 8px 32px rgba(0,0,0,0.3)}
     .report-header{background:linear-gradient(135deg,#0066cc 0%,#003d7a 100%);color:#fff;padding:20px;border-radius:12px 12px 0 0;display:flex;justify-content:space-between;align-items:center}
     .report-header h2{margin:0;font-size:22px}
@@ -118,6 +120,22 @@
     .report-stat{background:linear-gradient(135deg,#e3f2fd 0%,#f3f8ff 100%);padding:16px;border-radius:8px;border-left:4px solid #0066cc}
     .report-stat-label{font-size:12px;color:#003d7a;font-weight:600}
     .report-stat-value{font-size:24px;font-weight:700;color:#0066cc;margin-top:8px}
+    .alerts-report-empty{padding:14px 16px;border-radius:8px;background:#e8f5e9;color:#1b5e20;font-weight:600;margin-bottom:14px}
+    .alerts-report-empty.warn{background:#fff3e0;color:#e65100}
+    .alerts-report-badge{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:22px;padding:0 7px;background:#d32f2f;color:#fff;border-radius:999px;font-size:12px;font-weight:700}
+    .severity-badge{display:inline-block;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:700}
+    .severity-badge.critical{background:#ffebee;color:#c62828}
+    .severity-badge.warning{background:#fff3e0;color:#e65100}
+    .alerts-criteria{background:#f5f8fb;border:1px solid #e0e8f0;border-radius:8px;padding:14px 16px;margin-bottom:14px;color:#2c3e50;font-size:13px}
+    .alerts-criteria strong{color:#003d7a}
+    .alerts-criteria ul{margin:6px 0 0 18px}
+    .alerts-criteria li{margin:4px 0}
+    .alerts-settings{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;background:#f0f4f8;border:1px solid #e0e8f0;border-radius:8px;padding:14px 16px;margin-bottom:14px}
+    .alerts-settings-group{display:flex;flex-direction:column;gap:6px;min-width:220px}
+    .alerts-settings-group label{font-size:12px;font-weight:700;color:#003d7a;text-transform:uppercase;letter-spacing:0.4px}
+    .alerts-settings-group input{padding:9px 12px;border:1px solid #d0dce6;border-radius:6px;font-size:14px}
+    .alerts-settings-btn{padding:10px 14px;background:#0066cc;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:600}
+    .alerts-settings-btn:hover{background:#0052a3}
 
     @media (max-width:1200px){
       .report-content{grid-template-columns:1fr}
@@ -280,6 +298,7 @@
     .batch-card-header{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;font-size:13px}
     .batch-card-header strong{color:#003d7a}
     .batch-card-header .expiry-status{font-weight:600;padding:2px 6px;border-radius:3px}
+    .material-price-col{display:none !important}
     .expiry-ok{background:#c8e6c9;color:#2e7d32}
     .expiry-warn{background:#ffe0b2;color:#e65100}
     .expiry-critical{background:#ffcdd2;color:#c62828}
@@ -388,7 +407,7 @@
         <li>Un materiale/impianto è scaduto o sta per scadere tra 30 giorni</li>
         <li>La quantità del materiale raggiunge il valore soglia impostato</li>
       </ul>
-      Le notifiche compaiono in alto nella pagina ogni volta che si verifica una di queste condizioni.
+      Gli avvisi sono consultabili in <strong>Report Avvisi</strong> per avere tutto in un'unica vista.
     </div>
 
     <!-- Pulsanti Principali -->
@@ -410,6 +429,10 @@
 
           <button onclick="openIncomingRegisterModal()" style="background:linear-gradient(135deg,#43a047 0%,#2e7d32 100%);color:#fff;padding:12px 20px;font-size:15px;border:none;border-radius:8px;cursor:pointer;font-weight:600;box-shadow:0 4px 12px rgba(67,160,71,0.35);transition:all 0.2s;display:flex;align-items:center;gap:6px">
             📥 Registro Entrate
+          </button>
+
+          <button id="alertsReportBtn" onclick="openAlertsReportModal()" style="background:linear-gradient(135deg,#f57c00 0%,#e65100 100%);color:#fff;padding:12px 20px;font-size:15px;border:none;border-radius:8px;cursor:pointer;font-weight:600;box-shadow:0 4px 12px rgba(230,81,0,0.35);transition:all 0.2s;display:flex;align-items:center;gap:8px">
+            🧾 Report Avvisi <span id="alertsReportCount" class="alerts-report-badge">0</span>
           </button>
         </div>
       </div>
@@ -487,7 +510,7 @@
     <div class="table-wrapper">
       <table>
         <thead>
-          <tr><th>Nome</th><th>Data ordine</th><th style="text-align:center;">Scadenza</th><th>Prezzo</th><th>Distributore</th><th>Azienda</th><th style="text-align:center;">Quantità</th><th>Azioni</th></tr>
+          <tr><th>Nome</th><th>Data ordine</th><th style="text-align:center;">Scadenza</th><th class="material-price-col">Prezzo</th><th>Distributore</th><th>Azienda</th><th style="text-align:center;">Quantità</th><th>Azioni</th></tr>
         </thead>
         <tbody id="list"></tbody>
       </table>
@@ -783,10 +806,10 @@
             <label>Periodo</label>
             <select id="incomingPeriodFilter" onchange="updateIncomingRegisterData()">
               <option value="7">Ultimi 7 giorni</option>
-              <option value="30" selected>Ultimi 30 giorni</option>
+              <option value="30">Ultimi 30 giorni</option>
               <option value="90">Ultimi 90 giorni</option>
               <option value="365">Ultimo anno</option>
-              <option value="all">Tutto</option>
+              <option value="all" selected>Tutto</option>
             </select>
           </div>
           <div class="report-filter-group" style="margin-top:24px">
@@ -861,7 +884,7 @@
       </div>
       <div class="material-body">
         <form id="materialForm" class="material-form">
-          <div class="material-form-group"><label for="matName">Nome materiale</label><input id="matName" placeholder="Es. Cemento composito" required /></div>
+          <div class="material-form-group"><label for="matName">Nome materiale</label><input id="matName" list="matNameSuggestions" placeholder="Es. Cemento composito" required autocomplete="off" /><datalist id="matNameSuggestions"></datalist></div>
           <div class="material-form-group"><label for="matOrderDate">📅 Data Ordine</label><input id="matOrderDate" type="date" required /></div>
           <div class="material-form-group"><label for="matExpiry">⏰ Data Scadenza (gestita dal magazzino)</label><input id="matExpiry" type="date" /></div>
           <div class="material-form-group"><label for="matPrice">Prezzo (€)</label><input id="matPrice" type="number" step="0.01" placeholder="0.00" /></div>
@@ -1000,10 +1023,10 @@
       <div class="consumption-body">
         <form class="consumption-form" id="consumptionForm">
           <div class="consumption-group">
-            <label for="consumptionMaterial">Materiale</label>
-            <select id="consumptionMaterial" required onchange="updateConsumptionPreview()">
-              <option value="">-- Seleziona materiale --</option>
-            </select>
+            <label for="consumptionMaterialSearch">Materiale</label>
+            <input id="consumptionMaterialSearch" type="text" list="consumptionMaterialList" placeholder="Scrivi il nome materiale..." autocomplete="off" required oninput="updateConsumptionPreview()" onchange="updateConsumptionPreview()" />
+            <datalist id="consumptionMaterialList"></datalist>
+            <input id="consumptionMaterial" type="hidden" />
           </div>
 
           <div class="consumption-group">
@@ -1016,9 +1039,9 @@
             <input id="consumptionDate" type="date" required onchange="updateConsumptionPreview()" />
           </div>
 
-          <!-- Preview FIFO -->
+          <!-- Preview FEFO -->
           <div class="consumption-preview">
-            <div class="consumption-preview-title">📋 Preview Riduzione FIFO</div>
+            <div class="consumption-preview-title">📋 Preview Riduzione FEFO</div>
             <div id="consumptionPreviewContent" style="color:#666;font-size:13px;padding:8px">
               Seleziona un materiale per visualizzare anteprima...
             </div>
@@ -1194,6 +1217,90 @@
     </div>
   </div>
 
+  <!-- Report Avvisi Modal -->
+  <div id="alertsReportModal">
+    <div class="report-modal-content" style="max-width:1100px">
+      <div class="report-header" style="background:linear-gradient(135deg,#f57c00 0%,#e65100 100%)">
+        <h2>🧾 Report Avvisi</h2>
+        <button class="report-close" onclick="closeAlertsReportModal()">×</button>
+      </div>
+      <div class="report-body">
+        <div class="report-stats">
+          <div class="report-stat" style="border-left-color:#d32f2f">
+            <div class="report-stat-label">Totale Avvisi</div>
+            <div class="report-stat-value" id="alertsReportTotal">0</div>
+          </div>
+          <div class="report-stat" style="border-left-color:#0066cc">
+            <div class="report-stat-label">Avvisi Materiali</div>
+            <div class="report-stat-value" id="alertsReportMaterials">0</div>
+          </div>
+          <div class="report-stat" style="border-left-color:#2e7d32">
+            <div class="report-stat-label">Avvisi Implantare</div>
+            <div class="report-stat-value" id="alertsReportImplants">0</div>
+          </div>
+          <div class="report-stat" style="border-left-color:#c62828">
+            <div class="report-stat-label">Critici</div>
+            <div class="report-stat-value" id="alertsReportCritical">0</div>
+          </div>
+        </div>
+
+        <div class="alerts-settings">
+          <div class="alerts-settings-group">
+            <label for="alertsExpiryDaysInput">Giorni avviso scadenza</label>
+            <input id="alertsExpiryDaysInput" type="number" min="1" max="365" value="30" />
+          </div>
+          <div class="alerts-settings-group">
+            <label for="alertsImplantLowQtyInput">Soglia quantità bassa implantare</label>
+            <input id="alertsImplantLowQtyInput" type="number" min="1" max="99" value="2" />
+          </div>
+          <button class="alerts-settings-btn" onclick="saveAlertsSettings()">Salva soglie avvisi</button>
+        </div>
+
+        <div class="alerts-criteria">
+          <strong>Definizione livelli avviso</strong>
+          <ul>
+            <li><strong>Critico (Materiali):</strong> scadenza già passata oppure quantità sotto la soglia impostata.</li>
+            <li><strong>Attenzione (Materiali):</strong> scadenza entro <span id="alertsCriteriaDays">30</span> giorni oppure quantità uguale alla soglia.</li>
+            <li><strong>Critico (Implantare):</strong> scadenza già passata oppure quantità esaurita (0).</li>
+            <li><strong>Attenzione (Implantare):</strong> scadenza entro <span id="alertsCriteriaDaysImplants">30</span> giorni oppure quantità bassa (1-<span id="alertsCriteriaImplantQty">2</span>).</li>
+          </ul>
+        </div>
+
+        <div id="alertsReportEmpty" class="alerts-report-empty">✅ Nessun avviso attivo al momento.</div>
+
+        <h3 style="color:#003d7a;margin-bottom:10px">📦 Avvisi Magazzino Materiali</h3>
+        <div class="report-table-container">
+          <table class="report-table">
+            <thead>
+              <tr>
+                <th>Livello</th>
+                <th>Elemento</th>
+                <th>Tipo Avviso</th>
+                <th>Dettaglio</th>
+              </tr>
+            </thead>
+            <tbody id="alertsReportMaterialsTableBody"></tbody>
+          </table>
+        </div>
+
+        <h3 style="color:#003d7a;margin:20px 0 10px">🔩 Avvisi Magazzino Implantare</h3>
+        <div class="report-table-container">
+          <table class="report-table">
+            <thead>
+              <tr>
+                <th>Livello</th>
+                <th>Elemento</th>
+                <th>Tipo Avviso</th>
+                <th>Dettaglio</th>
+              </tr>
+            </thead>
+            <tbody id="alertsReportImplantsTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
@@ -1252,8 +1359,10 @@
     let currentExpiryFilter = 'Tutte';
     let currentQuantityFilter = 'Tutte';
     let allDocs = []; // store all docs for filtering
-
-    let notified = new Map(); // track notifications per doc
+    let alertsReportData = { materials: [], implants: [] };
+    const ALERTS_SETTINGS_KEY = 'magazzino_alert_settings_v1';
+    const DEFAULT_ALERTS_SETTINGS = { expiryWarningDays: 30, implantLowQtyWarning: 2 };
+    let alertsSettings = loadAlertsSettings();
 
     // --- LOCAL STORAGE FUNCTIONS ---
     function saveToLocalStorage(docs){
@@ -1277,7 +1386,15 @@
         existing.forEach(it => map.set(it.id, it));
         // Poi sovrascrivi con i dati di Firebase (priorità a Firebase)
         fbData.forEach(it => {
-          map.set(it.id, it);
+          const prev = map.get(it.id) || {};
+          const mergedItem = { ...prev, ...it };
+          if ((!Array.isArray(it.batches) || it.batches.length === 0) && Array.isArray(prev.batches) && prev.batches.length > 0) {
+            mergedItem.batches = prev.batches;
+            if (!Number.isFinite(Number(mergedItem.quantity))) {
+              mergedItem.quantity = prev.quantity || 0;
+            }
+          }
+          map.set(it.id, mergedItem);
         });
         const merged = Array.from(map.values());
         localStorage.setItem('magazzino_materials', JSON.stringify(merged));
@@ -1287,9 +1404,78 @@
       }
     }
 
+    function normalizeBatchRecord(batch, material){
+      if(!batch || typeof batch !== 'object') return null;
+      const qty = Number(batch.quantità ?? batch.quantita ?? batch.originalQuantita ?? batch.quantity ?? 0) || 0;
+      const qtyRemaining = Number(
+        batch.quantitàRimanente ?? batch.quantitaRimanente ?? batch.remainingQuantity ?? batch.quantityRemaining ?? qty
+      ) || 0;
+
+      return {
+        ...batch,
+        batchId: batch.batchId || batch.id || ('batch_legacy_' + String(material.id || 'mat') + '_' + Date.now()),
+        dataOrdine: batch.dataOrdine || batch.orderDate || batch.data || material.orderDate || material.createdAt || new Date().toISOString(),
+        quantità: qty,
+        quantitàRimanente: qtyRemaining,
+        prezzo: Number(batch.prezzo ?? batch.price ?? material.price ?? 0) || 0,
+        scadenza: batch.scadenza ?? batch.expiry ?? material.expiry ?? null,
+        distributore: batch.distributore || batch.distributor || material.distributor || '',
+        azienda: batch.azienda || batch.company || material.company || '',
+        ordinoId: batch.ordinoId || batch.orderId || null
+      };
+    }
+
     function loadFromLocalStorage(){
       const saved = localStorage.getItem('magazzino_materials');
-      return saved ? JSON.parse(saved) : [];
+      const parsed = saved ? JSON.parse(saved) : [];
+      if(!Array.isArray(parsed)) return [];
+
+      let changed = false;
+      const normalized = parsed.map(material => {
+        if(!material || typeof material !== 'object') return material;
+        const next = { ...material };
+
+        if(!Array.isArray(next.batches)) {
+          next.batches = [];
+          changed = true;
+        }
+
+        const normalizedBatches = next.batches
+          .map(batch => normalizeBatchRecord(batch, next))
+          .filter(Boolean);
+
+        if(normalizedBatches.length !== next.batches.length) changed = true;
+        if(normalizedBatches.length > 0) {
+          const totalQty = normalizedBatches.reduce((sum, b) => sum + (Number(b.quantitàRimanente || 0) || 0), 0);
+          if(Number(next.quantity || 0) !== totalQty) {
+            next.quantity = totalQty;
+            changed = true;
+          }
+        }
+
+        if(normalizedBatches.length === 0 && Number(next.quantity || 0) > 0) {
+          normalizedBatches.push(normalizeBatchRecord({
+            batchId: 'batch_restore_' + String(next.id || 'mat') + '_' + Date.now(),
+            dataOrdine: next.orderDate || next.createdAt || new Date().toISOString(),
+            quantità: Number(next.quantity || 0),
+            quantitàRimanente: Number(next.quantity || 0),
+            prezzo: Number(next.price || 0),
+            scadenza: next.expiry || null,
+            distributore: next.distributor || '',
+            azienda: next.company || ''
+          }, next));
+          changed = true;
+        }
+
+        next.batches = normalizedBatches;
+        return next;
+      });
+
+      if(changed) {
+        localStorage.setItem('magazzino_materials', JSON.stringify(normalized));
+      }
+
+      return normalized;
     }
 
     function addToLocalStorage(item){
@@ -1313,7 +1499,9 @@
         quantità: newItem.quantity || 0,
         quantitàRimanente: newItem.quantity || 0,
         prezzo: newItem.price || 0,
-        scadenza: newItem.expiry
+        scadenza: newItem.expiry,
+        distributore: newItem.distributor || '',
+        azienda: newItem.company || ''
       };
       
       const idx = materials.findIndex(m => m.id === newItem.id);
@@ -1324,11 +1512,13 @@
         existing.batches.push(newBatch);
         // Update total quantity
         existing.quantity = existing.batches.reduce((sum, b) => sum + (b.quantitàRimanente || 0), 0);
+        existing.expiry = recomputeMaterialExpiryFromBatches(existing.batches);
         existing.updatedAt = new Date().toISOString();
         materials[idx] = existing;
       } else {
         // New material - add batch
         newItem.batches.push(newBatch);
+        newItem.expiry = recomputeMaterialExpiryFromBatches(newItem.batches);
         materials.push(newItem);
       }
       
@@ -1373,6 +1563,76 @@
       loadMaterialsFromStorage();
     }
 
+    function recomputeMaterialExpiryFromBatches(batches){
+      if(!Array.isArray(batches) || batches.length === 0) return null;
+      const dated = batches
+        .filter(b => Number(b.quantitàRimanente || 0) > 0)
+        .map(b => parseFlexibleDate(b.scadenza))
+        .filter(Boolean)
+        .sort((a, b) => a.getTime() - b.getTime());
+
+      if(dated.length === 0) return null;
+      return dated[0].toISOString();
+    }
+
+    async function editBatchExpiry(materialId, batchId){
+      const materials = loadFromLocalStorage();
+      const materialIdx = materials.findIndex(m => String(m.id) === String(materialId));
+      if(materialIdx < 0){
+        showAlert('Materiale non trovato', 'warn');
+        return;
+      }
+
+      const material = materials[materialIdx];
+      if(!Array.isArray(material.batches) || material.batches.length === 0){
+        showAlert('Nessun batch disponibile', 'warn');
+        return;
+      }
+
+      const batch = material.batches.find(b => String(b.batchId || b.id) === String(batchId));
+      if(!batch){
+        showAlert('Batch non trovato', 'warn');
+        return;
+      }
+
+      const current = parseFlexibleDate(batch.scadenza);
+      const currentInput = current ? current.toISOString().split('T')[0] : '';
+      const newExpiry = prompt('Inserisci data scadenza batch (YYYY-MM-DD). Lascia vuoto per rimuovere:', currentInput);
+      if(newExpiry === null) return;
+
+      const value = String(newExpiry || '').trim();
+      if(!value){
+        batch.scadenza = null;
+      } else {
+        const parsed = parseFlexibleDate(value);
+        if(!parsed){
+          showAlert('Data scadenza batch non valida. Usa formato YYYY-MM-DD.', 'warn');
+          return;
+        }
+        batch.scadenza = parsed.toISOString();
+      }
+
+      material.updatedAt = new Date().toISOString();
+      material.expiry = recomputeMaterialExpiryFromBatches(material.batches);
+      materials[materialIdx] = material;
+      localStorage.setItem('magazzino_materials', JSON.stringify(materials));
+
+      if(firebaseReady && typeof db !== 'undefined'){
+        try {
+          await db.collection('materials').doc(material.id).set({
+            batches: material.batches,
+            expiry: material.expiry,
+            updatedAt: material.updatedAt
+          }, { merge: true });
+        } catch(err){
+          console.warn('Firebase update batch scadenza non riuscito:', err && err.message ? err.message : err);
+        }
+      }
+
+      loadMaterialsFromStorage();
+      showAlert('✓ Scadenza batch aggiornata', 'info');
+    }
+
     function promptSelectOrCustom(title, options, currentValue){
       const printable = options
         .filter(opt => opt && opt !== 'Other')
@@ -1411,6 +1671,7 @@
 
     function saveImplantsToStorage(implants){
       localStorage.setItem('magazzino_implants', JSON.stringify(implants));
+      checkAndNotify(allDocs);
     }
 
     function toFirestoreImplantData(implant){
@@ -1799,12 +2060,6 @@
       }
     }
 
-
-    // Request browser notification permission (optional)
-    if ('Notification' in window){
-      Notification.requestPermission().catch(()=>{});
-    }
-
     function showAlert(text, type='info'){
       const d = document.createElement('div');
       d.className = 'alert ' + (type==='warn'?'warn':'info');
@@ -1813,18 +2068,276 @@
       setTimeout(()=>d.remove(), 8000);
     }
 
-    function notify(title, body){
-      // Browser notification
-      if (window.Notification && Notification.permission === 'granted'){
-        new Notification(title, {body});
-      }
-      // in-app alert
-      showAlert(title + ' — ' + body, 'warn');
-    }
-
     function daysBetween(a,b){
       const ms = 24*60*60*1000;
       return Math.ceil((b-a)/ms);
+    }
+
+    function parseFlexibleDate(value){
+      if(!value) return null;
+      if(value instanceof Date) return isNaN(value.getTime()) ? null : value;
+      if(typeof value === 'number') {
+        const fromNumber = new Date(value);
+        return isNaN(fromNumber.getTime()) ? null : fromNumber;
+      }
+
+      const raw = String(value).trim();
+      if(!raw) return null;
+
+      const direct = new Date(raw);
+      if(!isNaN(direct.getTime())) return direct;
+
+      const m = raw.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/);
+      if(m){
+        const dd = parseInt(m[1], 10);
+        const mm = parseInt(m[2], 10);
+        const yy = parseInt(m[3], 10);
+        const fullYear = yy < 100 ? 2000 + yy : yy;
+        const parsed = new Date(fullYear, mm - 1, dd);
+        if(!isNaN(parsed.getTime())) return parsed;
+      }
+
+      return null;
+    }
+
+    function formatDate(value){
+      const d = parseFlexibleDate(value);
+      return d ? d.toLocaleDateString('it-IT') : '--';
+    }
+
+    function clampNumber(value, min, max, fallback){
+      const n = Number(value);
+      if(!Number.isFinite(n)) return fallback;
+      return Math.min(max, Math.max(min, Math.round(n)));
+    }
+
+    function loadAlertsSettings(){
+      try {
+        const raw = localStorage.getItem(ALERTS_SETTINGS_KEY);
+        if(!raw) return { ...DEFAULT_ALERTS_SETTINGS };
+        const parsed = JSON.parse(raw);
+        return {
+          expiryWarningDays: clampNumber(parsed.expiryWarningDays, 1, 365, DEFAULT_ALERTS_SETTINGS.expiryWarningDays),
+          implantLowQtyWarning: clampNumber(parsed.implantLowQtyWarning, 1, 99, DEFAULT_ALERTS_SETTINGS.implantLowQtyWarning)
+        };
+      } catch {
+        return { ...DEFAULT_ALERTS_SETTINGS };
+      }
+    }
+
+    function applyAlertsSettingsToUI(){
+      const expiryInput = document.getElementById('alertsExpiryDaysInput');
+      const implantQtyInput = document.getElementById('alertsImplantLowQtyInput');
+      const criteriaDays = document.getElementById('alertsCriteriaDays');
+      const criteriaDaysImplants = document.getElementById('alertsCriteriaDaysImplants');
+      const criteriaImplantQty = document.getElementById('alertsCriteriaImplantQty');
+
+      if(expiryInput) expiryInput.value = alertsSettings.expiryWarningDays;
+      if(implantQtyInput) implantQtyInput.value = alertsSettings.implantLowQtyWarning;
+      if(criteriaDays) criteriaDays.textContent = alertsSettings.expiryWarningDays;
+      if(criteriaDaysImplants) criteriaDaysImplants.textContent = alertsSettings.expiryWarningDays;
+      if(criteriaImplantQty) criteriaImplantQty.textContent = alertsSettings.implantLowQtyWarning;
+    }
+
+    function saveAlertsSettings(){
+      const expiryInput = document.getElementById('alertsExpiryDaysInput');
+      const implantQtyInput = document.getElementById('alertsImplantLowQtyInput');
+
+      alertsSettings = {
+        expiryWarningDays: clampNumber(expiryInput ? expiryInput.value : DEFAULT_ALERTS_SETTINGS.expiryWarningDays, 1, 365, DEFAULT_ALERTS_SETTINGS.expiryWarningDays),
+        implantLowQtyWarning: clampNumber(implantQtyInput ? implantQtyInput.value : DEFAULT_ALERTS_SETTINGS.implantLowQtyWarning, 1, 99, DEFAULT_ALERTS_SETTINGS.implantLowQtyWarning)
+      };
+
+      localStorage.setItem(ALERTS_SETTINGS_KEY, JSON.stringify(alertsSettings));
+      applyAlertsSettingsToUI();
+      checkAndNotify(allDocs);
+      showAlert('✓ Soglie avvisi aggiornate', 'info');
+    }
+
+    function buildMaterialAlerts(docs){
+      const now = new Date();
+      const alerts = [];
+
+      docs.forEach(doc => {
+        const data = doc.data();
+        const name = data.name || 'Materiale senza nome';
+        const expiry = data.expiry ? (data.expiry.toDate ? data.expiry.toDate() : new Date(data.expiry)) : null;
+        const qty = Number(data.quantity || 0);
+        const threshold = Number(data.lowStockThreshold || 2);
+
+        if (expiry && !isNaN(expiry.getTime())) {
+          const days = daysBetween(now, expiry);
+          if (days < 0) {
+            alerts.push({
+              level: 'critical',
+              source: 'materials',
+              item: name,
+              type: 'Scadenza',
+              detail: 'Scaduto il ' + expiry.toLocaleDateString('it-IT')
+            });
+          } else if (days <= alertsSettings.expiryWarningDays) {
+            alerts.push({
+              level: 'warning',
+              source: 'materials',
+              item: name,
+              type: 'Scadenza',
+              detail: 'Scade tra ' + days + ' giorni (' + expiry.toLocaleDateString('it-IT') + ')'
+            });
+          }
+        }
+
+        if (qty < threshold) {
+          alerts.push({
+            level: 'critical',
+            source: 'materials',
+            item: name,
+            type: 'Quantità',
+            detail: 'Quantità ' + qty + ' sotto soglia ' + threshold
+          });
+        } else if (qty === threshold) {
+          alerts.push({
+            level: 'warning',
+            source: 'materials',
+            item: name,
+            type: 'Quantità',
+            detail: 'Quantità pari alla soglia (' + threshold + ')'
+          });
+        }
+      });
+
+      return alerts;
+    }
+
+    function buildImplantAlerts(){
+      const now = new Date();
+      const implants = loadImplantsFromStorage();
+      const alerts = [];
+
+      implants.forEach(implant => {
+        const itemName = [implant.type, implant.model].filter(Boolean).join(' - ') || implant.type || implant.model || 'Impianto';
+        const expiry = implant.expiry ? new Date(implant.expiry) : null;
+        const qty = Number(implant.quantity || 0);
+
+        if (expiry && !isNaN(expiry.getTime())) {
+          const days = daysBetween(now, expiry);
+          if (days < 0) {
+            alerts.push({
+              level: 'critical',
+              source: 'implants',
+              item: itemName,
+              type: 'Scadenza',
+              detail: 'Scaduto il ' + expiry.toLocaleDateString('it-IT')
+            });
+          } else if (days <= alertsSettings.expiryWarningDays) {
+            alerts.push({
+              level: 'warning',
+              source: 'implants',
+              item: itemName,
+              type: 'Scadenza',
+              detail: 'Scade tra ' + days + ' giorni (' + expiry.toLocaleDateString('it-IT') + ')'
+            });
+          }
+        }
+
+        if (qty <= 0) {
+          alerts.push({
+            level: 'critical',
+            source: 'implants',
+            item: itemName,
+            type: 'Quantità',
+            detail: 'Quantità esaurita (0)'
+          });
+        } else if (qty <= alertsSettings.implantLowQtyWarning) {
+          alerts.push({
+            level: 'warning',
+            source: 'implants',
+            item: itemName,
+            type: 'Quantità',
+            detail: 'Quantità bassa: ' + qty + ' (soglia ' + alertsSettings.implantLowQtyWarning + ')'
+          });
+        }
+      });
+
+      return alerts;
+    }
+
+    function updateAlertsReportBadge(){
+      const badgeEl = document.getElementById('alertsReportCount');
+      if (!badgeEl) return;
+      const total = alertsReportData.materials.length + alertsReportData.implants.length;
+      badgeEl.textContent = total;
+      badgeEl.style.background = total > 0 ? '#d32f2f' : '#2e7d32';
+    }
+
+    function updateAlertsReportSection(tbodyId, alerts, emptyMessage){
+      const tbody = document.getElementById(tbodyId);
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      if (!alerts.length) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = '<td colspan="4" style="text-align:center;color:#666;padding:16px">' + emptyMessage + '</td>';
+        tbody.appendChild(tr);
+        return;
+      }
+
+      alerts.forEach(alert => {
+        const tr = document.createElement('tr');
+        const levelLabel = alert.level === 'critical' ? 'Critico' : 'Attenzione';
+        tr.innerHTML = `
+          <td><span class="severity-badge ${alert.level}">${levelLabel}</span></td>
+          <td>${alert.item}</td>
+          <td>${alert.type}</td>
+          <td>${alert.detail}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderAlertsReport(){
+      const materialAlerts = alertsReportData.materials;
+      const implantAlerts = alertsReportData.implants;
+      const allAlerts = [...materialAlerts, ...implantAlerts];
+      const criticalCount = allAlerts.filter(a => a.level === 'critical').length;
+
+      const totalEl = document.getElementById('alertsReportTotal');
+      const materialsEl = document.getElementById('alertsReportMaterials');
+      const implantsEl = document.getElementById('alertsReportImplants');
+      const criticalEl = document.getElementById('alertsReportCritical');
+      const emptyEl = document.getElementById('alertsReportEmpty');
+
+      if (totalEl) totalEl.textContent = allAlerts.length;
+      if (materialsEl) materialsEl.textContent = materialAlerts.length;
+      if (implantsEl) implantsEl.textContent = implantAlerts.length;
+      if (criticalEl) criticalEl.textContent = criticalCount;
+
+      if (emptyEl) {
+        if (allAlerts.length === 0) {
+          emptyEl.textContent = '✅ Nessun avviso attivo al momento.';
+          emptyEl.classList.remove('warn');
+        } else {
+          emptyEl.textContent = '⚠️ Avvisi attivi rilevati. Materiali e Implantare sono separati nelle tabelle seguenti.';
+          emptyEl.classList.add('warn');
+        }
+      }
+
+      updateAlertsReportSection('alertsReportMaterialsTableBody', materialAlerts, 'Nessun avviso attivo per il magazzino materiali');
+      updateAlertsReportSection('alertsReportImplantsTableBody', implantAlerts, 'Nessun avviso attivo per il magazzino implantare');
+      updateAlertsReportBadge();
+    }
+
+    function openAlertsReportModal() {
+      const modal = document.getElementById('alertsReportModal');
+      if (!modal) return;
+      applyAlertsSettingsToUI();
+      renderAlertsReport();
+      modal.classList.add('active');
+    }
+
+    function closeAlertsReportModal() {
+      const modal = document.getElementById('alertsReportModal');
+      if (!modal) return;
+      modal.classList.remove('active');
     }
 
     function initCategoryFilters(){
@@ -1966,18 +2479,47 @@
       return str.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
     }
 
+    function refreshMatNameSuggestions(filterText = '') {
+      const datalist = document.getElementById('matNameSuggestions');
+      if (!datalist) return;
+
+      const normalizedFilter = (filterText || '').toLowerCase().trim();
+      const materials = loadFromLocalStorage();
+      const uniqueNames = Array.from(new Set(
+        materials
+          .map(m => (m && m.name ? String(m.name).trim() : ''))
+          .filter(Boolean)
+      ));
+
+      const filteredNames = uniqueNames
+        .filter(name => {
+          if (!normalizedFilter) return true;
+          return name.toLowerCase().includes(normalizedFilter);
+        })
+        .sort((a, b) => a.localeCompare(b, 'it-IT'))
+        .slice(0, 40);
+
+      datalist.innerHTML = '';
+      filteredNames.forEach(name => {
+        const option = document.createElement('option');
+        option.value = toTitleCase(name);
+        datalist.appendChild(option);
+      });
+    }
+
     let modalAutoFillTimeout;
     document.getElementById('matName').addEventListener('input', function() {
       clearTimeout(modalAutoFillTimeout);
       const materialName = this.value.trim();
+      refreshMatNameSuggestions(materialName);
 
       modalAutoFillTimeout = setTimeout(() => {
-        if(materialName.length < 3) return;
-
         const materials = loadFromLocalStorage();
         const lowerName = materialName.toLowerCase();
 
         const match = materials.find(m => m.name && m.name.toLowerCase() === lowerName);
+
+        if(!match && materialName.length < 3) return;
 
         if(match) {
           document.getElementById('matName').value = toTitleCase(match.name);
@@ -2064,21 +2606,27 @@
         createdAt: new Date(),
         updatedAt: new Date()
       };
-      
-      const materialId = window.crypto && window.crypto.randomUUID ? window.crypto.randomUUID() : ('m_' + Date.now() + '_' + Math.floor(Math.random()*100000));
+
+      const existingByName = loadFromLocalStorage().find(m => (m.name || '').trim().toLowerCase() === name.toLowerCase());
+      const materialId = existingByName
+        ? existingByName.id
+        : (window.crypto && window.crypto.randomUUID ? window.crypto.randomUUID() : ('m_' + Date.now() + '_' + Math.floor(Math.random()*100000)));
       
       addToLocalStorage({id: materialId, ...newData});
       
       if(firebaseReady && typeof db !== 'undefined'){
         try {
-          await db.collection('materials').doc(materialId).set(newData);
+          const localSaved = loadFromLocalStorage().find(m => m.id === materialId) || { id: materialId, ...newData };
+          const cloudPayload = { ...localSaved };
+          delete cloudPayload.id;
+          await db.collection('materials').doc(materialId).set(cloudPayload, { merge: true });
         } catch(err) {
           console.warn('Firebase unavailable:', err.message);
         }
       }
       
       closeMaterialModal();
-      showAlert('✓ ' + name + ' aggiunto', 'info');
+      showAlert(existingByName ? ('✓ ' + name + ' aggiornato con nuovo carico') : ('✓ ' + name + ' aggiunto'), 'info');
       setTimeout(loadMaterialsFromStorage, 100);
     });
 
@@ -2119,13 +2667,12 @@
       
       const expandBtnId = 'expand_' + doc.id;
       const batchDetailId = 'batch_' + doc.id;
-      const currentExpiryInput = expiry && !isNaN(expiry.getTime()) ? expiry.toISOString().split('T')[0] : '';
       
       tr.innerHTML = `
         <td data-label="Nome"><button class="batch-expand-btn" id="${expandBtnId}" style="margin-right:8px">▶</button><span class="editable-name" style="cursor:pointer;text-decoration:underline;">${escapeHtml(data.name)}</span></td>
         <td data-label="Data ordine">${orderDate ? orderDate.toLocaleDateString() : '-'}</td>
-        <td data-label="Scadenza" style="text-align:center;white-space:nowrap;"><span class="editable-expiry" title="Modifica scadenza" style="cursor:pointer;text-decoration:underline;">${statusHtml}</span></td>
-        <td data-label="Prezzo">€ ${Number(data.price).toFixed(2)}</td>
+        <td data-label="Scadenza" style="text-align:center;white-space:nowrap;"><span class="readonly-expiry" title="Scadenza riassuntiva automatica (modifica i singoli batch)">${statusHtml}</span></td>
+        <td data-label="Prezzo" class="material-price-col">€ ${Number(data.price).toFixed(2)}</td>
         <td data-label="Distributore">${escapeHtml(data.distributor||'-')}</td>
         <td data-label="Azienda">${escapeHtml(data.company||'-')}</td>
         <td data-label="Quantità" style="text-align:center;">${lowBadge}<div><span class="editable-threshold" title="Modifica soglia quantità" style="font-size:11px;color:#003d7a;cursor:pointer;text-decoration:underline;">Soglia: ${soglia}</span></div></td>
@@ -2143,21 +2690,6 @@
           data.name = formattedName;
           updateMaterialFields(doc.id, { name: formattedName });
         }
-      });
-      tr.querySelector('.editable-expiry').addEventListener('click', () => {
-        const newExpiry = prompt('Inserisci data scadenza (YYYY-MM-DD). Lascia vuoto per rimuovere:', currentExpiryInput);
-        if (newExpiry === null) return;
-        const expiryValue = (newExpiry || '').trim();
-        if (!expiryValue) {
-          updateMaterialFields(doc.id, { expiry: null });
-          return;
-        }
-        const parsed = new Date(expiryValue);
-        if (isNaN(parsed.getTime())) {
-          showAlert('Data scadenza non valida. Usa formato YYYY-MM-DD.', 'warn');
-          return;
-        }
-        updateMaterialFields(doc.id, { expiry: parsed });
       });
       tr.querySelector('.editable-threshold').addEventListener('click', () => {
         const newThresholdRaw = prompt('Inserisci soglia quantità minima (numero intero >= 1):', String(soglia));
@@ -2192,9 +2724,13 @@
       if (batches.length === 0) {
         batchesHtml += '<div style="color:#666;font-size:13px">Nessun batch disponibile</div>';
       } else {
-        batches.forEach(batch => {
+        const sortedBatchesForDisplay = [...batches].sort((a, b) => new Date(b.dataOrdine || 0) - new Date(a.dataOrdine || 0));
+        sortedBatchesForDisplay.forEach(batch => {
           const batchExpiry = batch.scadenza ? new Date(batch.scadenza) : null;
           const batchDays = batchExpiry ? daysBetween(now, batchExpiry) : null;
+          const encodedMaterialId = encodeURIComponent(String(doc.id));
+          const encodedBatchId = encodeURIComponent(String(batch.batchId || batch.id || ''));
+          const batchExpiryLabel = batchExpiry ? batchExpiry.toLocaleDateString() : 'N/A';
           
           let expiryClass = 'expiry-ok';
           if (batchDays !== null && batchDays < 0) expiryClass = 'expiry-critical';
@@ -2205,11 +2741,11 @@
               <div class="batch-card-header">
                 <div><strong>${batch.batchId}</strong></div>
                 <div>Ordine: ${batch.dataOrdine}</div>
-                <div>Scade: ${batchExpiry ? batchExpiry.toLocaleDateString() : 'N/A'}</div>
+                <div>Scade: <span class="editable-batch-expiry" data-material-id="${encodedMaterialId}" data-batch-id="${encodedBatchId}" title="Clicca per modificare scadenza batch" style="cursor:pointer;text-decoration:underline;color:#003d7a">${batchExpiryLabel}</span></div>
                 <div><span class="expiry-status ${expiryClass}">${batch.quantitàRimanente}/${batch.quantità} pz</span></div>
               </div>
               <div style="font-size:12px;color:#666;margin-top:6px">
-                Prezzo: €${batch.prezzo.toFixed(2)} | Ordine ID: ${batch.ordinoId || 'N/A'}
+                Fornitore: ${escapeHtml(batch.distributore || data.distributor || 'N/A')} | Azienda: ${escapeHtml(batch.azienda || data.company || 'N/A')} | Prezzo: €${Number(batch.prezzo || 0).toFixed(2)} | Ordine ID: ${batch.ordinoId || 'N/A'}
               </div>
           `;
           
@@ -2227,6 +2763,14 @@
       
       batchesHtml += '</div>';
       batchDetailRow.innerHTML = `<td colspan="8">${batchesHtml}</td>`;
+
+      batchDetailRow.querySelectorAll('.editable-batch-expiry').forEach(el => {
+        el.addEventListener('click', () => {
+          const materialId = decodeURIComponent(el.getAttribute('data-material-id') || '');
+          const batchId = decodeURIComponent(el.getAttribute('data-batch-id') || '');
+          if(materialId && batchId) editBatchExpiry(materialId, batchId);
+        });
+      });
       
       // Insert batch row after material row
       setTimeout(() => {
@@ -2425,42 +2969,17 @@
 
     // Load initial data from localStorage on page load
     window.addEventListener('load', ()=>{
+      applyAlertsSettingsToUI();
       loadMaterialsFromStorage();
     });
 
     function checkAndNotify(docs){
-      const now = new Date();
-      docs.forEach(doc=>{
-        const data = doc.data();
-        const expiry = data.expiry ? (data.expiry.toDate ? data.expiry.toDate() : new Date(data.expiry)) : null;
-        // expiry notifications
-        if(expiry){
-          const days = daysBetween(now, expiry);
-          const key = doc.id + ':expiry';
-          if(days < 0){
-            if(!notified.get(key)){
-              notify('Materiale scaduto: '+data.name, 'Scaduto il '+expiry.toLocaleDateString());
-              notified.set(key, true);
-            }
-          } else if(days <= 30){
-            if(!notified.get(key)){
-              notify('Scadenza prossima: '+data.name, 'Scade tra '+days+' giorni ('+expiry.toLocaleDateString()+')');
-              notified.set(key, true);
-            }
-          } else {
-            notified.delete(key);
-          }
-        }
-        // low stock notifications
-        const key2 = doc.id + ':low';
-        const soglia = data.lowStockThreshold || 2;
-        if((data.quantity||0) < soglia){
-          if(!notified.get(key2)){
-            notify('Quantità bassa: '+data.name, 'Quantità = '+(data.quantity||0));
-            notified.set(key2, true);
-          }
-        } else notified.delete(key2);
-      });
+      const normalizedDocs = Array.isArray(docs) ? docs : [];
+      alertsReportData = {
+        materials: buildMaterialAlerts(normalizedDocs),
+        implants: buildImplantAlerts()
+      };
+      renderAlertsReport();
     }
 
     // periodic check (every 5 minutes)
@@ -3379,21 +3898,28 @@
       const materials = loadFromLocalStorage();
       const categoryFilter = document.getElementById('incomingCategoryFilter').value;
       const distributorFilter = document.getElementById('incomingDistributorFilter').value;
-      const periodFilter = parseInt(document.getElementById('incomingPeriodFilter').value);
+      const periodFilterValue = document.getElementById('incomingPeriodFilter').value;
 
       // Estrai tutti i batch da tutti i materiali
       let allBatches = [];
       materials.forEach(m => {
         if (m.batches && Array.isArray(m.batches)) {
           m.batches.forEach(batch => {
+            const batchOrderDate = batch.dataOrdine || batch.orderDate || m.orderDate || m.createdAt;
+            const batchQuantity = Number(
+              batch.quantità ?? batch.quantita ?? batch.originalQuantita ?? batch.quantity ?? 0
+            ) || 0;
+            const batchIdentifier = batch.batchId || batch.id || '';
+            const entryType = batch.ordinoId ? 'Ordine' : 'Materiale';
+
             allBatches.push({
               materialName: m.name,
               category: m.category,
               distributor: m.distributor,
-              orderDate: batch.dataOrdine,
-              quantity: batch.originalQuantita || batch.quantita,
-              batchId: batch.id,
-              type: batch.type === 'order' ? 'Ordine' : 'Materiale'
+              orderDate: batchOrderDate,
+              quantity: batchQuantity,
+              batchId: batchIdentifier,
+              type: entryType
             });
           });
         }
@@ -3407,17 +3933,26 @@
       });
 
       // Filtra per periodo
-      if (periodFilter !== -1 && periodFilter !== 'all') {
-        const cutoffDate = new Date();
-        cutoffDate.setDate(cutoffDate.getDate() - periodFilter);
-        allBatches = allBatches.filter(b => {
-          const batchDate = new Date(b.orderDate);
-          return batchDate >= cutoffDate;
-        });
+      if (periodFilterValue !== 'all') {
+        const periodDays = parseInt(periodFilterValue, 10);
+        if (Number.isInteger(periodDays) && periodDays > 0) {
+          const cutoffDate = new Date();
+          cutoffDate.setDate(cutoffDate.getDate() - periodDays);
+          allBatches = allBatches.filter(b => {
+            const batchDate = parseFlexibleDate(b.orderDate);
+            return batchDate && batchDate >= cutoffDate;
+          });
+        }
       }
 
       // Ordina per data (più recenti prima)
-      allBatches.sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate));
+      allBatches.sort((a, b) => {
+        const dA = parseFlexibleDate(a.orderDate);
+        const dB = parseFlexibleDate(b.orderDate);
+        const tA = dA ? dA.getTime() : 0;
+        const tB = dB ? dB.getTime() : 0;
+        return tB - tA;
+      });
 
       return allBatches;
     }
@@ -3468,7 +4003,7 @@
     function resetIncomingFilters() {
       document.getElementById('incomingCategoryFilter').value = 'Tutti';
       document.getElementById('incomingDistributorFilter').value = 'Tutti';
-      document.getElementById('incomingPeriodFilter').value = '30';
+      document.getElementById('incomingPeriodFilter').value = 'all';
       updateIncomingRegisterData();
     }
 
@@ -3855,6 +4390,7 @@
       const modal = document.getElementById('materialModal');
       modal.classList.add('active');
       setupMaterialCustomFields();
+      refreshMatNameSuggestions('');
     }
 
     function closeMaterialModal() {
@@ -4615,27 +5151,32 @@
             cleanName = matchCat[1].trim();
             category = matchCat[2].trim();
           }
-          
-          // Crea nuovo materiale con tutti i dati dall'articolo
-          materialId = window.crypto && window.crypto.randomUUID ? window.crypto.randomUUID() : ('m_' + Date.now() + '_' + Math.floor(Math.random()*100000));
-          const newMaterial = {
-            id: materialId,
-            name: cleanName,
-            category: category,
-            distributor: distributor,
-            company: article.company || '',
-            orderDate: new Date(orderDate),
-            expiry: article.expiry ? new Date(article.expiry) : null,
-            price: article.price || 0,
-            vatRate: article.vatRate || 22,
-            quantity: 0,
-            batches: [],
-            lowStockThreshold: article.lowStockThreshold || 2,
-            notifyDays: 30,
-            createdAt: new Date(),
-            updatedAt: new Date()
-          };
-          materials.push(newMaterial);
+
+          const existingByName = materials.find(m => (m.name || '').trim().toLowerCase() === cleanName.toLowerCase());
+          if (existingByName) {
+            materialId = existingByName.id;
+          } else {
+            // Crea nuovo materiale con tutti i dati dall'articolo
+            materialId = window.crypto && window.crypto.randomUUID ? window.crypto.randomUUID() : ('m_' + Date.now() + '_' + Math.floor(Math.random()*100000));
+            const newMaterial = {
+              id: materialId,
+              name: cleanName,
+              category: category,
+              distributor: distributor,
+              company: article.company || '',
+              orderDate: new Date(orderDate),
+              expiry: article.expiry ? new Date(article.expiry) : null,
+              price: article.price || 0,
+              vatRate: article.vatRate || 22,
+              quantity: 0,
+              batches: [],
+              lowStockThreshold: article.lowStockThreshold || 2,
+              notifyDays: 30,
+              createdAt: new Date(),
+              updatedAt: new Date()
+            };
+            materials.push(newMaterial);
+          }
         }
         
         const matIdx = materials.findIndex(m => m.id === materialId);
@@ -4652,6 +5193,7 @@
             quantità: article.quantity,
             quantitàRimanente: article.quantity,
             prezzo: article.price,
+            distributore: distributor,
             azienda: article.company || '',
             descrizione: article.description || '',
             scadenza: article.expiry
@@ -4659,6 +5201,7 @@
 
           material.batches.push(newBatch);
           material.quantity = material.batches.reduce((sum, b) => sum + (b.quantitàRimanente || 0), 0);
+          material.expiry = recomputeMaterialExpiryFromBatches(material.batches);
           material.updatedAt = new Date().toISOString();
           materials[matIdx] = material;
         }
@@ -4670,7 +5213,52 @@
       loadMaterialsFromStorage();
     });
 
-    // ===== CONSUMO MATERIALE FUNCTIONS (FIFO SYSTEM) =====
+    // ===== CONSUMO MATERIALE FUNCTIONS (FEFO SYSTEM) =====
+    let consumptionMaterialLookup = [];
+
+    function normalizeConsumptionText(value){
+      return String(value || '').toLowerCase().trim().replace(/\s+/g, ' ');
+    }
+
+    function syncConsumptionMaterialSelection(){
+      const searchInput = document.getElementById('consumptionMaterialSearch');
+      const hiddenInput = document.getElementById('consumptionMaterial');
+      if (!searchInput || !hiddenInput) return '';
+
+      const typed = normalizeConsumptionText(searchInput.value);
+      if (!typed) {
+        hiddenInput.value = '';
+        return '';
+      }
+
+      const exact = consumptionMaterialLookup.find(item => item.normalizedName === typed || item.normalizedDisplay === typed);
+      hiddenInput.value = exact ? exact.id : '';
+      return hiddenInput.value;
+    }
+
+    function ensureMaterialHasBatches(material){
+      if (!material || typeof material !== 'object') return false;
+      let changed = false;
+      if (!Array.isArray(material.batches)) {
+        material.batches = [];
+        changed = true;
+      }
+      const qty = Number(material.quantity || 0);
+      if (material.batches.length === 0 && qty > 0) {
+        material.batches.push({
+          batchId: 'batch_restore_' + String(material.id || 'mat') + '_' + Date.now(),
+          dataOrdine: material.orderDate || new Date().toISOString(),
+          quantità: qty,
+          quantitàRimanente: qty,
+          prezzo: Number(material.price || 0),
+          scadenza: material.expiry || null,
+          distributore: material.distributor || '',
+          azienda: material.company || ''
+        });
+        changed = true;
+      }
+      return changed;
+    }
     
     function openConsumptionModal() {
       const modal = document.getElementById('consumptionModal');
@@ -4682,19 +5270,46 @@
       const modal = document.getElementById('consumptionModal');
       modal.classList.remove('active');
       document.getElementById('consumptionForm').reset();
+      document.getElementById('consumptionMaterialSearch').value = '';
       document.getElementById('consumptionMaterial').value = '';
     }
 
     function initConsumptionModal() {
       const materials = loadFromLocalStorage();
-      const select = document.getElementById('consumptionMaterial');
-      select.innerHTML = '<option value="">-- Seleziona materiale --</option>';
+      const datalist = document.getElementById('consumptionMaterialList');
+      const searchInput = document.getElementById('consumptionMaterialSearch');
+      const hiddenInput = document.getElementById('consumptionMaterial');
+      datalist.innerHTML = '';
+      searchInput.value = '';
+      hiddenInput.value = '';
+      consumptionMaterialLookup = [];
+      let normalized = false;
       
       materials.forEach(m => {
+        if (ensureMaterialHasBatches(m)) normalized = true;
+      });
+      if (normalized) {
+        localStorage.setItem('magazzino_materials', JSON.stringify(materials));
+      }
+
+      materials
+        .filter(m => Number(m.quantity || 0) > 0)
+        .sort((a, b) => (a.name || '').localeCompare((b.name || ''), 'it-IT'))
+        .forEach(m => {
+        const itemName = (m.name || '').trim();
+        const displayName = itemName + ' (' + (m.quantity || 0) + ' pz disponibili)';
+        consumptionMaterialLookup.push({
+          id: m.id,
+          name: itemName,
+          display: displayName,
+          normalizedName: normalizeConsumptionText(itemName),
+          normalizedDisplay: normalizeConsumptionText(displayName)
+        });
+
         const opt = document.createElement('option');
-        opt.value = m.id;
-        opt.textContent = m.name + ' (' + (m.quantity || 0) + ' pz disponibili)';
-        select.appendChild(opt);
+        opt.value = itemName;
+        opt.label = (m.quantity || 0) + ' pz disponibili';
+        datalist.appendChild(opt);
       });
 
       const today = new Date().toISOString().split('T')[0];
@@ -4702,12 +5317,17 @@
     }
 
     function updateConsumptionPreview() {
-      const materialId = document.getElementById('consumptionMaterial').value;
+      const materialId = syncConsumptionMaterialSelection();
       const quantity = parseInt(document.getElementById('consumptionQuantity').value) || 0;
+      const searchValue = (document.getElementById('consumptionMaterialSearch').value || '').trim();
       const previewDiv = document.getElementById('consumptionPreviewContent');
 
       if (!materialId || quantity <= 0) {
-        previewDiv.innerHTML = 'Seleziona materiale e quantità per visualizzare anteprima...';
+        if (searchValue && !materialId) {
+          previewDiv.innerHTML = 'Seleziona un materiale valido dai suggerimenti automatici.';
+        } else {
+          previewDiv.innerHTML = 'Inserisci materiale e quantità per visualizzare anteprima...';
+        }
         return;
       }
 
@@ -4718,22 +5338,27 @@
         return;
       }
 
-      // Ottieni batch del materiale (ordina per data ordine, più vecchi prima)
-      const batches = (material.batches || []).sort((a, b) => new Date(a.datiOrdine) - new Date(b.dataOrdine));
+      // Ordina per scadenza più vicina (FEFO). Se manca scadenza, usa data ordine più vecchia.
+      const batches = [...(material.batches || [])].sort((a, b) => {
+        const aExpiry = a.scadenza ? new Date(a.scadenza).getTime() : Number.POSITIVE_INFINITY;
+        const bExpiry = b.scadenza ? new Date(b.scadenza).getTime() : Number.POSITIVE_INFINITY;
+        if (aExpiry !== bExpiry) return aExpiry - bExpiry;
+        return new Date(a.dataOrdine || 0).getTime() - new Date(b.dataOrdine || 0).getTime();
+      });
       
       if (batches.length === 0) {
         previewDiv.innerHTML = '⚠️ Nessun batch disponibile per questo materiale';
         return;
       }
 
-      // Simula riduzione FIFO
+      // Simula riduzione FEFO
       let remainingQty = quantity;
       let previewHtml = '';
       let found = false;
 
       for (let i = 0; i < batches.length && remainingQty > 0; i++) {
         const batch = batches[i];
-        const batchRemaining = batch.quantitàRimanente || batch.quantità || 0;
+        const batchRemaining = Number(batch.quantitàRimanente ?? batch.quantità ?? 0) || 0;
         
         if (batchRemaining > 0) {
           found = true;
@@ -4769,12 +5394,12 @@
     document.getElementById('consumptionForm')?.addEventListener('submit', function(e) {
       e.preventDefault();
       
-      const materialId = document.getElementById('consumptionMaterial').value;
+      const materialId = syncConsumptionMaterialSelection();
       const quantity = parseInt(document.getElementById('consumptionQuantity').value);
       const consumptionDate = document.getElementById('consumptionDate').value;
 
       if (!materialId || !quantity || quantity <= 0) {
-        alert('Compila tutti i campi correttamente');
+        alert('Compila tutti i campi e seleziona un materiale valido');
         return;
       }
 
@@ -4786,16 +5411,21 @@
       }
 
       const material = materials[materialIdx];
-      let batches = (material.batches || []).sort((a, b) => new Date(a.dataOrdine) - new Date(b.dataOrdine));
+      let batches = [...(material.batches || [])].sort((a, b) => {
+        const aExpiry = a.scadenza ? new Date(a.scadenza).getTime() : Number.POSITIVE_INFINITY;
+        const bExpiry = b.scadenza ? new Date(b.scadenza).getTime() : Number.POSITIVE_INFINITY;
+        if (aExpiry !== bExpiry) return aExpiry - bExpiry;
+        return new Date(a.dataOrdine || 0).getTime() - new Date(b.dataOrdine || 0).getTime();
+      });
       
-      // Sistema FIFO: riduce dai batch più vecchi
+      // Sistema FEFO: riduce prima dai batch con scadenza più vicina
       let remainingQty = quantity;
       let consumed = [];
       let totalQtyBefore = 0;
       let totalQtyAfter = 0;
 
       for (let i = 0; i < batches.length && remainingQty > 0; i++) {
-        const batchRemaining = batches[i].quantitàRimanente || batches[i].quantità || 0;
+        const batchRemaining = Number(batches[i].quantitàRimanente ?? batches[i].quantità ?? 0) || 0;
         if (batchRemaining > 0) {
           totalQtyBefore += batchRemaining;
           const qtyFromBatch = Math.min(remainingQty, batchRemaining);
@@ -4813,7 +5443,8 @@
 
       // Aggiorna batch e storico consumi
       material.batches = batches;
-      material.quantity = (material.quantity || 0) - quantity;
+      material.quantity = material.batches.reduce((sum, b) => sum + (Number(b.quantitàRimanente || 0) || 0), 0);
+      material.expiry = recomputeMaterialExpiryFromBatches(material.batches);
       material.consumptionHistory = material.consumptionHistory || [];
       material.consumptionHistory.push({
         data: consumptionDate,
