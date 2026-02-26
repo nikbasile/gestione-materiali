@@ -870,7 +870,7 @@
                 <th>Nome Materiale</th>
                 <th>Distributore</th>
                 <th>Quantità</th>
-                <th>ID Lotto</th>
+                <th>Lotto (data)</th>
                 <th>Tipo</th>
               </tr>
             </thead>
@@ -1310,7 +1310,7 @@
                 <th>Azienda</th>
                 <th>Modello</th>
                 <th>Quantità</th>
-                <th>ID Lotto</th>
+                <th>Lotto (data)</th>
               </tr>
             </thead>
             <tbody id="implantsIncomingRegisterTableBody"></tbody>
@@ -2443,12 +2443,13 @@
           lotsHtml += '<div style="color:#666;font-size:13px">Nessun lotto disponibile</div>';
         } else {
           const sortedLotsForDisplay = [...lots].sort((a, b) => new Date(b.dataOrdine || 0) - new Date(a.dataOrdine || 0));
-          sortedLotsForDisplay.forEach(lot => {
+          sortedLotsForDisplay.forEach((lot, lotIndex) => {
             const lotExpiry = parseFlexibleDate(lot.scadenza);
             const lotDays = lotExpiry ? daysBetween(now, lotExpiry) : null;
             const encodedImplantId = encodeURIComponent(String(implant.id));
             const encodedLotId = encodeURIComponent(String(lot.batchId || lot.id || ''));
             const lotExpiryLabel = lotExpiry ? formatDate(lotExpiry) : 'N/A';
+            const lotLabel = getLotDisplayLabel(lot, lotIndex);
             let expiryClass = 'expiry-ok';
             if (lotDays !== null && lotDays < 0) expiryClass = 'expiry-critical';
             else if (lotDays !== null && lotDays < 90) expiryClass = 'expiry-warn';
@@ -2456,7 +2457,7 @@
             lotsHtml += `
               <div class="batch-card">
                 <div class="batch-card-header">
-                  <div><strong>Lotto ${lot.batchId || '-'}</strong></div>
+                  <div><strong>${lotLabel}</strong></div>
                   <div>Data ordine: ${formatDate(lot.dataOrdine)}</div>
                   <div>Scade: <span class="editable-implant-lot-expiry" data-implant-id="${encodedImplantId}" data-lot-id="${encodedLotId}" title="Clicca per modificare scadenza lotto" style="cursor:pointer;text-decoration:underline;color:#003d7a">${lotExpiryLabel}</span></div>
                   <div><span class="expiry-status ${expiryClass}">${lot.quantitàRimanente}/${lot.quantità} pz</span></div>
@@ -3276,12 +3277,13 @@
         batchesHtml += '<div style="color:#666;font-size:13px">Nessun lotto disponibile</div>';
       } else {
         const sortedBatchesForDisplay = [...batches].sort((a, b) => new Date(b.dataOrdine || 0) - new Date(a.dataOrdine || 0));
-        sortedBatchesForDisplay.forEach(batch => {
+        sortedBatchesForDisplay.forEach((batch, batchIndex) => {
           const batchExpiry = batch.scadenza ? new Date(batch.scadenza) : null;
           const batchDays = batchExpiry ? daysBetween(now, batchExpiry) : null;
           const encodedMaterialId = encodeURIComponent(String(doc.id));
           const encodedBatchId = encodeURIComponent(String(batch.batchId || batch.id || ''));
           const batchExpiryLabel = batchExpiry ? formatDate(batchExpiry) : 'N/A';
+          const batchLabel = getLotDisplayLabel(batch, batchIndex);
           
           let expiryClass = 'expiry-ok';
           if (batchDays !== null && batchDays < 0) expiryClass = 'expiry-critical';
@@ -3290,7 +3292,7 @@
           batchesHtml += `
             <div class="batch-card">
               <div class="batch-card-header">
-                <div><strong>Lotto ${batch.batchId}</strong></div>
+                <div><strong>${batchLabel}</strong></div>
                 <div>Data ordine: ${formatDate(batch.dataOrdine)}</div>
                 <div>Scade: <span class="editable-batch-expiry" data-material-id="${encodedMaterialId}" data-batch-id="${encodedBatchId}" title="Clicca per modificare scadenza lotto" style="cursor:pointer;text-decoration:underline;color:#003d7a">${batchExpiryLabel}</span></div>
                 <div><span class="expiry-status ${expiryClass}">${batch.quantitàRimanente}/${batch.quantità} pz</span></div>
@@ -4062,7 +4064,7 @@
         return;
       }
 
-      const headers = ['Data Ordine', 'Tipo', 'Azienda', 'Modello', 'Quantità', 'ID Lotto'];
+      const headers = ['Data Ordine', 'Tipo', 'Azienda', 'Modello', 'Quantità', 'Lotto (data)'];
       let csvContent = headers.join(',') + '\n';
 
       rowsData.forEach(row => {
@@ -4072,7 +4074,7 @@
           row.company || '--',
           row.model || '--',
           Number(row.quantity || 0),
-          row.lotId || row.implantId || '--'
+          getLotDisplayLabel({ dataOrdine: row.orderDate || row.createdAt })
         ];
         csvContent += values.map(csvEscape).join(',') + '\n';
       });
@@ -4127,14 +4129,14 @@
         return;
       }
 
-      const headers = ['Data Ordine', 'Tipo', 'Azienda', 'Modello', 'Qta', 'ID Lotto'];
+      const headers = ['Data Ordine', 'Tipo', 'Azienda', 'Modello', 'Qta', 'Lotto (data)'];
       const rows = rowsData.map(row => [
         formatDate(row.orderDate || row.createdAt),
         row.type || '--',
         row.company || '--',
         row.model || '--',
         String(Number(row.quantity || 0)),
-        String(row.lotId || row.implantId || '--')
+        String(getLotDisplayLabel({ dataOrdine: row.orderDate || row.createdAt }))
       ]);
       const totalQty = rowsData.reduce((sum, row) => sum + (Number(row.quantity || 0) || 0), 0);
       const summaryLines = [
@@ -4676,6 +4678,7 @@
 
       filtered.forEach(b => {
         const orderDate = formatDate(b.orderDate);
+        const lotLabel = getLotDisplayLabel({ dataOrdine: b.orderDate });
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td>${orderDate}</td>
@@ -4683,7 +4686,7 @@
           <td>${b.materialName || '--'}</td>
           <td>${b.distributor || '--'}</td>
           <td>${b.quantity || 0}</td>
-          <td style="font-family:monospace;font-size:12px">${b.batchId ? b.batchId.substring(0, 8) : '--'}</td>
+          <td>${lotLabel}</td>
           <td>${b.type || '--'}</td>
         `;
         tbody.appendChild(tr);
@@ -4799,7 +4802,7 @@
           const operator = String(entry.operatore || entry.operator || '').trim() || '--';
           const dateValue = entry.data || entry.timestamp;
           const batchInfo = Array.isArray(entry.batchesConsumed)
-            ? entry.batchesConsumed.map(b => `${b.quantità || 0}pz da lotto ${b.batchId || '-'}`).join(', ')
+            ? entry.batchesConsumed.map((b, idx) => `${b.quantità || 0}pz da ${getLotDisplayLabel(b, idx)}`).join(', ')
             : '--';
 
           allConsumptions.push({
@@ -5195,6 +5198,7 @@
 
       filtered.forEach(e => {
         const orderDate = formatDate(e.orderDate || e.createdAt);
+        const lotLabel = getLotDisplayLabel({ dataOrdine: e.orderDate || e.createdAt });
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td>${orderDate}</td>
@@ -5202,7 +5206,7 @@
           <td>${e.company || '--'}</td>
           <td>${e.model}</td>
           <td>${e.quantity || 0}</td>
-          <td style="font-family:monospace;font-size:12px">${e.lotId ? String(e.lotId).substring(0, 12) : '--'}</td>
+          <td>${lotLabel}</td>
         `;
         tbody.appendChild(tr);
       });
@@ -5354,10 +5358,11 @@
         found = true;
         const qtyFromLot = Math.min(remainingQty, lotRemaining);
         const qtyAfter = lotRemaining - qtyFromLot;
+        const lotLabel = getLotDisplayLabel(lot, i);
 
         previewHtml += `
           <div class="consumption-preview-line">
-            <span>📦 <strong>Lotto ${lot.batchId || '-'}</strong> (Ordine: ${formatDate(lot.dataOrdine)})</span>
+            <span>📦 <strong>${lotLabel}</strong> (Ordine: ${formatDate(lot.dataOrdine)})</span>
           </div>
           <div class="consumption-preview-line">
             <span style="margin-left:20px">Scadenza: ${formatDate(lot.scadenza)}</span>
@@ -5416,7 +5421,7 @@
         if(lotRemaining <= 0) continue;
         const qtyFromLot = Math.min(remainingQty, lotRemaining);
         lots[i].quantitàRimanente = lotRemaining - qtyFromLot;
-        consumed.push({ batchId: lots[i].batchId, quantità: qtyFromLot });
+        consumed.push({ batchId: lots[i].batchId, dataOrdine: lots[i].dataOrdine, quantità: qtyFromLot });
         lots[i].consumptions = Array.isArray(lots[i].consumptions) ? lots[i].consumptions : [];
         lots[i].consumptions.push({
           data: consumptionDate,
@@ -5466,7 +5471,7 @@
         }
       }
 
-      const lotInfo = consumed.map(c => `${c.quantità} pz da lotto ${c.batchId}`).join(', ');
+      const lotInfo = consumed.map((c, idx) => `${c.quantità} pz da ${getLotDisplayLabel(c, idx)}`).join(', ');
       showAlert(`✅ ${operator} ha consumato ${quantity} pz impianti da: ${lotInfo}`, 'info');
 
       closeImplantConsumptionModal();
@@ -5527,7 +5532,7 @@
         history.forEach(entry => {
           const operator = String(entry.operatore || entry.operator || '').trim() || '--';
           const batches = Array.isArray(entry.batchesConsumed)
-            ? entry.batchesConsumed.map(b => `${b.quantità || 0}pz da lotto ${b.batchId || '-'}`).join(', ')
+            ? entry.batchesConsumed.map((b, idx) => `${b.quantità || 0}pz da ${getLotDisplayLabel(b, idx)}`).join(', ')
             : '--';
           allConsumptions.push({
             date: entry.data || entry.timestamp,
@@ -6647,10 +6652,11 @@
           found = true;
           const qtyFromBatch = Math.min(remainingQty, batchRemaining);
           const qtyAfter = batchRemaining - qtyFromBatch;
+          const batchLabel = getLotDisplayLabel(batch, i);
           
           previewHtml += `
             <div class="consumption-preview-line">
-              <span>📦 <strong>Lotto ${batch.batchId}</strong> (Ordine: ${formatDate(batch.dataOrdine)})</span>
+              <span>📦 <strong>${batchLabel}</strong> (Ordine: ${formatDate(batch.dataOrdine)})</span>
             </div>
             <div class="consumption-preview-line">
               <span style="margin-left:20px">Scadenza: ${formatDate(batch.scadenza)}</span>
@@ -6715,7 +6721,7 @@
           const qtyFromBatch = Math.min(remainingQty, batchRemaining);
           batches[i].quantitàRimanente = batchRemaining - qtyFromBatch;
           totalQtyAfter += batches[i].quantitàRimanente;
-          consumed.push({batchId: batches[i].batchId, quantità: qtyFromBatch});
+          consumed.push({batchId: batches[i].batchId, dataOrdine: batches[i].dataOrdine, quantità: qtyFromBatch});
           batches[i].consumptions = Array.isArray(batches[i].consumptions) ? batches[i].consumptions : [];
           batches[i].consumptions.push({
             data: consumptionDate,
@@ -6763,7 +6769,7 @@
       }
 
       // Mostra notifica di conferma
-      const batchInfo = consumed.map(c => `${c.quantità} pz da lotto ${c.batchId}`).join(', ');
+      const batchInfo = consumed.map((c, idx) => `${c.quantità} pz da ${getLotDisplayLabel(c, idx)}`).join(', ');
       showAlert(`✅ ${operator} ha consumato ${quantity} pz da: ${batchInfo}`, 'info');
       
       closeConsumptionModal();
