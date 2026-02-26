@@ -5732,6 +5732,19 @@
       saveToLocalStorage(materials);
       saveOperator(operator);
 
+      if(firebaseReady && typeof db !== 'undefined'){
+        const cloudPayload = {
+          batches: material.batches,
+          quantity: material.quantity,
+          expiry: material.expiry,
+          consumptionHistory: material.consumptionHistory,
+          updatedAt: new Date().toISOString()
+        };
+        db.collection('materials').doc(material.id).set(cloudPayload, { merge: true }).catch(err => {
+          console.warn('Firebase sync consumo non riuscita:', err && err.message ? err.message : err);
+        });
+      }
+
       // Mostra notifica di conferma
       const batchInfo = consumed.map(c => `${c.quantità} pz da ${c.batchId}`).join(', ');
       showAlert(`✅ ${operator} ha consumato ${quantity} pz da: ${batchInfo}`, 'info');
