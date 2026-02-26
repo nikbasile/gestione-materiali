@@ -431,6 +431,10 @@
             📥 Registro Entrate
           </button>
 
+          <button onclick="openOutgoingRegisterModal()" style="background:linear-gradient(135deg,#e53935 0%,#b71c1c 100%);color:#fff;padding:12px 20px;font-size:15px;border:none;border-radius:8px;cursor:pointer;font-weight:600;box-shadow:0 4px 12px rgba(183,28,28,0.35);transition:all 0.2s;display:flex;align-items:center;gap:6px">
+            📤 Registro Uscite
+          </button>
+
           <button id="alertsReportBtn" onclick="openAlertsReportModal()" style="background:linear-gradient(135deg,#f57c00 0%,#e65100 100%);color:#fff;padding:12px 20px;font-size:15px;border:none;border-radius:8px;cursor:pointer;font-weight:600;box-shadow:0 4px 12px rgba(230,81,0,0.35);transition:all 0.2s;display:flex;align-items:center;gap:8px">
             🧾 Report Avvisi <span id="alertsReportCount" class="alerts-report-badge">0</span>
           </button>
@@ -855,6 +859,77 @@
     </div>
   </div>
 
+  <!-- Registro Uscite Modal -->
+  <div id="outgoingRegisterModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:10000;overflow-y:auto;padding:20px">
+    <div class="report-modal-content">
+      <div class="report-header" style="background:linear-gradient(135deg,#e53935 0%,#b71c1c 100%)">
+        <h2>📤 Registro Uscite Magazzino</h2>
+        <button class="report-close" onclick="closeOutgoingRegisterModal()">×</button>
+      </div>
+      <div class="report-body">
+        <div class="report-filters">
+          <div class="report-filter-group">
+            <label>Categoria</label>
+            <select id="outgoingCategoryFilter" onchange="updateOutgoingRegisterData()">
+              <option value="Tutti">Tutti</option>
+            </select>
+          </div>
+          <div class="report-filter-group">
+            <label>Operatore</label>
+            <select id="outgoingOperatorFilter" onchange="updateOutgoingRegisterData()">
+              <option value="Tutti">Tutti</option>
+            </select>
+          </div>
+          <div class="report-filter-group">
+            <label>Periodo</label>
+            <select id="outgoingPeriodFilter" onchange="updateOutgoingRegisterData()">
+              <option value="7">Ultimi 7 giorni</option>
+              <option value="30">Ultimi 30 giorni</option>
+              <option value="90">Ultimi 90 giorni</option>
+              <option value="365">Ultimo anno</option>
+              <option value="all" selected>Tutto</option>
+            </select>
+          </div>
+          <div class="report-filter-group" style="margin-top:24px">
+            <button onclick="resetOutgoingFilters()" style="padding:8px 16px;background:#d32f2f;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:600">Azzera Filtri</button>
+          </div>
+        </div>
+
+        <div class="report-stats">
+          <div class="report-stat">
+            <div class="report-stat-label">Totale Uscite</div>
+            <div class="report-stat-value" id="outgoingTotalCount">0</div>
+          </div>
+          <div class="report-stat">
+            <div class="report-stat-label">Quantità Totale Scaricata</div>
+            <div class="report-stat-value" id="outgoingTotalQuantity">0</div>
+          </div>
+          <div class="report-stat">
+            <div class="report-stat-label">Ultimo Scarico</div>
+            <div class="report-stat-value" id="outgoingLastDate" style="font-size:16px">--</div>
+          </div>
+        </div>
+
+        <h3 style="color:#003d7a;margin-bottom:12px">📋 Storico Uscite</h3>
+        <div class="report-table-container">
+          <table class="report-table">
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>Categoria</th>
+                <th>Nome Materiale</th>
+                <th>Operatore</th>
+                <th>Quantità</th>
+                <th>Batch Utilizzati</th>
+              </tr>
+            </thead>
+            <tbody id="outgoingRegisterTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Add Selection Modal -->
   <div id="addSelectionModal">
     <div class="selection-modal-content">
@@ -1037,6 +1112,12 @@
           <div class="consumption-group">
             <label for="consumptionDate">Data consumo</label>
             <input id="consumptionDate" type="date" required onchange="updateConsumptionPreview()" />
+          </div>
+
+          <div class="consumption-group">
+            <label for="consumptionOperator">Operatore</label>
+            <input id="consumptionOperator" type="text" list="consumptionOperatorList" placeholder="Es. Maria" required autocomplete="off" />
+            <datalist id="consumptionOperatorList"></datalist>
           </div>
 
           <!-- Preview FEFO -->
@@ -4016,6 +4097,181 @@
       updateIncomingRegisterData();
     }
 
+    // ===== OUTGOING REGISTER FUNCTIONS =====
+    const OPERATORS_KEY = 'magazzino_operators';
+    const LAST_OPERATOR_KEY = 'magazzino_last_operator';
+
+    function loadOperators(){
+      try {
+        const raw = localStorage.getItem(OPERATORS_KEY);
+        const parsed = raw ? JSON.parse(raw) : [];
+        return Array.isArray(parsed) ? parsed.filter(Boolean) : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function saveOperator(name){
+      const op = String(name || '').trim();
+      if(!op) return;
+      const operators = loadOperators();
+      if(!operators.some(o => String(o).toLowerCase() === op.toLowerCase())) {
+        operators.push(op);
+        operators.sort((a,b)=>String(a).localeCompare(String(b), 'it-IT'));
+        localStorage.setItem(OPERATORS_KEY, JSON.stringify(operators));
+      }
+      localStorage.setItem(LAST_OPERATOR_KEY, op);
+    }
+
+    function initConsumptionOperator(){
+      const listEl = document.getElementById('consumptionOperatorList');
+      const inputEl = document.getElementById('consumptionOperator');
+      if(!listEl || !inputEl) return;
+      const operators = loadOperators();
+      listEl.innerHTML = '';
+      operators.forEach(op => {
+        const opt = document.createElement('option');
+        opt.value = op;
+        listEl.appendChild(opt);
+      });
+      const last = localStorage.getItem(LAST_OPERATOR_KEY) || '';
+      if(last) inputEl.value = last;
+    }
+
+    function openOutgoingRegisterModal() {
+      const modal = document.getElementById('outgoingRegisterModal');
+      if (!modal) return;
+      modal.style.display = 'flex';
+      modal.style.alignItems = 'flex-start';
+      modal.style.justifyContent = 'center';
+      setTimeout(() => initOutgoingRegisterFilters(), 100);
+    }
+
+    function closeOutgoingRegisterModal() {
+      const modal = document.getElementById('outgoingRegisterModal');
+      if (!modal) return;
+      modal.style.display = 'none';
+    }
+
+    function initOutgoingRegisterFilters() {
+      const materials = loadFromLocalStorage();
+      const categories = Array.from(new Set(materials.map(m => m.category).filter(Boolean))).sort();
+      const categorySelect = document.getElementById('outgoingCategoryFilter');
+      categorySelect.innerHTML = '<option value="Tutti">Tutti</option>';
+      categories.forEach(cat => {
+        const opt = document.createElement('option');
+        opt.value = cat;
+        opt.textContent = cat;
+        categorySelect.appendChild(opt);
+      });
+
+      const operators = loadOperators();
+      const operatorSelect = document.getElementById('outgoingOperatorFilter');
+      operatorSelect.innerHTML = '<option value="Tutti">Tutti</option>';
+      operators.forEach(op => {
+        const opt = document.createElement('option');
+        opt.value = op;
+        opt.textContent = op;
+        operatorSelect.appendChild(opt);
+      });
+
+      updateOutgoingRegisterData();
+    }
+
+    function getFilteredOutgoingData() {
+      const materials = loadFromLocalStorage();
+      const categoryFilter = document.getElementById('outgoingCategoryFilter').value;
+      const operatorFilter = document.getElementById('outgoingOperatorFilter').value;
+      const periodFilterValue = document.getElementById('outgoingPeriodFilter').value;
+
+      let allConsumptions = [];
+      materials.forEach(m => {
+        const history = Array.isArray(m.consumptionHistory) ? m.consumptionHistory : [];
+        history.forEach(entry => {
+          const qty = Number(entry.quantità || 0) || 0;
+          const operator = String(entry.operatore || entry.operator || '').trim() || '--';
+          const dateValue = entry.data || entry.timestamp;
+          const batchInfo = Array.isArray(entry.batchesConsumed)
+            ? entry.batchesConsumed.map(b => `${b.quantità || 0}pz da ${b.batchId || '-'}`).join(', ')
+            : '--';
+
+          allConsumptions.push({
+            date: dateValue,
+            category: m.category || '--',
+            materialName: m.name || '--',
+            operator,
+            quantity: qty,
+            batches: batchInfo
+          });
+        });
+      });
+
+      allConsumptions = allConsumptions.filter(c => {
+        if (categoryFilter !== 'Tutti' && c.category !== categoryFilter) return false;
+        if (operatorFilter !== 'Tutti' && c.operator !== operatorFilter) return false;
+        return true;
+      });
+
+      if (periodFilterValue !== 'all') {
+        const periodDays = parseInt(periodFilterValue, 10);
+        if (Number.isInteger(periodDays) && periodDays > 0) {
+          const cutoffDate = new Date();
+          cutoffDate.setDate(cutoffDate.getDate() - periodDays);
+          allConsumptions = allConsumptions.filter(c => {
+            const d = parseFlexibleDate(c.date);
+            return d && d >= cutoffDate;
+          });
+        }
+      }
+
+      allConsumptions.sort((a, b) => {
+        const da = parseFlexibleDate(a.date);
+        const db = parseFlexibleDate(b.date);
+        return (db ? db.getTime() : 0) - (da ? da.getTime() : 0);
+      });
+
+      return allConsumptions;
+    }
+
+    function updateOutgoingRegisterData() {
+      const filtered = getFilteredOutgoingData();
+      const totalCount = filtered.length;
+      const totalQuantity = filtered.reduce((sum, c) => sum + (Number(c.quantity || 0) || 0), 0);
+      const lastDate = filtered.length > 0 ? formatDate(filtered[0].date) : '--';
+
+      document.getElementById('outgoingTotalCount').textContent = totalCount;
+      document.getElementById('outgoingTotalQuantity').textContent = totalQuantity;
+      document.getElementById('outgoingLastDate').textContent = lastDate;
+
+      const tbody = document.getElementById('outgoingRegisterTableBody');
+      tbody.innerHTML = '';
+      filtered.forEach(c => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${formatDate(c.date)}</td>
+          <td>${c.category || '--'}</td>
+          <td>${c.materialName || '--'}</td>
+          <td>${c.operator || '--'}</td>
+          <td>${c.quantity || 0}</td>
+          <td>${c.batches || '--'}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      if (filtered.length === 0) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = '<td colspan="6" style="text-align:center;color:#999;padding:20px">Nessuna uscita trovata</td>';
+        tbody.appendChild(tr);
+      }
+    }
+
+    function resetOutgoingFilters() {
+      document.getElementById('outgoingCategoryFilter').value = 'Tutti';
+      document.getElementById('outgoingOperatorFilter').value = 'Tutti';
+      document.getElementById('outgoingPeriodFilter').value = 'all';
+      updateOutgoingRegisterData();
+    }
+
     // ===== IMPLANTS REPORT FUNCTIONS =====
     let implantsReportCharts = { trend: null, distribution: null };
 
@@ -5323,6 +5579,7 @@
 
       const today = new Date().toISOString().split('T')[0];
       document.getElementById('consumptionDate').value = today;
+      initConsumptionOperator();
     }
 
     function updateConsumptionPreview() {
@@ -5406,9 +5663,10 @@
       const materialId = syncConsumptionMaterialSelection();
       const quantity = parseInt(document.getElementById('consumptionQuantity').value);
       const consumptionDate = document.getElementById('consumptionDate').value;
+      const operator = String(document.getElementById('consumptionOperator').value || '').trim();
 
-      if (!materialId || !quantity || quantity <= 0) {
-        alert('Compila tutti i campi e seleziona un materiale valido');
+      if (!materialId || !quantity || quantity <= 0 || !operator) {
+        alert('Compila tutti i campi, operatore incluso, e seleziona un materiale valido');
         return;
       }
 
@@ -5441,6 +5699,13 @@
           batches[i].quantitàRimanente = batchRemaining - qtyFromBatch;
           totalQtyAfter += batches[i].quantitàRimanente;
           consumed.push({batchId: batches[i].batchId, quantità: qtyFromBatch});
+          batches[i].consumptions = Array.isArray(batches[i].consumptions) ? batches[i].consumptions : [];
+          batches[i].consumptions.push({
+            data: consumptionDate,
+            quantità: qtyFromBatch,
+            operatore: operator,
+            timestamp: new Date().toISOString()
+          });
           remainingQty -= qtyFromBatch;
         }
       }
@@ -5458,16 +5723,18 @@
       material.consumptionHistory.push({
         data: consumptionDate,
         quantità: quantity,
+        operatore: operator,
         batchesConsumed: consumed,
         timestamp: new Date().toISOString()
       });
 
       materials[materialIdx] = material;
       saveToLocalStorage(materials);
+      saveOperator(operator);
 
       // Mostra notifica di conferma
       const batchInfo = consumed.map(c => `${c.quantità} pz da ${c.batchId}`).join(', ');
-      showAlert(`✅ Consumati ${quantity} pz da: ${batchInfo}`, 'info');
+      showAlert(`✅ ${operator} ha consumato ${quantity} pz da: ${batchInfo}`, 'info');
       
       closeConsumptionModal();
       loadMaterialsFromStorage(); // Ricarica tabella
