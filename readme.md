@@ -21,6 +21,13 @@ Quando vuoi passare a modalità admin sicura:
 3. In `firestore.rules`, imposta `allow delete: if isDeleteAdmin();` per `materials` e `implants`.
 4. Pubblica le regole con: `firebase deploy --only firestore:rules`.
 
+Checklist pre-produzione (rapida):
+- Verifica che `ADMIN_DELETE_UIDS` in `index.html` contenga solo UID autorizzati.
+- Attiva il toggle "🔒 Restrizioni elimina admin" nella pagina principale.
+- Verifica in `firestore.rules` che `delete` sia consentito solo con `isDeleteAdmin()`.
+- Esegui deploy regole: `firebase deploy --only firestore:rules`.
+- Test finale: utente non admin (delete bloccato) e utente admin (delete consentito).
+
 Deploy:
 - Sostituire la configurazione Firebase in `index.html` con i valori del tuo progetto Firebase.
 - Abilitare Firestore nel progetto Firebase.

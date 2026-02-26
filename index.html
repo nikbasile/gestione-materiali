@@ -408,6 +408,17 @@
         <li>La quantità del materiale raggiunge il valore soglia impostato</li>
       </ul>
       Gli avvisi sono consultabili in <strong>Report Avvisi</strong> per avere tutto in un'unica vista.
+
+      <div style="margin-top:12px;padding:10px 12px;background:#fff;border:1px solid #d0dce6;border-radius:8px;">
+        <strong>Checklist pre-produzione (sicurezza eliminazione):</strong>
+        <ul style="margin:8px 0 0 18px; font-size:13px; color:#003d7a;">
+          <li>Verifica gli UID autorizzati in <strong>ADMIN_DELETE_UIDS</strong></li>
+          <li>Attiva il toggle <strong>🔒 Restrizioni elimina admin</strong></li>
+          <li>Conferma in Firestore rules: delete solo admin</li>
+          <li>Esegui deploy delle regole Firestore</li>
+          <li>Testa delete con utente non admin e admin</li>
+        </ul>
+      </div>
     </div>
 
     <!-- Pulsanti Principali -->
