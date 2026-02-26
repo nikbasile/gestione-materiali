@@ -1468,6 +1468,15 @@
         }
 
         next.batches = normalizedBatches;
+
+        const computedSummaryExpiry = recomputeMaterialExpiryFromBatches(normalizedBatches);
+        const currentSummaryExpiry = parseFlexibleDate(next.expiry);
+        const currentSummaryExpiryIso = currentSummaryExpiry ? currentSummaryExpiry.toISOString() : null;
+        if ((computedSummaryExpiry || null) !== (currentSummaryExpiryIso || null)) {
+          next.expiry = computedSummaryExpiry;
+          changed = true;
+        }
+
         return next;
       });
 
