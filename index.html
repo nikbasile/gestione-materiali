@@ -1772,8 +1772,15 @@
 
     function loadFromLocalStorage(){
       const saved = localStorage.getItem('magazzino_materials');
-      const parsed = saved ? JSON.parse(saved) : [];
+      const legacy = localStorage.getItem('magazzino');
+      const parsed = saved ? JSON.parse(saved) : (legacy ? JSON.parse(legacy) : []);
       if(!Array.isArray(parsed)) return [];
+
+      if(!saved && legacy && Array.isArray(parsed) && parsed.length > 0){
+        try {
+          localStorage.setItem('magazzino_materials', JSON.stringify(parsed));
+        } catch(_err) {}
+      }
 
       let changed = false;
       const normalized = parsed.map(material => {
