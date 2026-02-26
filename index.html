@@ -653,6 +653,7 @@
         <button class="action-menu-btn" onclick="openImplantsReportModal()" style="background-color:#1976d2">📊 Analisi Spese Impianti</button>
         <button class="action-menu-btn" onclick="openImplantsIncomingRegisterModal()" style="background-color:#43a047">📥 Registro Entrate Impianti</button>
         <button class="action-menu-btn" onclick="openImplantConsumptionModal()" style="background-color:#f57c00">📉 Registra Consumo Impianti</button>
+        <button class="action-menu-btn" onclick="openActiveImplantsUsageModal()" style="background-color:#fbc02d;color:#3e2723;font-weight:700">🟡 Magazzino Attivo Impianti</button>
         <button class="action-menu-btn" onclick="openImplantsOutgoingRegisterModal()" style="background-color:#e53935">📤 Registro Uscite Impianti</button>
         <div id="implantsMenu" class="action-menu" style="display:none;position:absolute;background:white;border:1px solid #ddd;border-radius:8px;box-shadow:0 4px 8px rgba(0,0,0,0.1);z-index:100;min-width:250px;top:40px;left:0">
           <button class="menu-item" onclick="downloadImplantsPDF()">📄 Scarica PDF Impianti</button>
@@ -1417,6 +1418,14 @@
             <input id="implantConsumptionOperator" type="text" list="consumptionOperatorList" placeholder="Es. Maria" required autocomplete="off" />
           </div>
 
+          <div class="consumption-group">
+            <label for="implantConsumptionStatus">Stato</label>
+            <select id="implantConsumptionStatus" onchange="updateImplantConsumptionPreview()">
+              <option value="in_uso" selected>🟡 In uso</option>
+              <option value="consumato">🔴 Consumato</option>
+            </select>
+          </div>
+
           <div class="consumption-preview">
             <div class="consumption-preview-title">📋 Preview Riduzione FEFO</div>
             <div id="implantConsumptionPreviewContent" style="color:#666;font-size:13px;padding:8px">
@@ -1426,7 +1435,7 @@
 
           <div class="consumption-buttons">
             <button type="button" class="consumption-btn cancel" onclick="closeImplantConsumptionModal()">Annulla</button>
-            <button type="submit" class="consumption-btn confirm">✓ Conferma Consumo</button>
+            <button type="submit" class="consumption-btn confirm">✓ Conferma Movimento</button>
           </div>
         </form>
       </div>
@@ -1464,6 +1473,14 @@
               <option value="all">Tutto</option>
             </select>
           </div>
+          <div class="report-filter-group">
+            <label>Stato</label>
+            <select id="implantsOutgoingStatusFilter" onchange="updateImplantsOutgoingRegisterData()">
+              <option value="Tutti" selected>Tutti</option>
+              <option value="in_uso">In uso</option>
+              <option value="consumato">Consumato</option>
+            </select>
+          </div>
           <div class="report-filter-group" style="margin-top:24px">
             <button onclick="resetImplantsOutgoingFilters()" style="padding:8px 16px;background:#d32f2f;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:600">Azzera Filtri</button>
           </div>
@@ -1495,10 +1512,57 @@
                 <th>Modello</th>
                 <th>Operatore</th>
                 <th>Quantità</th>
+                <th>Stato</th>
                 <th>Lotti (data)</th>
               </tr>
             </thead>
             <tbody id="implantsOutgoingRegisterTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Magazzino Attivo Impianti Modal -->
+  <div id="activeImplantsUsageModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:10000;overflow-y:auto;padding:20px">
+    <div class="report-modal-content">
+      <div class="report-header" style="background:linear-gradient(135deg,#fbc02d 0%,#f9a825 100%);color:#3e2723">
+        <h2>🟡 Magazzino Attivo Impianti</h2>
+        <button class="report-close" onclick="closeActiveImplantsUsageModal()" style="border-color:#3e2723;color:#3e2723">×</button>
+      </div>
+      <div class="report-body">
+        <div class="report-stats">
+          <div class="report-stat">
+            <div class="report-stat-label">Voci In Uso</div>
+            <div class="report-stat-value" id="activeImplantsUsageTotalCount">0</div>
+          </div>
+          <div class="report-stat">
+            <div class="report-stat-label">Quantità In Uso</div>
+            <div class="report-stat-value" id="activeImplantsUsageTotalQuantity">0</div>
+          </div>
+          <div class="report-stat">
+            <div class="report-stat-label">Ultimo Prelievo</div>
+            <div class="report-stat-value" id="activeImplantsUsageLastDate" style="font-size:16px">--</div>
+          </div>
+        </div>
+
+        <h3 style="color:#003d7a;margin-bottom:12px">📋 Impianti Attualmente in Uso</h3>
+        <div class="report-table-container">
+          <table class="report-table">
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>Tipo</th>
+                <th>Azienda</th>
+                <th>Modello</th>
+                <th>Operatore</th>
+                <th>Quantità</th>
+                <th>Lotti (data)</th>
+                <th>Stato</th>
+                <th>Azione</th>
+              </tr>
+            </thead>
+            <tbody id="activeImplantsUsageTableBody"></tbody>
           </table>
         </div>
       </div>
@@ -4191,7 +4255,7 @@
         return;
       }
 
-      const headers = ['Data', 'Tipo', 'Azienda', 'Modello', 'Operatore', 'Quantità', 'Lotti (data)'];
+      const headers = ['Data', 'Tipo', 'Azienda', 'Modello', 'Operatore', 'Quantità', 'Stato', 'Lotti (data)'];
       let csvContent = headers.join(',') + '\n';
 
       rowsData.forEach(row => {
@@ -4202,6 +4266,7 @@
           row.model || '--',
           row.operator || '--',
           Number(row.quantity || 0),
+          getConsumptionStatusLabel(row.status),
           row.batches || '--'
         ];
         csvContent += values.map(csvEscape).join(',') + '\n';
@@ -4257,7 +4322,7 @@
         return;
       }
 
-      const headers = ['Data', 'Tipo', 'Azienda', 'Modello', 'Operatore', 'Qta', 'Lotti (data)'];
+      const headers = ['Data', 'Tipo', 'Azienda', 'Modello', 'Operatore', 'Qta', 'Stato', 'Lotti (data)'];
       const rows = rowsData.map(row => [
         formatDate(row.date),
         row.type || '--',
@@ -4265,6 +4330,7 @@
         row.model || '--',
         row.operator || '--',
         String(Number(row.quantity || 0)),
+        getConsumptionStatusLabel(row.status),
         row.batches || '--'
       ]);
       const totalQty = rowsData.reduce((sum, row) => sum + (Number(row.quantity || 0) || 0), 0);
@@ -4279,7 +4345,7 @@
         headers,
         rows,
         summaryLines,
-        [12, 14, 14, 14, 12, 8, 26]
+        [10, 12, 12, 12, 11, 7, 9, 23]
       );
       showAlert('✓ PDF Uscite Impianti scaricato con successo', 'info');
     }
@@ -5500,6 +5566,8 @@
       const hiddenInput = document.getElementById('implantConsumptionId');
       if(searchInput) searchInput.value = '';
       if(hiddenInput) hiddenInput.value = '';
+      const statusEl = document.getElementById('implantConsumptionStatus');
+      if(statusEl) statusEl.value = 'in_uso';
     }
 
     function initImplantConsumptionModal(){
@@ -5542,6 +5610,8 @@
 
       const today = new Date().toISOString().split('T')[0];
       document.getElementById('implantConsumptionDate').value = today;
+      const statusEl = document.getElementById('implantConsumptionStatus');
+      if(statusEl) statusEl.value = 'in_uso';
 
       const lastOp = localStorage.getItem(LAST_OPERATOR_KEY) || '';
       const opInput = document.getElementById('implantConsumptionOperator');
@@ -5628,6 +5698,7 @@
       const quantity = parseInt(document.getElementById('implantConsumptionQuantity').value, 10) || 0;
       const consumptionDate = document.getElementById('implantConsumptionDate').value;
       const operator = String(document.getElementById('implantConsumptionOperator').value || '').trim();
+      const movementStatus = (document.getElementById('implantConsumptionStatus') || {}).value === 'consumato' ? 'consumato' : 'in_uso';
 
       if(!implantId || quantity <= 0 || !consumptionDate || !operator){
         alert('Compila tutti i campi e seleziona un impianto valido');
@@ -5678,10 +5749,13 @@
       implant.expiry = recomputeImplantExpiryFromBatches(implant.batches);
       implant.updatedAt = new Date().toISOString();
       implant.consumptionHistory = Array.isArray(implant.consumptionHistory) ? implant.consumptionHistory : [];
+      const usageId = 'use_impl_' + String(implant.id || 'imp') + '_' + Date.now();
       implant.consumptionHistory.push({
+        usageId,
         data: consumptionDate,
         quantità: quantity,
         operatore: operator,
+        status: movementStatus,
         type: implant.type || '--',
         company: implant.company || '--',
         model: getImplantDisplayModel(implant) || '--',
@@ -5708,11 +5782,14 @@
       }
 
       const lotInfo = consumed.map((c, idx) => `${c.quantità} pz da ${getLotDisplayLabel(c, idx)}`).join(', ');
-      showAlert(`✅ ${operator} ha consumato ${quantity} pz impianti da: ${lotInfo}`, 'info');
+      const statusLabel = getConsumptionStatusLabel(movementStatus);
+      showAlert(`✅ ${operator} ha registrato "${statusLabel}" impianti (${quantity} pz) da: ${lotInfo}`, 'info');
 
       closeImplantConsumptionModal();
       initImplantFilters();
       renderImplantsList();
+      updateImplantsOutgoingRegisterData();
+      updateActiveImplantsUsageData();
     });
 
     // ===== IMPLANTS OUTGOING REGISTER =====
@@ -5761,12 +5838,14 @@
       const typeFilter = document.getElementById('implantsOutgoingTypeFilter').value;
       const operatorFilter = document.getElementById('implantsOutgoingOperatorFilter').value;
       const periodFilter = document.getElementById('implantsOutgoingPeriodFilter').value;
+      const statusFilter = (document.getElementById('implantsOutgoingStatusFilter') || {}).value || 'Tutti';
 
       let allConsumptions = [];
       implants.forEach(i => {
         const history = Array.isArray(i.consumptionHistory) ? i.consumptionHistory : [];
         history.forEach(entry => {
           const operator = String(entry.operatore || entry.operator || '').trim() || '--';
+          const status = entry.status === 'in_uso' ? 'in_uso' : 'consumato';
           const batches = Array.isArray(entry.batchesConsumed)
             ? entry.batchesConsumed.map((b, idx) => `${b.quantità || 0}pz da ${getLotDisplayLabel(b, idx)}`).join(', ')
             : '--';
@@ -5777,6 +5856,7 @@
             model: getImplantDisplayModel(i) || '--',
             operator,
             quantity: Number(entry.quantità || 0) || 0,
+            status,
             batches
           });
         });
@@ -5785,6 +5865,7 @@
       allConsumptions = allConsumptions.filter(c => {
         if(typeFilter !== 'Tutti' && c.type !== typeFilter) return false;
         if(operatorFilter !== 'Tutti' && c.operator !== operatorFilter) return false;
+        if(statusFilter !== 'Tutti' && c.status !== statusFilter) return false;
         return true;
       });
 
@@ -5830,6 +5911,7 @@
           <td>${c.model || '--'}</td>
           <td>${c.operator || '--'}</td>
           <td>${c.quantity || 0}</td>
+          <td>${getConsumptionStatusBadge(c.status)}</td>
           <td>${c.batches || '--'}</td>
         `;
         tbody.appendChild(tr);
@@ -5837,7 +5919,7 @@
 
       if(filtered.length === 0){
         const tr = document.createElement('tr');
-        tr.innerHTML = '<td colspan="7" style="text-align:center;color:#999;padding:20px">Nessuna uscita impianti trovata</td>';
+        tr.innerHTML = '<td colspan="8" style="text-align:center;color:#999;padding:20px">Nessuna uscita impianti trovata</td>';
         tbody.appendChild(tr);
       }
     }
@@ -5846,7 +5928,147 @@
       document.getElementById('implantsOutgoingTypeFilter').value = 'Tutti';
       document.getElementById('implantsOutgoingOperatorFilter').value = 'Tutti';
       document.getElementById('implantsOutgoingPeriodFilter').value = '30';
+      const statusFilter = document.getElementById('implantsOutgoingStatusFilter');
+      if(statusFilter) statusFilter.value = 'Tutti';
       updateImplantsOutgoingRegisterData();
+    }
+
+    function getActiveImplantsUsageData(){
+      const implants = loadImplantsFromStorage();
+      const rows = [];
+      implants.forEach(implant => {
+        const history = Array.isArray(implant.consumptionHistory) ? implant.consumptionHistory : [];
+        history.forEach((entry, index) => {
+          const status = entry.status === 'in_uso' ? 'in_uso' : 'consumato';
+          if(status !== 'in_uso' || entry.closedAt) return;
+          rows.push({
+            implantId: implant.id,
+            usageId: String(entry.usageId || `${implant.id}_${index}`),
+            date: entry.data || entry.timestamp,
+            type: implant.type || '--',
+            company: implant.company || '--',
+            model: getImplantDisplayModel(implant) || '--',
+            operator: String(entry.operatore || entry.operator || '').trim() || '--',
+            quantity: Number(entry.quantità || 0) || 0,
+            batches: Array.isArray(entry.batchesConsumed)
+              ? entry.batchesConsumed.map((b, idx) => `${b.quantità || 0}pz da ${getLotDisplayLabel(b, idx)}`).join(', ')
+              : '--',
+            status
+          });
+        });
+      });
+
+      rows.sort((a,b) => {
+        const da = parseFlexibleDate(a.date);
+        const db = parseFlexibleDate(b.date);
+        return (db ? db.getTime() : 0) - (da ? da.getTime() : 0);
+      });
+      return rows;
+    }
+
+    function openActiveImplantsUsageModal(){
+      const modal = document.getElementById('activeImplantsUsageModal');
+      if(!modal) return;
+      modal.style.display = 'flex';
+      modal.style.alignItems = 'flex-start';
+      modal.style.justifyContent = 'center';
+      updateActiveImplantsUsageData();
+    }
+
+    function closeActiveImplantsUsageModal(){
+      const modal = document.getElementById('activeImplantsUsageModal');
+      if(!modal) return;
+      modal.style.display = 'none';
+    }
+
+    async function markImplantUsageAsConsumed(implantId, usageId){
+      const implants = loadImplantsFromStorage();
+      const implantIdx = implants.findIndex(i => i.id === implantId);
+      if(implantIdx < 0){
+        showAlert('Impianto non trovato', 'warn');
+        return;
+      }
+
+      const implant = implants[implantIdx];
+      implant.consumptionHistory = Array.isArray(implant.consumptionHistory) ? implant.consumptionHistory : [];
+      const entry = implant.consumptionHistory.find((h, idx) => String(h.usageId || `${implant.id}_${idx}`) === String(usageId));
+      if(!entry){
+        showAlert('Voce in uso impianto non trovata', 'warn');
+        return;
+      }
+      if(entry.closedAt || entry.status === 'consumato'){
+        showAlert('Voce impianto già chiusa come consumata', 'warn');
+        return;
+      }
+
+      const suggestedOperator = String(localStorage.getItem(LAST_OPERATOR_KEY) || entry.operatore || '').trim();
+      const closingOperator = prompt('Operatore che chiude il consumo impianto:', suggestedOperator);
+      if(closingOperator === null) return;
+      const operator = String(closingOperator || '').trim() || String(entry.operatore || '--').trim();
+
+      entry.status = 'consumato';
+      entry.closedAt = new Date().toISOString();
+      entry.closedBy = operator;
+      entry.updatedAt = new Date().toISOString();
+
+      implants[implantIdx] = implant;
+      saveImplantsToStorage(implants);
+      saveOperator(operator);
+
+      if(firebaseReady && typeof db !== 'undefined'){
+        try {
+          await db.collection('implants').doc(implant.id).set({
+            consumptionHistory: implant.consumptionHistory,
+            updatedAt: new Date().toISOString()
+          }, { merge: true });
+        } catch(err){
+          console.warn('Firebase sync chiusura in uso impianti non riuscita:', err && err.message ? err.message : err);
+        }
+      }
+
+      showAlert(`✅ ${operator} ha chiuso come consumato l'impianto in uso`, 'info');
+      updateActiveImplantsUsageData();
+      updateImplantsOutgoingRegisterData();
+    }
+
+    function updateActiveImplantsUsageData(){
+      const rows = getActiveImplantsUsageData();
+      const totalCount = rows.length;
+      const totalQuantity = rows.reduce((sum, row) => sum + (Number(row.quantity || 0) || 0), 0);
+      const lastDate = rows.length > 0 ? formatDate(rows[0].date) : '--';
+
+      const totalCountEl = document.getElementById('activeImplantsUsageTotalCount');
+      const totalQtyEl = document.getElementById('activeImplantsUsageTotalQuantity');
+      const lastDateEl = document.getElementById('activeImplantsUsageLastDate');
+      if(totalCountEl) totalCountEl.textContent = String(totalCount);
+      if(totalQtyEl) totalQtyEl.textContent = String(totalQuantity);
+      if(lastDateEl) lastDateEl.textContent = lastDate;
+
+      const tbody = document.getElementById('activeImplantsUsageTableBody');
+      if(!tbody) return;
+      tbody.innerHTML = '';
+
+      rows.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${formatDate(row.date)}</td>
+          <td>${row.type || '--'}</td>
+          <td>${row.company || '--'}</td>
+          <td>${row.model || '--'}</td>
+          <td>${row.operator || '--'}</td>
+          <td>${row.quantity || 0}</td>
+          <td>${row.batches || '--'}</td>
+          <td>${getConsumptionStatusBadge(row.status)}</td>
+          <td><button style="padding:6px 10px;background:#d32f2f;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:600" onclick="markImplantUsageAsConsumed('${row.implantId}','${row.usageId}')">Segna consumato</button></td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      if(rows.length === 0){
+        const tr = document.createElement('tr');
+        tr.innerHTML = '<td colspan="9" style="text-align:center;color:#999;padding:20px">Nessun impianto attualmente in uso</td>';
+        tbody.appendChild(tr);
+      }
     }
 
     // ===== NUOVO ORDINE FUNCTIONS =====
