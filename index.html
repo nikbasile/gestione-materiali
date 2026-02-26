@@ -746,6 +746,14 @@
               <option value="Tutti">Tutti</option>
             </select>
           </div>
+          <div class="report-filter-group">
+            <label>Stato Movimento</label>
+            <select id="reportStatusFilter" onchange="updateReportData()">
+              <option value="Tutti" selected>Tutti</option>
+              <option value="in_uso">In uso</option>
+              <option value="consumato">Consumato</option>
+            </select>
+          </div>
           <div class="report-filter-group" style="margin-top:24px">
             <button onclick="resetReportFilters()" style="padding:8px 16px;background:#d32f2f;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:600">Azzera Filtri</button>
           </div>
@@ -1247,6 +1255,14 @@
             <label>Azienda</label>
             <select id="implantsReportCompanyFilter" onchange="updateImplantsReportData()">
               <option value="Tutte">Tutte</option>
+            </select>
+          </div>
+          <div class="report-filter-group">
+            <label>Stato Movimento</label>
+            <select id="implantsReportStatusFilter" onchange="updateImplantsReportData()">
+              <option value="Tutti" selected>Tutti</option>
+              <option value="in_uso">In uso</option>
+              <option value="consumato">Consumato</option>
             </select>
           </div>
           <div class="report-filter-group" style="margin-top:24px">
@@ -4571,11 +4587,20 @@
       const categoryFilter = document.getElementById('reportCategoryFilter').value;
       const companyFilter = document.getElementById('reportCompanyFilter').value;
       const distributorFilter = document.getElementById('reportDistributorFilter').value;
+      const statusFilter = (document.getElementById('reportStatusFilter') || {}).value || 'Tutti';
 
       return materials.filter(m => {
         if (categoryFilter !== 'Tutti' && m.category !== categoryFilter) return false;
         if (companyFilter !== 'Tutte' && m.company !== companyFilter) return false;
         if (distributorFilter !== 'Tutti' && m.distributor !== distributorFilter) return false;
+        if (statusFilter !== 'Tutti') {
+          const history = Array.isArray(m.consumptionHistory) ? m.consumptionHistory : [];
+          const hasStatus = history.some(entry => {
+            const entryStatus = entry && entry.status === 'in_uso' ? 'in_uso' : 'consumato';
+            return entryStatus === statusFilter;
+          });
+          if (!hasStatus) return false;
+        }
         return true;
       });
     }
@@ -4711,6 +4736,8 @@
       document.getElementById('reportCategoryFilter').value = 'Tutti';
       document.getElementById('reportCompanyFilter').value = 'Tutte';
       document.getElementById('reportDistributorFilter').value = 'Tutti';
+      const statusFilter = document.getElementById('reportStatusFilter');
+      if(statusFilter) statusFilter.value = 'Tutti';
       updateReportData();
     }
 
@@ -5232,10 +5259,19 @@
       const implants = loadImplantsFromStorage();
       const typeFilter = document.getElementById('implantsReportTypeFilter').value;
       const companyFilter = document.getElementById('implantsReportCompanyFilter').value;
+      const statusFilter = (document.getElementById('implantsReportStatusFilter') || {}).value || 'Tutti';
 
       return implants.filter(i => {
         if (typeFilter !== 'Tutti' && i.type !== typeFilter) return false;
         if (companyFilter !== 'Tutte' && i.company !== companyFilter) return false;
+        if (statusFilter !== 'Tutti') {
+          const history = Array.isArray(i.consumptionHistory) ? i.consumptionHistory : [];
+          const hasStatus = history.some(entry => {
+            const entryStatus = entry && entry.status === 'in_uso' ? 'in_uso' : 'consumato';
+            return entryStatus === statusFilter;
+          });
+          if (!hasStatus) return false;
+        }
         return true;
       });
     }
@@ -5369,6 +5405,8 @@
     function resetImplantsReportFilters() {
       document.getElementById('implantsReportTypeFilter').value = 'Tutti';
       document.getElementById('implantsReportCompanyFilter').value = 'Tutte';
+      const statusFilter = document.getElementById('implantsReportStatusFilter');
+      if(statusFilter) statusFilter.value = 'Tutti';
       updateImplantsReportData();
     }
 
