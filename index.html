@@ -454,6 +454,11 @@
         </div>
 
         <div style="display:flex;gap:12px;align-items:center">
+          <label style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #d0dce6;border-radius:8px;padding:8px 12px;font-size:13px;color:#003d7a;font-weight:600;white-space:nowrap;">
+            <input type="checkbox" id="deleteRestrictionsToggle" />
+            🔒 Restrizioni elimina admin
+          </label>
+
           <!-- Pulsante Scarica Dati Materiali -->
           <div style="position:relative">
             <button class="action-menu-btn" onclick="toggleActionMenu('downloadMenu')">📥 Scarica Dati ▼</button>
@@ -1528,6 +1533,13 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
     const auth = firebase.auth();
+    const DELETE_RESTRICTIONS_KEY = 'magazzino_delete_restrictions_active_v1';
+    const ADMIN_DELETE_UIDS = [
+      'INSERISCI_UID_ADMIN'
+    ];
+    let currentUserUid = null;
+    let deleteRestrictionsActive = loadDeleteRestrictionsFlag();
+    let isDeleteAdmin = false;
     const APP_VERSION = '2026-02-20-fix-local-first-3';
     console.log('App version:', APP_VERSION);
     let firebaseReady = true;
@@ -1541,14 +1553,64 @@
     // Login anonimo automatico
     auth.onAuthStateChanged(user => {
       if (!user) {
+        currentUserUid = null;
+        isDeleteAdmin = false;
         auth.signInAnonymously().catch(err => {
           console.warn('Errore login anonimo:', err.message);
         });
       } else {
         console.log('Login anonimo riuscito:', user.uid);
+        currentUserUid = user.uid;
+        refreshDeletePermissions();
         startRealtimeListeners();
       }
     });
+
+    function loadDeleteRestrictionsFlag(){
+      try {
+        return localStorage.getItem(DELETE_RESTRICTIONS_KEY) === 'true';
+      } catch(_err) {
+        return false;
+      }
+    }
+
+    function saveDeleteRestrictionsFlag(value){
+      try {
+        localStorage.setItem(DELETE_RESTRICTIONS_KEY, value ? 'true' : 'false');
+      } catch(_err) {}
+    }
+
+    function refreshDeletePermissions(){
+      isDeleteAdmin = !deleteRestrictionsActive || ADMIN_DELETE_UIDS.includes(String(currentUserUid || ''));
+      const toggle = document.getElementById('deleteRestrictionsToggle');
+      if (toggle) toggle.checked = !!deleteRestrictionsActive;
+      if (Array.isArray(allDocs) && allDocs.length >= 0) renderFilteredMaterials();
+      if (typeof renderImplantsList === 'function') renderImplantsList();
+    }
+
+    function initDeleteRestrictionsToggle(){
+      const toggle = document.getElementById('deleteRestrictionsToggle');
+      if (!toggle) return;
+      toggle.checked = !!deleteRestrictionsActive;
+      toggle.addEventListener('change', function(){
+        deleteRestrictionsActive = !!this.checked;
+        saveDeleteRestrictionsFlag(deleteRestrictionsActive);
+        refreshDeletePermissions();
+        showAlert(
+          deleteRestrictionsActive
+            ? '🔒 Restrizioni eliminazione attive (solo admin)'
+            : '🔓 Restrizioni eliminazione disattive (modalità test)',
+          'info'
+        );
+      });
+    }
+
+    function ensureDeleteAdmin(){
+      if(!deleteRestrictionsActive) return true;
+      if(isDeleteAdmin) return true;
+      showAlert('Azione consentita solo all\'amministratore', 'warn');
+      return false;
+    }
 
     const listEl = document.getElementById('list');
     const alertsEl = document.getElementById('alerts');
@@ -2158,6 +2220,7 @@
     }
 
     function deleteImplant(id){
+      if(!ensureDeleteAdmin()) return;
       if(!confirm('Eliminare questo impianto?')) return;
       const implants = loadImplantsFromStorage();
       const filtered = implants.filter(m=>m.id !== id);
@@ -2352,7 +2415,9 @@
           <td data-label="Prezzo">€ ${Number(implant.price||0).toFixed(2)}</td>
           <td data-label="Quantità" style="text-align:center">${qtyBadge}</td>
           <td data-label="Azioni" style="white-space:nowrap">
-            <button class="btn-action btn-del" onclick="deleteImplant('${implant.id}')" title="Elimina">×</button>
+            ${(!deleteRestrictionsActive || isDeleteAdmin)
+              ? `<button class="btn-action btn-del" onclick="deleteImplant('${implant.id}')" title="Elimina">×</button>`
+              : '<span title="Solo amministratore" style="font-size:16px;opacity:0.7">🔒</span>'}
           </td>
         `;
         implantsList.appendChild(tr);
@@ -3147,12 +3212,17 @@
         <td data-label="Azienda">${escapeHtml(data.company||'-')}</td>
         <td data-label="Quantità" style="text-align:center;">${lowBadge}<div><span class="editable-threshold" title="Modifica soglia quantità" style="font-size:11px;color:#003d7a;cursor:pointer;text-decoration:underline;">Soglia: ${soglia}</span></div></td>
         <td data-label="Azioni" style="white-space:nowrap;padding:8px;">
-          <button data-id="${doc.id}" class="btn-action btn-del" title="Elimina">×</button>
+          ${(!deleteRestrictionsActive || isDeleteAdmin)
+            ? `<button data-id="${doc.id}" class="btn-action btn-del" title="Elimina">×</button>`
+            : '<span title="Solo amministratore" style="font-size:16px;opacity:0.7">🔒</span>'}
         </td>
       `;
       
       // attach actions
-      tr.querySelector('.btn-del').addEventListener('click', (e)=>{e.preventDefault(); deleteItem(doc.id)});
+      const deleteBtn = tr.querySelector('.btn-del');
+      if(deleteBtn){
+        deleteBtn.addEventListener('click', (e)=>{e.preventDefault(); deleteItem(doc.id)});
+      }
       tr.querySelector('.editable-name').addEventListener('click', () => {
         const newName = prompt('Modifica nome materiale:', data.name);
         if(newName && newName.trim() && newName !== data.name) {
@@ -3274,6 +3344,7 @@
     }
 
     function deleteItem(id){
+      if(!ensureDeleteAdmin()) return;
       if(!confirm('Eliminare questo elemento?')) return;
       deleteFromLocalStorage(id);
       loadMaterialsFromStorage(); // aggiorna subito la UI
@@ -3442,6 +3513,8 @@
 
     // Load initial data from localStorage on page load
     window.addEventListener('load', ()=>{
+      initDeleteRestrictionsToggle();
+      refreshDeletePermissions();
       applyAlertsSettingsToUI();
       loadMaterialsFromStorage();
     });
