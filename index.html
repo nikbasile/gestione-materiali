@@ -632,9 +632,15 @@
         <button class="action-menu-btn" onclick="toggleActionMenu('implantsMenu')">📥 Scarica Dati ▼</button>
         <button class="action-menu-btn" onclick="openImplantsReportModal()" style="background-color:#1976d2">📊 Analisi Spese Impianti</button>
         <button class="action-menu-btn" onclick="openImplantsIncomingRegisterModal()" style="background-color:#43a047">📥 Registro Entrate Impianti</button>
+        <button class="action-menu-btn" onclick="openImplantConsumptionModal()" style="background-color:#f57c00">📉 Registra Consumo Impianti</button>
+        <button class="action-menu-btn" onclick="openImplantsOutgoingRegisterModal()" style="background-color:#e53935">📤 Registro Uscite Impianti</button>
         <div id="implantsMenu" class="action-menu" style="display:none;position:absolute;background:white;border:1px solid #ddd;border-radius:8px;box-shadow:0 4px 8px rgba(0,0,0,0.1);z-index:100;min-width:250px;top:40px;left:0">
           <button class="menu-item" onclick="downloadImplantsPDF()">📄 Scarica PDF Impianti</button>
           <button class="menu-item" onclick="exportImplantsCSV()">📊 Scarica CSV Impianti</button>
+          <button class="menu-item" onclick="downloadImplantsIncomingLotsPDF()">📄 PDF Entrate Lotti Impianti</button>
+          <button class="menu-item" onclick="exportImplantsIncomingLotsCSV()">📊 CSV Entrate Lotti Impianti</button>
+          <button class="menu-item" onclick="downloadImplantsOutgoingPDF()">📄 PDF Uscite Impianti</button>
+          <button class="menu-item" onclick="exportImplantsOutgoingCSV()">📊 CSV Uscite Impianti</button>
         </div>
       </div>
       
@@ -848,7 +854,7 @@
                 <th>Nome Materiale</th>
                 <th>Distributore</th>
                 <th>Quantità</th>
-                <th>ID Batch</th>
+                <th>ID Lotto</th>
                 <th>Tipo</th>
               </tr>
             </thead>
@@ -920,7 +926,7 @@
                 <th>Nome Materiale</th>
                 <th>Operatore</th>
                 <th>Quantità</th>
-                <th>Batch Utilizzati</th>
+                <th>Lotti Utilizzati</th>
               </tr>
             </thead>
             <tbody id="outgoingRegisterTableBody"></tbody>
@@ -1288,10 +1294,129 @@
                 <th>Azienda</th>
                 <th>Modello</th>
                 <th>Quantità</th>
-                <th>ID Impianto</th>
+                <th>ID Lotto</th>
               </tr>
             </thead>
             <tbody id="implantsIncomingRegisterTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Consumo Impianti Modal -->
+  <div id="implantConsumptionModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:10000;overflow-y:auto;padding:20px">
+    <div class="consumption-modal-content">
+      <div class="consumption-header">
+        <h2>📉 Registra Consumo Impianti</h2>
+        <button class="consumption-close" onclick="closeImplantConsumptionModal()">×</button>
+      </div>
+      <div class="consumption-body">
+        <form class="consumption-form" id="implantConsumptionForm">
+          <div class="consumption-group">
+            <label for="implantConsumptionSearch">Impianto</label>
+            <input id="implantConsumptionSearch" type="text" list="implantConsumptionList" placeholder="Scrivi tipo/modello impianto..." autocomplete="off" required oninput="updateImplantConsumptionPreview()" onchange="updateImplantConsumptionPreview()" />
+            <datalist id="implantConsumptionList"></datalist>
+            <input id="implantConsumptionId" type="hidden" />
+          </div>
+
+          <div class="consumption-group">
+            <label for="implantConsumptionQuantity">Quantità da consumare (pz)</label>
+            <input id="implantConsumptionQuantity" type="number" min="1" step="1" required onchange="updateImplantConsumptionPreview()" />
+          </div>
+
+          <div class="consumption-group">
+            <label for="implantConsumptionDate">Data consumo</label>
+            <input id="implantConsumptionDate" type="date" required onchange="updateImplantConsumptionPreview()" />
+          </div>
+
+          <div class="consumption-group">
+            <label for="implantConsumptionOperator">Operatore</label>
+            <input id="implantConsumptionOperator" type="text" list="consumptionOperatorList" placeholder="Es. Maria" required autocomplete="off" />
+          </div>
+
+          <div class="consumption-preview">
+            <div class="consumption-preview-title">📋 Preview Riduzione FEFO</div>
+            <div id="implantConsumptionPreviewContent" style="color:#666;font-size:13px;padding:8px">
+              Seleziona un impianto per visualizzare anteprima...
+            </div>
+          </div>
+
+          <div class="consumption-buttons">
+            <button type="button" class="consumption-btn cancel" onclick="closeImplantConsumptionModal()">Annulla</button>
+            <button type="submit" class="consumption-btn confirm">✓ Conferma Consumo</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Registro Uscite Impianti Modal -->
+  <div id="implantsOutgoingRegisterModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:10000;overflow-y:auto;padding:20px">
+    <div class="report-modal-content">
+      <div class="report-header" style="background:linear-gradient(135deg,#e53935 0%,#b71c1c 100%)">
+        <h2>📤 Registro Uscite Impianti</h2>
+        <button class="report-close" onclick="closeImplantsOutgoingRegisterModal()">×</button>
+      </div>
+      <div class="report-body">
+        <div class="report-filters">
+          <div class="report-filter-group">
+            <label>Tipo</label>
+            <select id="implantsOutgoingTypeFilter" onchange="updateImplantsOutgoingRegisterData()">
+              <option value="Tutti">Tutti</option>
+            </select>
+          </div>
+          <div class="report-filter-group">
+            <label>Operatore</label>
+            <select id="implantsOutgoingOperatorFilter" onchange="updateImplantsOutgoingRegisterData()">
+              <option value="Tutti">Tutti</option>
+            </select>
+          </div>
+          <div class="report-filter-group">
+            <label>Periodo</label>
+            <select id="implantsOutgoingPeriodFilter" onchange="updateImplantsOutgoingRegisterData()">
+              <option value="7">Ultimi 7 giorni</option>
+              <option value="30" selected>Ultimi 30 giorni</option>
+              <option value="90">Ultimi 90 giorni</option>
+              <option value="365">Ultimo anno</option>
+              <option value="all">Tutto</option>
+            </select>
+          </div>
+          <div class="report-filter-group" style="margin-top:24px">
+            <button onclick="resetImplantsOutgoingFilters()" style="padding:8px 16px;background:#d32f2f;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:600">Azzera Filtri</button>
+          </div>
+        </div>
+
+        <div class="report-stats">
+          <div class="report-stat">
+            <div class="report-stat-label">Totale Uscite</div>
+            <div class="report-stat-value" id="implantsOutgoingTotalCount">0</div>
+          </div>
+          <div class="report-stat">
+            <div class="report-stat-label">Quantità Totale Scaricata</div>
+            <div class="report-stat-value" id="implantsOutgoingTotalQuantity">0</div>
+          </div>
+          <div class="report-stat">
+            <div class="report-stat-label">Ultimo Scarico</div>
+            <div class="report-stat-value" id="implantsOutgoingLastDate" style="font-size:16px">--</div>
+          </div>
+        </div>
+
+        <h3 style="color:#003d7a;margin-bottom:12px">📋 Storico Uscite Impianti</h3>
+        <div class="report-table-container">
+          <table class="report-table">
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>Tipo</th>
+                <th>Azienda</th>
+                <th>Modello</th>
+                <th>Operatore</th>
+                <th>Quantità</th>
+                <th>Lotti Utilizzati</th>
+              </tr>
+            </thead>
+            <tbody id="implantsOutgoingRegisterTableBody"></tbody>
           </table>
         </div>
       </div>
@@ -1675,19 +1800,19 @@
 
       const material = materials[materialIdx];
       if(!Array.isArray(material.batches) || material.batches.length === 0){
-        showAlert('Nessun batch disponibile', 'warn');
+        showAlert('Nessun lotto disponibile', 'warn');
         return;
       }
 
       const batch = material.batches.find(b => String(b.batchId || b.id) === String(batchId));
       if(!batch){
-        showAlert('Batch non trovato', 'warn');
+        showAlert('Lotto non trovato', 'warn');
         return;
       }
 
       const current = parseFlexibleDate(batch.scadenza);
       const currentInput = current ? current.toISOString().split('T')[0] : '';
-      const newExpiry = prompt('Inserisci data scadenza batch (YYYY-MM-DD). Lascia vuoto per rimuovere:', currentInput);
+      const newExpiry = prompt('Inserisci data scadenza lotto (YYYY-MM-DD). Lascia vuoto per rimuovere:', currentInput);
       if(newExpiry === null) return;
 
       const value = String(newExpiry || '').trim();
@@ -1696,7 +1821,7 @@
       } else {
         const parsed = parseFlexibleDate(value);
         if(!parsed){
-          showAlert('Data scadenza batch non valida. Usa formato YYYY-MM-DD.', 'warn');
+          showAlert('Data scadenza lotto non valida. Usa formato YYYY-MM-DD.', 'warn');
           return;
         }
         batch.scadenza = parsed.toISOString();
@@ -1720,7 +1845,7 @@
       }
 
       loadMaterialsFromStorage();
-      showAlert('✓ Scadenza batch aggiornata', 'info');
+      showAlert('✓ Scadenza lotto aggiornata', 'info');
     }
 
     function promptSelectOrCustom(title, options, currentValue){
@@ -1740,18 +1865,109 @@
     let currentImplantModelFilter = 'Tutti';
     let currentImplantExpiryFilter = 'Tutte';
 
+    function getImplantDisplayModel(implant){
+      return implant && (implant.model || implant.kitComponents) ? (implant.model || implant.kitComponents) : null;
+    }
+
+    function getImplantIdentityKey(implant){
+      const parts = [
+        String(implant && implant.type ? implant.type : '').trim().toLowerCase(),
+        String(implant && implant.company ? implant.company : '').trim().toLowerCase(),
+        String(getImplantDisplayModel(implant) || '').trim().toLowerCase(),
+        String(implant && implant.diameter ? implant.diameter : '').trim().toLowerCase(),
+        String(implant && implant.length ? implant.length : '').trim().toLowerCase()
+      ];
+      return parts.join('|');
+    }
+
+    function normalizeImplantBatchRecord(batch, implant){
+      if(!batch || typeof batch !== 'object') return null;
+      const qty = Number(batch.quantità ?? batch.quantita ?? batch.originalQuantita ?? batch.quantity ?? 0) || 0;
+      const qtyRemaining = Number(
+        batch.quantitàRimanente ?? batch.quantitaRimanente ?? batch.remainingQuantity ?? batch.quantityRemaining ?? qty
+      ) || 0;
+
+      return {
+        ...batch,
+        batchId: batch.batchId || batch.id || ('lotto_implant_' + String(implant.id || 'imp') + '_' + Date.now()),
+        dataOrdine: batch.dataOrdine || batch.orderDate || batch.data || implant.orderDate || implant.createdAt || new Date().toISOString(),
+        quantità: qty,
+        quantitàRimanente: qtyRemaining,
+        prezzo: Number(batch.prezzo ?? batch.price ?? implant.price ?? 0) || 0,
+        scadenza: batch.scadenza ?? batch.expiry ?? implant.expiry ?? null,
+        azienda: batch.azienda || batch.company || implant.company || ''
+      };
+    }
+
+    function recomputeImplantExpiryFromBatches(batches){
+      if(!Array.isArray(batches) || batches.length === 0) return null;
+      const dated = batches
+        .filter(b => Number(b.quantitàRimanente || 0) > 0)
+        .map(b => parseFlexibleDate(b.scadenza))
+        .filter(Boolean)
+        .sort((a, b) => b.getTime() - a.getTime());
+      if(dated.length === 0) return null;
+      return dated[0].toISOString();
+    }
+
     function loadImplantsFromStorage(){
       const saved = localStorage.getItem('magazzino_implants');
       const implants = saved ? JSON.parse(saved) : [];
       if(!Array.isArray(implants)) return [];
       let changed = false;
       const normalized = implants.map(item => {
-        if(item && item.id) return item;
-        changed = true;
-        return {
-          ...item,
-          id: (window.crypto && window.crypto.randomUUID ? window.crypto.randomUUID() : '_implant_' + Date.now() + '_' + Math.floor(Math.random() * 100000))
-        };
+        if(!item || typeof item !== 'object') return item;
+        const next = { ...item };
+        if(!next.id){
+          next.id = (window.crypto && window.crypto.randomUUID ? window.crypto.randomUUID() : '_implant_' + Date.now() + '_' + Math.floor(Math.random() * 100000));
+          changed = true;
+        }
+
+        if(!Array.isArray(next.batches)) {
+          next.batches = [];
+          changed = true;
+        }
+
+        if(!Array.isArray(next.consumptionHistory)) {
+          next.consumptionHistory = [];
+          changed = true;
+        }
+
+        const normalizedBatches = next.batches
+          .map(batch => normalizeImplantBatchRecord(batch, next))
+          .filter(Boolean);
+        if(normalizedBatches.length !== next.batches.length) changed = true;
+
+        const currentQty = Number(next.quantity || 0) || 0;
+        if(normalizedBatches.length === 0 && currentQty > 0){
+          normalizedBatches.push(normalizeImplantBatchRecord({
+            batchId: 'lotto_restore_' + String(next.id || 'imp') + '_' + Date.now(),
+            dataOrdine: next.orderDate || next.createdAt || new Date().toISOString(),
+            quantità: currentQty,
+            quantitàRimanente: currentQty,
+            prezzo: Number(next.price || 0),
+            scadenza: next.expiry || null,
+            azienda: next.company || ''
+          }, next));
+          changed = true;
+        }
+
+        next.batches = normalizedBatches;
+        const computedQty = normalizedBatches.reduce((sum, b) => sum + (Number(b.quantitàRimanente || 0) || 0), 0);
+        if(currentQty !== computedQty) {
+          next.quantity = computedQty;
+          changed = true;
+        }
+
+        const computedExpiry = recomputeImplantExpiryFromBatches(normalizedBatches);
+        const currentExpiry = parseFlexibleDate(next.expiry);
+        const currentExpiryIso = currentExpiry ? currentExpiry.toISOString() : null;
+        if((computedExpiry || null) !== (currentExpiryIso || null)) {
+          next.expiry = computedExpiry;
+          changed = true;
+        }
+
+        return next;
       });
       if(changed){
         saveImplantsToStorage(normalized);
@@ -1877,6 +2093,38 @@
       const newImplant = {...implant, id: implant.id || (window.crypto && window.crypto.randomUUID ? window.crypto.randomUUID() : '_implant_'+Date.now())};
       if(newImplant.orderDate instanceof Date) newImplant.orderDate = newImplant.orderDate.toISOString();
       if(newImplant.expiry instanceof Date) newImplant.expiry = newImplant.expiry.toISOString();
+      if(newImplant.createdAt instanceof Date) newImplant.createdAt = newImplant.createdAt.toISOString();
+
+      const batchId = 'lotto_impl_' + String(newImplant.id).substring(0, 8) + '_' + Date.now();
+      const newBatch = normalizeImplantBatchRecord({
+        batchId,
+        dataOrdine: newImplant.orderDate,
+        quantità: Number(newImplant.quantity || 0),
+        quantitàRimanente: Number(newImplant.quantity || 0),
+        prezzo: Number(newImplant.price || 0),
+        scadenza: newImplant.expiry || null,
+        azienda: newImplant.company || ''
+      }, newImplant);
+
+      const identityKey = getImplantIdentityKey(newImplant);
+      const existingIdx = implants.findIndex(item => getImplantIdentityKey(item) === identityKey);
+
+      if(existingIdx >= 0){
+        const existing = implants[existingIdx];
+        if(!Array.isArray(existing.batches)) existing.batches = [];
+        if(newBatch) existing.batches.push(newBatch);
+        existing.quantity = existing.batches.reduce((sum, b) => sum + (Number(b.quantitàRimanente || 0) || 0), 0);
+        existing.expiry = recomputeImplantExpiryFromBatches(existing.batches);
+        existing.updatedAt = new Date().toISOString();
+        implants[existingIdx] = existing;
+        saveImplantsToStorage(implants);
+        return existing.id;
+      }
+
+      newImplant.batches = newBatch ? [newBatch] : [];
+      newImplant.consumptionHistory = Array.isArray(newImplant.consumptionHistory) ? newImplant.consumptionHistory : [];
+      newImplant.quantity = newImplant.batches.reduce((sum, b) => sum + (Number(b.quantitàRimanente || 0) || 0), 0);
+      newImplant.expiry = recomputeImplantExpiryFromBatches(newImplant.batches);
       implants.push(newImplant);
       saveImplantsToStorage(implants);
       return newImplant.id;
@@ -1960,6 +2208,64 @@
       renderImplantsList();
     }
 
+    async function editImplantBatchExpiry(implantId, batchId){
+      const implants = loadImplantsFromStorage();
+      const implantIdx = implants.findIndex(i => String(i.id) === String(implantId));
+      if(implantIdx < 0){
+        showAlert('Impianto non trovato', 'warn');
+        return;
+      }
+
+      const implant = implants[implantIdx];
+      if(!Array.isArray(implant.batches) || implant.batches.length === 0){
+        showAlert('Nessun lotto disponibile', 'warn');
+        return;
+      }
+
+      const batch = implant.batches.find(b => String(b.batchId || b.id) === String(batchId));
+      if(!batch){
+        showAlert('Lotto non trovato', 'warn');
+        return;
+      }
+
+      const current = parseFlexibleDate(batch.scadenza);
+      const currentInput = current ? current.toISOString().split('T')[0] : '';
+      const newExpiry = prompt('Inserisci data scadenza lotto impianto (YYYY-MM-DD). Lascia vuoto per rimuovere:', currentInput);
+      if(newExpiry === null) return;
+
+      const value = String(newExpiry || '').trim();
+      if(!value){
+        batch.scadenza = null;
+      } else {
+        const parsed = parseFlexibleDate(value);
+        if(!parsed){
+          showAlert('Data scadenza lotto non valida. Usa formato YYYY-MM-DD.', 'warn');
+          return;
+        }
+        batch.scadenza = parsed.toISOString();
+      }
+
+      implant.updatedAt = new Date().toISOString();
+      implant.expiry = recomputeImplantExpiryFromBatches(implant.batches);
+      implants[implantIdx] = implant;
+      saveImplantsToStorage(implants);
+
+      if(firebaseReady && typeof db !== 'undefined'){
+        try {
+          await db.collection('implants').doc(implant.id).set({
+            batches: implant.batches,
+            expiry: implant.expiry,
+            updatedAt: implant.updatedAt
+          }, { merge: true });
+        } catch(err){
+          console.warn('Firebase update lotto impianto non riuscito:', err && err.message ? err.message : err);
+        }
+      }
+
+      renderImplantsList();
+      showAlert('✓ Scadenza lotto impianto aggiornata', 'info');
+    }
+
     function renderImplantsList(){
       const implantsList = document.getElementById('implantsList');
       let implants = loadImplantsFromStorage();
@@ -1973,7 +2279,7 @@
         implants = implants.filter(i => i.company === currentImplantCompanyFilter);
       }
       if(currentImplantModelFilter !== 'Tutti'){
-        implants = implants.filter(i => i.model === currentImplantModelFilter);
+        implants = implants.filter(i => (getImplantDisplayModel(i) || '') === currentImplantModelFilter);
       }
       if(currentImplantExpiryFilter !== 'Tutte'){
         implants = implants.filter(i => {
@@ -1992,25 +2298,27 @@
         });
       }
       
-      // Ordina alfabeticamente per tipo e azienda
+      // Ordina per data ordine (più recente -> meno recente)
       implants.sort((a, b) => {
-        const typeA = (a.type || '').toLowerCase();
-        const typeB = (b.type || '').toLowerCase();
-        const companyA = (a.company || '').toLowerCase();
-        const companyB = (b.company || '').toLowerCase();
-        
-        if(typeA !== typeB) return typeA.localeCompare(typeB);
-        return companyA.localeCompare(companyB);
+        const dateA = parseFlexibleDate(a.orderDate || a.createdAt);
+        const dateB = parseFlexibleDate(b.orderDate || b.createdAt);
+        const timeA = dateA ? dateA.getTime() : 0;
+        const timeB = dateB ? dateB.getTime() : 0;
+        if(timeA !== timeB) return timeB - timeA;
+        return String(a.type || '').localeCompare(String(b.type || ''), 'it-IT');
       });
       
       implantsList.innerHTML = '';
       
       implants.forEach(implant=>{
         const tr = document.createElement('tr');
-        const orderDate = implant.orderDate ? new Date(implant.orderDate).toLocaleDateString() : '-';
-        const expiry = implant.expiry ? new Date(implant.expiry) : null;
+        const orderDate = parseFlexibleDate(implant.orderDate);
+        const expiry = parseFlexibleDate(implant.expiry);
         const diameter = implant.diameter ? implant.diameter + ' mm' : '-';
         const length = implant.length ? implant.length + ' mm' : '-';
+        const displayModel = getImplantDisplayModel(implant);
+        const expandBtnId = 'expand_impl_' + implant.id;
+        const lotDetailId = 'lot_impl_' + implant.id;
         
         // Semaforo scadenza (editabile)
         let statusHtml = '';
@@ -2020,34 +2328,26 @@
           const days = daysBetween(now, expiry);
           const mesi = days / 30.44;
           if(days < 0) {
-            statusHtml = '<span onclick="editImplantExpiry(\''+implant.id+'\')" title="Scaduto il ' + expiry.toLocaleDateString() + ' - Clicca per modificare" style="font-size:24px;cursor:pointer;">🔴</span>';
+            statusHtml = '<span onclick="editImplantExpiry(\''+implant.id+'\')" title="Scaduto il ' + formatDate(expiry) + ' - Clicca per modificare" style="font-size:24px;cursor:pointer;">🔴</span>';
           } else if(mesi < 3) {
-            statusHtml = '<span onclick="editImplantExpiry(\''+implant.id+'\')" title="Scade tra ' + days + ' giorni il ' + expiry.toLocaleDateString() + ' - Clicca per modificare" style="font-size:24px;cursor:pointer;">🔴</span>';
+            statusHtml = '<span onclick="editImplantExpiry(\''+implant.id+'\')" title="Scade tra ' + days + ' giorni il ' + formatDate(expiry) + ' - Clicca per modificare" style="font-size:24px;cursor:pointer;">🔴</span>';
           } else if(mesi < 6) {
-            statusHtml = '<span onclick="editImplantExpiry(\''+implant.id+'\')" title="Scade tra ' + days + ' giorni il ' + expiry.toLocaleDateString() + ' - Clicca per modificare" style="font-size:24px;cursor:pointer;">🟡</span>';
+            statusHtml = '<span onclick="editImplantExpiry(\''+implant.id+'\')" title="Scade tra ' + days + ' giorni il ' + formatDate(expiry) + ' - Clicca per modificare" style="font-size:24px;cursor:pointer;">🟡</span>';
           } else {
-            statusHtml = '<span onclick="editImplantExpiry(\''+implant.id+'\')" title="Scade tra ' + days + ' giorni il ' + expiry.toLocaleDateString() + ' - Clicca per modificare" style="font-size:24px;cursor:pointer;">🟢</span>';
+            statusHtml = '<span onclick="editImplantExpiry(\''+implant.id+'\')" title="Scade tra ' + days + ' giorni il ' + formatDate(expiry) + ' - Clicca per modificare" style="font-size:24px;cursor:pointer;">🟢</span>';
           }
         }
         
         // Badge quantità
         const qtyBadge = '<span class="badge ok" style="background:#388e3c;color:#fff;font-size:14px;padding:6px 12px;border-radius:6px;font-weight:600;">'+implant.quantity+'</span>';
         
-        // Mostra modello o componenti kit
-        let modelDisplay = '-';
-        if(implant.type === 'Kit chirurgico' && implant.kitComponents){
-          modelDisplay = escapeHtml(implant.kitComponents);
-        } else if(implant.model) {
-          modelDisplay = escapeHtml(implant.model);
-        }
-        
         tr.innerHTML = `
-          <td data-label="Tipo">${escapeHtml(implant.type)}</td>
+          <td data-label="Tipo"><button class="batch-expand-btn" id="${expandBtnId}" style="margin-right:8px">▶</button>${escapeHtml(implant.type)}</td>
           <td data-label="Azienda">${escapeHtml(implant.company)}</td>
-          <td data-label="Modello">${modelDisplay}</td>
+          <td data-label="Modello">${escapeHtml(displayModel || '-')}</td>
           <td data-label="Ø">${diameter}</td>
           <td data-label="L">${length}</td>
-          <td data-label="Data ordine">${orderDate}</td>
+          <td data-label="Data ordine">${formatDate(orderDate)}</td>
           <td data-label="Scadenza" style="text-align:center;white-space:nowrap;">${statusHtml}</td>
           <td data-label="Prezzo">€ ${Number(implant.price||0).toFixed(2)}</td>
           <td data-label="Quantità" style="text-align:center">${qtyBadge}</td>
@@ -2056,6 +2356,79 @@
           </td>
         `;
         implantsList.appendChild(tr);
+
+        const lotDetailRow = document.createElement('tr');
+        lotDetailRow.id = lotDetailId;
+        lotDetailRow.className = 'batch-details';
+
+        const lots = Array.isArray(implant.batches) ? implant.batches : [];
+        let lotsHtml = '<div class="batches-list">';
+        if(lots.length === 0) {
+          lotsHtml += '<div style="color:#666;font-size:13px">Nessun lotto disponibile</div>';
+        } else {
+          const sortedLotsForDisplay = [...lots].sort((a, b) => new Date(b.dataOrdine || 0) - new Date(a.dataOrdine || 0));
+          sortedLotsForDisplay.forEach(lot => {
+            const lotExpiry = parseFlexibleDate(lot.scadenza);
+            const lotDays = lotExpiry ? daysBetween(now, lotExpiry) : null;
+            const encodedImplantId = encodeURIComponent(String(implant.id));
+            const encodedLotId = encodeURIComponent(String(lot.batchId || lot.id || ''));
+            const lotExpiryLabel = lotExpiry ? formatDate(lotExpiry) : 'N/A';
+            let expiryClass = 'expiry-ok';
+            if (lotDays !== null && lotDays < 0) expiryClass = 'expiry-critical';
+            else if (lotDays !== null && lotDays < 90) expiryClass = 'expiry-warn';
+
+            lotsHtml += `
+              <div class="batch-card">
+                <div class="batch-card-header">
+                  <div><strong>Lotto ${lot.batchId || '-'}</strong></div>
+                  <div>Data ordine: ${formatDate(lot.dataOrdine)}</div>
+                  <div>Scade: <span class="editable-implant-lot-expiry" data-implant-id="${encodedImplantId}" data-lot-id="${encodedLotId}" title="Clicca per modificare scadenza lotto" style="cursor:pointer;text-decoration:underline;color:#003d7a">${lotExpiryLabel}</span></div>
+                  <div><span class="expiry-status ${expiryClass}">${lot.quantitàRimanente}/${lot.quantità} pz</span></div>
+                </div>
+                <div style="font-size:12px;color:#666;margin-top:6px">
+                  Azienda: ${escapeHtml(lot.azienda || implant.company || 'N/A')} | Prezzo: €${Number(lot.prezzo || implant.price || 0).toFixed(2)}
+                </div>
+            `;
+
+            if (Array.isArray(lot.consumptions) && lot.consumptions.length > 0) {
+              lotsHtml += '<div class="consumption-history">📉 Consumi: ';
+              lot.consumptions.forEach(c => {
+                lotsHtml += `${c.quantità || 0}pz (${formatDate(c.data)}) `;
+              });
+              lotsHtml += '</div>';
+            }
+
+            lotsHtml += '</div>';
+          });
+        }
+        lotsHtml += '</div>';
+        lotDetailRow.innerHTML = `<td colspan="10">${lotsHtml}</td>`;
+
+        lotDetailRow.querySelectorAll('.editable-implant-lot-expiry').forEach(el => {
+          el.addEventListener('click', () => {
+            const implantId = decodeURIComponent(el.getAttribute('data-implant-id') || '');
+            const lotId = decodeURIComponent(el.getAttribute('data-lot-id') || '');
+            if(implantId && lotId) editImplantBatchExpiry(implantId, lotId);
+          });
+        });
+
+        setTimeout(() => {
+          if (tr.parentNode) {
+            tr.parentNode.insertBefore(lotDetailRow, tr.nextSibling);
+          }
+        }, 0);
+
+        const expandBtn = tr.querySelector('#' + expandBtnId);
+        if(expandBtn){
+          expandBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const detail = document.getElementById(lotDetailId);
+            if(detail){
+              detail.classList.toggle('show');
+              expandBtn.textContent = detail.classList.contains('show') ? '▼' : '▶';
+            }
+          });
+        }
       });
     }
 
@@ -2192,7 +2565,9 @@
 
     function formatDate(value){
       const d = parseFlexibleDate(value);
-      return d ? d.toLocaleDateString('it-IT') : '--';
+      return d
+        ? new Intl.DateTimeFormat('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(d)
+        : '--';
     }
 
     function clampNumber(value, min, max, fallback){
@@ -2533,11 +2908,16 @@
         });
       }
       
-      // Ordina alfabeticamente per nome
+      // Ordina per data ordine (più recente -> meno recente)
       filtered.sort((a, b) => {
+        const dateA = parseFlexibleDate(a.data().orderDate || a.data().createdAt);
+        const dateB = parseFlexibleDate(b.data().orderDate || b.data().createdAt);
+        const timeA = dateA ? dateA.getTime() : 0;
+        const timeB = dateB ? dateB.getTime() : 0;
+        if(timeA !== timeB) return timeB - timeA;
         const nameA = (a.data().name || '').toLowerCase();
         const nameB = (b.data().name || '').toLowerCase();
-        return nameA.localeCompare(nameB);
+        return nameA.localeCompare(nameB, 'it-IT');
       });
       
       filtered.forEach(doc=>{
@@ -2733,15 +3113,15 @@
         const days = daysBetween(now, expiry);
         const mesi = days / 30.44;
         if(days < 0) {
-          statusHtml = '<span title="Scaduto il ' + expiry.toLocaleDateString() + '" style="font-size:24px;cursor:help;">🔴</span>';
+          statusHtml = '<span title="Scaduto il ' + formatDate(expiry) + '" style="font-size:24px;cursor:help;">🔴</span>';
         } else if(days <= 30) {
-          statusHtml = '<span title="Scade tra ' + days + ' giorni il ' + expiry.toLocaleDateString() + '" style="font-size:24px;cursor:help;">🟡</span>';
+          statusHtml = '<span title="Scade tra ' + days + ' giorni il ' + formatDate(expiry) + '" style="font-size:24px;cursor:help;">🟡</span>';
         } else if(mesi < 3) {
-          statusHtml = '<span title="Scade tra ' + days + ' giorni il ' + expiry.toLocaleDateString() + '" style="font-size:24px;cursor:help;">🔴</span>';
+          statusHtml = '<span title="Scade tra ' + days + ' giorni il ' + formatDate(expiry) + '" style="font-size:24px;cursor:help;">🔴</span>';
         } else if(mesi < 6) {
-          statusHtml = '<span title="Scade tra ' + days + ' giorni il ' + expiry.toLocaleDateString() + '" style="font-size:24px;cursor:help;">🟡</span>';
+          statusHtml = '<span title="Scade tra ' + days + ' giorni il ' + formatDate(expiry) + '" style="font-size:24px;cursor:help;">🟡</span>';
         } else {
-          statusHtml = '<span title="Scade tra ' + days + ' giorni il ' + expiry.toLocaleDateString() + '" style="font-size:24px;cursor:help;">🟢</span>';
+          statusHtml = '<span title="Scade tra ' + days + ' giorni il ' + formatDate(expiry) + '" style="font-size:24px;cursor:help;">🟢</span>';
         }
       }
       // Badge semaforo quantità
@@ -2760,7 +3140,7 @@
       
       tr.innerHTML = `
         <td data-label="Nome"><button class="batch-expand-btn" id="${expandBtnId}" style="margin-right:8px">▶</button><span class="editable-name" style="cursor:pointer;text-decoration:underline;">${escapeHtml(data.name)}</span></td>
-        <td data-label="Data ordine">${orderDate ? orderDate.toLocaleDateString() : '-'}</td>
+        <td data-label="Data ordine">${formatDate(orderDate)}</td>
         <td data-label="Scadenza" style="text-align:center;white-space:nowrap;"><span class="readonly-expiry" title="Scadenza riassuntiva automatica (modifica i singoli batch)">${statusHtml}</span></td>
         <td data-label="Prezzo" class="material-price-col">€ ${Number(data.price).toFixed(2)}</td>
         <td data-label="Distributore">${escapeHtml(data.distributor||'-')}</td>
@@ -2812,7 +3192,7 @@
       let batchesHtml = '<div class="batches-list">';
       
       if (batches.length === 0) {
-        batchesHtml += '<div style="color:#666;font-size:13px">Nessun batch disponibile</div>';
+        batchesHtml += '<div style="color:#666;font-size:13px">Nessun lotto disponibile</div>';
       } else {
         const sortedBatchesForDisplay = [...batches].sort((a, b) => new Date(b.dataOrdine || 0) - new Date(a.dataOrdine || 0));
         sortedBatchesForDisplay.forEach(batch => {
@@ -2820,7 +3200,7 @@
           const batchDays = batchExpiry ? daysBetween(now, batchExpiry) : null;
           const encodedMaterialId = encodeURIComponent(String(doc.id));
           const encodedBatchId = encodeURIComponent(String(batch.batchId || batch.id || ''));
-          const batchExpiryLabel = batchExpiry ? batchExpiry.toLocaleDateString() : 'N/A';
+          const batchExpiryLabel = batchExpiry ? formatDate(batchExpiry) : 'N/A';
           
           let expiryClass = 'expiry-ok';
           if (batchDays !== null && batchDays < 0) expiryClass = 'expiry-critical';
@@ -2829,9 +3209,9 @@
           batchesHtml += `
             <div class="batch-card">
               <div class="batch-card-header">
-                <div><strong>${batch.batchId}</strong></div>
-                <div>Ordine: ${batch.dataOrdine}</div>
-                <div>Scade: <span class="editable-batch-expiry" data-material-id="${encodedMaterialId}" data-batch-id="${encodedBatchId}" title="Clicca per modificare scadenza batch" style="cursor:pointer;text-decoration:underline;color:#003d7a">${batchExpiryLabel}</span></div>
+                <div><strong>Lotto ${batch.batchId}</strong></div>
+                <div>Data ordine: ${formatDate(batch.dataOrdine)}</div>
+                <div>Scade: <span class="editable-batch-expiry" data-material-id="${encodedMaterialId}" data-batch-id="${encodedBatchId}" title="Clicca per modificare scadenza lotto" style="cursor:pointer;text-decoration:underline;color:#003d7a">${batchExpiryLabel}</span></div>
                 <div><span class="expiry-status ${expiryClass}">${batch.quantitàRimanente}/${batch.quantità} pz</span></div>
               </div>
               <div style="font-size:12px;color:#666;margin-top:6px">
@@ -2842,7 +3222,7 @@
           if (batch.consumptions && batch.consumptions.length > 0) {
             batchesHtml += '<div class="consumption-history">📉 Consumi: ';
             batch.consumptions.forEach(c => {
-              batchesHtml += `${c.quantità}pz (${c.data}) `;
+              batchesHtml += `${c.quantità}pz (${formatDate(c.data)}) `;
             });
             batchesHtml += '</div>';
           }
@@ -2946,7 +3326,10 @@
                 expiry: data.expiry && data.expiry.toDate ? data.expiry.toDate().toISOString() : data.expiry,
                 price: data.price,
                 quantity: data.quantity,
-                createdAt: data.createdAt && data.createdAt.toDate ? data.createdAt.toDate().toISOString() : data.createdAt
+                createdAt: data.createdAt && data.createdAt.toDate ? data.createdAt.toDate().toISOString() : data.createdAt,
+                updatedAt: data.updatedAt && data.updatedAt.toDate ? data.updatedAt.toDate().toISOString() : data.updatedAt,
+                batches: Array.isArray(data.batches) ? data.batches : [],
+                consumptionHistory: Array.isArray(data.consumptionHistory) ? data.consumptionHistory : []
               };
             });
 
@@ -3584,6 +3967,142 @@
       showAlert('✓ CSV Impianti scaricato con successo', 'info');
     }
 
+    function csvEscape(value){
+      return '"' + String(value === null || value === undefined ? '' : value).replace(/"/g, '""') + '"';
+    }
+
+    function exportImplantsIncomingLotsCSV(){
+      const rowsData = getFilteredImplantsIncomingData();
+      if(!rowsData || rowsData.length === 0){
+        showAlert('Nessuna entrata lotti impianti da esportare', 'warn');
+        return;
+      }
+
+      const headers = ['Data Ordine', 'Tipo', 'Azienda', 'Modello', 'Quantità', 'ID Lotto'];
+      let csvContent = headers.join(',') + '\n';
+
+      rowsData.forEach(row => {
+        const values = [
+          formatDate(row.orderDate || row.createdAt),
+          row.type || '--',
+          row.company || '--',
+          row.model || '--',
+          Number(row.quantity || 0),
+          row.lotId || row.implantId || '--'
+        ];
+        csvContent += values.map(csvEscape).join(',') + '\n';
+      });
+
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'impianti_entrate_lotti_' + new Date().toISOString().split('T')[0] + '.csv';
+      link.click();
+      URL.revokeObjectURL(url);
+      showAlert('✓ CSV Entrate Lotti Impianti scaricato con successo', 'info');
+    }
+
+    function exportImplantsOutgoingCSV(){
+      const rowsData = getFilteredImplantsOutgoingData();
+      if(!rowsData || rowsData.length === 0){
+        showAlert('Nessuna uscita impianti da esportare', 'warn');
+        return;
+      }
+
+      const headers = ['Data', 'Tipo', 'Azienda', 'Modello', 'Operatore', 'Quantità', 'Lotti Utilizzati'];
+      let csvContent = headers.join(',') + '\n';
+
+      rowsData.forEach(row => {
+        const values = [
+          formatDate(row.date),
+          row.type || '--',
+          row.company || '--',
+          row.model || '--',
+          row.operator || '--',
+          Number(row.quantity || 0),
+          row.batches || '--'
+        ];
+        csvContent += values.map(csvEscape).join(',') + '\n';
+      });
+
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'impianti_uscite_' + new Date().toISOString().split('T')[0] + '.csv';
+      link.click();
+      URL.revokeObjectURL(url);
+      showAlert('✓ CSV Uscite Impianti scaricato con successo', 'info');
+    }
+
+    function downloadImplantsIncomingLotsPDF(){
+      const rowsData = getFilteredImplantsIncomingData();
+      if(!rowsData || rowsData.length === 0){
+        showAlert('Nessuna entrata lotti impianti da esportare', 'warn');
+        return;
+      }
+
+      const headers = ['Data Ordine', 'Tipo', 'Azienda', 'Modello', 'Qta', 'ID Lotto'];
+      const rows = rowsData.map(row => [
+        formatDate(row.orderDate || row.createdAt),
+        row.type || '--',
+        row.company || '--',
+        row.model || '--',
+        String(Number(row.quantity || 0)),
+        String(row.lotId || row.implantId || '--')
+      ]);
+      const totalQty = rowsData.reduce((sum, row) => sum + (Number(row.quantity || 0) || 0), 0);
+      const summaryLines = [
+        'Totale lotti in entrata: ' + rowsData.length,
+        'Quantità totale in entrata: ' + totalQty
+      ];
+
+      generateTablePDF(
+        'Studio Dentistico - Registro Entrate Lotti Impianti',
+        'impianti_entrate_lotti_' + new Date().toISOString().split('T')[0] + '.pdf',
+        headers,
+        rows,
+        summaryLines,
+        [14, 16, 18, 18, 8, 18]
+      );
+      showAlert('✓ PDF Entrate Lotti Impianti scaricato con successo', 'info');
+    }
+
+    function downloadImplantsOutgoingPDF(){
+      const rowsData = getFilteredImplantsOutgoingData();
+      if(!rowsData || rowsData.length === 0){
+        showAlert('Nessuna uscita impianti da esportare', 'warn');
+        return;
+      }
+
+      const headers = ['Data', 'Tipo', 'Azienda', 'Modello', 'Operatore', 'Qta', 'Lotti Utilizzati'];
+      const rows = rowsData.map(row => [
+        formatDate(row.date),
+        row.type || '--',
+        row.company || '--',
+        row.model || '--',
+        row.operator || '--',
+        String(Number(row.quantity || 0)),
+        row.batches || '--'
+      ]);
+      const totalQty = rowsData.reduce((sum, row) => sum + (Number(row.quantity || 0) || 0), 0);
+      const summaryLines = [
+        'Totale movimenti uscita impianti: ' + rowsData.length,
+        'Quantità totale scaricata: ' + totalQty
+      ];
+
+      generateTablePDF(
+        'Studio Dentistico - Registro Uscite Impianti',
+        'impianti_uscite_' + new Date().toISOString().split('T')[0] + '.pdf',
+        headers,
+        rows,
+        summaryLines,
+        [12, 14, 14, 14, 12, 8, 26]
+      );
+      showAlert('✓ PDF Uscite Impianti scaricato con successo', 'info');
+    }
+
     // --- IMPLANTS EVENT LISTENERS ---
     document.getElementById('implantsBtn').addEventListener('click', openImplantsModal);
     
@@ -3706,6 +4225,7 @@
       if(length === 'Other') length = document.getElementById('implantLengthCustom').value;
       
       const orderDate = document.getElementById('implantOrderDate').value;
+      const expiryInput = document.getElementById('implantExpiry').value;
       const price = parseFloat(document.getElementById('implantPrice').value) || 0;
       const quantity = parseInt(document.getElementById('implantQuantity').value, 10) || 0;
 
@@ -3717,18 +4237,21 @@
         diameter: diameter || null,
         length: length || null,
         orderDate: new Date(orderDate),
-        expiry: null,
+        expiry: expiryInput ? new Date(expiryInput) : null,
         price,
         quantity,
         createdAt: new Date()
       };
 
       const implantId = addImplantToStorage(newImplant);
+      const storedImplant = loadImplantsFromStorage().find(i => i.id === implantId);
       
       // Sync to Firebase (optional)
       if(firebaseReady && typeof db !== 'undefined'){
         try {
-          await db.collection('implants').doc(implantId).set(newImplant);
+          if(storedImplant){
+            await db.collection('implants').doc(implantId).set(toFirestoreImplantData(storedImplant), { merge: true });
+          }
         } catch(err) {
           console.warn('Firebase sync failed for implant:', err.message);
         }
@@ -3736,7 +4259,7 @@
 
       document.getElementById('implantForm').reset();
       document.getElementById('implantQuantity').value = 1;
-      showAlert('✓ Impianto aggiunto', 'info');
+      showAlert('✓ Carico impianto registrato', 'info');
       initImplantFilters(); // Aggiorna i filtri
       renderImplantsList();
     });
@@ -4192,7 +4715,7 @@
           const operator = String(entry.operatore || entry.operator || '').trim() || '--';
           const dateValue = entry.data || entry.timestamp;
           const batchInfo = Array.isArray(entry.batchesConsumed)
-            ? entry.batchesConsumed.map(b => `${b.quantità || 0}pz da ${b.batchId || '-'}`).join(', ')
+            ? entry.batchesConsumed.map(b => `${b.quantità || 0}pz da lotto ${b.batchId || '-'}`).join(', ')
             : '--';
 
           allConsumptions.push({
@@ -4438,7 +4961,7 @@
         const dateB = b.orderDate ? (typeof b.orderDate === 'string' ? new Date(b.orderDate) : b.orderDate) : new Date();
         return dateB - dateA;
       }).forEach(i => {
-        const orderDate = i.orderDate ? (typeof i.orderDate === 'string' ? i.orderDate : i.orderDate.toLocaleDateString('it-IT')) : '--';
+        const orderDate = formatDate(i.orderDate);
         const total = ((i.price || 0) * (i.quantity || 1)).toFixed(2);
         const tr = document.createElement('tr');
         tr.innerHTML = `
@@ -4506,16 +5029,38 @@
       const companyFilter = document.getElementById('implantsIncomingCompanyFilter').value;
       const periodFilter = document.getElementById('implantsIncomingPeriodFilter').value;
 
-      // Ogni impianto è un'entrata a sé
-      let allEntries = implants.map(i => ({
-        implantId: i.id,
-        type: i.type,
-        company: i.company,
-        model: i.model || i.kitComponents || '--',
-        orderDate: i.orderDate,
-        quantity: i.quantity,
-        createdAt: i.createdAt || i.orderDate
-      }));
+      // Estrai tutti i lotti impianti (come entrate)
+      let allEntries = [];
+      implants.forEach(i => {
+        const lots = Array.isArray(i.batches) ? i.batches : [];
+        if(lots.length === 0){
+          allEntries.push({
+            implantId: i.id,
+            lotId: i.id,
+            type: i.type,
+            company: i.company,
+            model: i.model || i.kitComponents || '--',
+            orderDate: i.orderDate,
+            quantity: i.quantity,
+            createdAt: i.createdAt || i.orderDate
+          });
+          return;
+        }
+
+        lots.forEach(lot => {
+          const lotQty = Number(lot.quantità ?? lot.quantita ?? lot.originalQuantita ?? lot.quantity ?? 0) || 0;
+          allEntries.push({
+            implantId: i.id,
+            lotId: lot.batchId || lot.id || i.id,
+            type: i.type,
+            company: i.company,
+            model: i.model || i.kitComponents || '--',
+            orderDate: lot.dataOrdine || lot.orderDate || i.orderDate,
+            quantity: lotQty,
+            createdAt: i.createdAt || i.orderDate
+          });
+        });
+      });
 
       // Filtra per tipo e azienda
       allEntries = allEntries.filter(e => {
@@ -4573,7 +5118,7 @@
           <td>${e.company || '--'}</td>
           <td>${e.model}</td>
           <td>${e.quantity || 0}</td>
-          <td style="font-family:monospace;font-size:12px">${e.implantId ? e.implantId.substring(0, 8) : '--'}</td>
+          <td style="font-family:monospace;font-size:12px">${e.lotId ? String(e.lotId).substring(0, 12) : '--'}</td>
         `;
         tbody.appendChild(tr);
       });
@@ -4591,6 +5136,392 @@
       document.getElementById('implantsIncomingCompanyFilter').value = 'Tutte';
       document.getElementById('implantsIncomingPeriodFilter').value = '30';
       updateImplantsIncomingRegisterData();
+    }
+
+    // ===== IMPLANTS FEFO CONSUMPTION =====
+    let implantConsumptionLookup = [];
+
+    function syncImplantConsumptionSelection(){
+      const searchInput = document.getElementById('implantConsumptionSearch');
+      const hiddenInput = document.getElementById('implantConsumptionId');
+      if(!searchInput || !hiddenInput) return '';
+
+      const typed = normalizeConsumptionText(searchInput.value);
+      if(!typed){
+        hiddenInput.value = '';
+        return '';
+      }
+
+      const exact = implantConsumptionLookup.find(item => item.normalizedName === typed || item.normalizedDisplay === typed);
+      hiddenInput.value = exact ? exact.id : '';
+      return hiddenInput.value;
+    }
+
+    function openImplantConsumptionModal(){
+      const modal = document.getElementById('implantConsumptionModal');
+      if(!modal) return;
+      modal.style.display = 'flex';
+      modal.style.alignItems = 'flex-start';
+      modal.style.justifyContent = 'center';
+      setTimeout(() => initImplantConsumptionModal(), 100);
+    }
+
+    function closeImplantConsumptionModal(){
+      const modal = document.getElementById('implantConsumptionModal');
+      if(!modal) return;
+      modal.style.display = 'none';
+      const form = document.getElementById('implantConsumptionForm');
+      if(form) form.reset();
+      const searchInput = document.getElementById('implantConsumptionSearch');
+      const hiddenInput = document.getElementById('implantConsumptionId');
+      if(searchInput) searchInput.value = '';
+      if(hiddenInput) hiddenInput.value = '';
+    }
+
+    function initImplantConsumptionModal(){
+      const implants = loadImplantsFromStorage();
+      const datalist = document.getElementById('implantConsumptionList');
+      const searchInput = document.getElementById('implantConsumptionSearch');
+      const hiddenInput = document.getElementById('implantConsumptionId');
+      if(!datalist || !searchInput || !hiddenInput) return;
+      initConsumptionOperator();
+
+      datalist.innerHTML = '';
+      searchInput.value = '';
+      hiddenInput.value = '';
+      implantConsumptionLookup = [];
+
+      implants
+        .filter(i => Number(i.quantity || 0) > 0)
+        .sort((a,b) => {
+          const da = parseFlexibleDate(a.orderDate || a.createdAt);
+          const db = parseFlexibleDate(b.orderDate || b.createdAt);
+          return (db ? db.getTime() : 0) - (da ? da.getTime() : 0);
+        })
+        .forEach(i => {
+          const model = getImplantDisplayModel(i) || '--';
+          const lots = Array.isArray(i.batches) ? i.batches.length : 0;
+          const baseName = [i.type || 'Impianto', model, i.company || '--'].join(' | ');
+          const displayName = `${baseName} (${i.quantity || 0} pz, ${lots} lotti)`;
+          implantConsumptionLookup.push({
+            id: i.id,
+            name: baseName,
+            display: displayName,
+            normalizedName: normalizeConsumptionText(baseName),
+            normalizedDisplay: normalizeConsumptionText(displayName)
+          });
+
+          const opt = document.createElement('option');
+          opt.value = displayName;
+          datalist.appendChild(opt);
+        });
+
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('implantConsumptionDate').value = today;
+
+      const lastOp = localStorage.getItem(LAST_OPERATOR_KEY) || '';
+      const opInput = document.getElementById('implantConsumptionOperator');
+      if(opInput && lastOp) opInput.value = lastOp;
+    }
+
+    function updateImplantConsumptionPreview(){
+      const implantId = syncImplantConsumptionSelection();
+      const quantity = parseInt(document.getElementById('implantConsumptionQuantity').value, 10) || 0;
+      const searchValue = (document.getElementById('implantConsumptionSearch').value || '').trim();
+      const previewDiv = document.getElementById('implantConsumptionPreviewContent');
+      if(!previewDiv) return;
+
+      if(!implantId || quantity <= 0){
+        if(searchValue && !implantId) {
+          previewDiv.innerHTML = 'Seleziona un impianto valido dai suggerimenti automatici.';
+        } else {
+          previewDiv.innerHTML = 'Inserisci impianto e quantità per visualizzare anteprima...';
+        }
+        return;
+      }
+
+      const implants = loadImplantsFromStorage();
+      const implant = implants.find(i => i.id === implantId);
+      if(!implant){
+        previewDiv.innerHTML = 'Impianto non trovato';
+        return;
+      }
+
+      const lots = [...(implant.batches || [])].sort((a,b) => {
+        const aExpiry = a.scadenza ? new Date(a.scadenza).getTime() : Number.POSITIVE_INFINITY;
+        const bExpiry = b.scadenza ? new Date(b.scadenza).getTime() : Number.POSITIVE_INFINITY;
+        if(aExpiry !== bExpiry) return aExpiry - bExpiry;
+        return new Date(a.dataOrdine || 0).getTime() - new Date(b.dataOrdine || 0).getTime();
+      });
+
+      if(lots.length === 0){
+        previewDiv.innerHTML = '⚠️ Nessun lotto disponibile per questo impianto';
+        return;
+      }
+
+      let remainingQty = quantity;
+      let previewHtml = '';
+      let found = false;
+
+      for(let i = 0; i < lots.length && remainingQty > 0; i++){
+        const lot = lots[i];
+        const lotRemaining = Number(lot.quantitàRimanente ?? lot.quantità ?? 0) || 0;
+        if(lotRemaining <= 0) continue;
+        found = true;
+        const qtyFromLot = Math.min(remainingQty, lotRemaining);
+        const qtyAfter = lotRemaining - qtyFromLot;
+
+        previewHtml += `
+          <div class="consumption-preview-line">
+            <span>📦 <strong>Lotto ${lot.batchId || '-'}</strong> (Ordine: ${formatDate(lot.dataOrdine)})</span>
+          </div>
+          <div class="consumption-preview-line">
+            <span style="margin-left:20px">Scadenza: ${formatDate(lot.scadenza)}</span>
+          </div>
+          <div class="consumption-preview-line">
+            <span style="margin-left:20px">Riducibile: <strong>${qtyFromLot} pz</strong></span>
+            <strong style="color:#d32f2f">${lotRemaining} → ${qtyAfter} pz</strong>
+          </div>
+        `;
+
+        remainingQty -= qtyFromLot;
+      }
+
+      if(!found){
+        previewHtml = '⚠️ Impianto esaurito';
+      } else if(remainingQty > 0){
+        previewHtml += `<div class="consumption-preview-line" style="color:#d32f2f"><strong>⚠️ Quantità insufficiente: mancano ${remainingQty} pz</strong></div>`;
+      }
+
+      previewDiv.innerHTML = previewHtml;
+    }
+
+    document.getElementById('implantConsumptionForm')?.addEventListener('submit', async function(e){
+      e.preventDefault();
+
+      const implantId = syncImplantConsumptionSelection();
+      const quantity = parseInt(document.getElementById('implantConsumptionQuantity').value, 10) || 0;
+      const consumptionDate = document.getElementById('implantConsumptionDate').value;
+      const operator = String(document.getElementById('implantConsumptionOperator').value || '').trim();
+
+      if(!implantId || quantity <= 0 || !consumptionDate || !operator){
+        alert('Compila tutti i campi e seleziona un impianto valido');
+        return;
+      }
+
+      const implants = loadImplantsFromStorage();
+      const implantIdx = implants.findIndex(i => i.id === implantId);
+      if(implantIdx < 0){
+        alert('Impianto non trovato');
+        return;
+      }
+
+      const implant = implants[implantIdx];
+      let lots = [...(implant.batches || [])].sort((a,b) => {
+        const aExpiry = a.scadenza ? new Date(a.scadenza).getTime() : Number.POSITIVE_INFINITY;
+        const bExpiry = b.scadenza ? new Date(b.scadenza).getTime() : Number.POSITIVE_INFINITY;
+        if(aExpiry !== bExpiry) return aExpiry - bExpiry;
+        return new Date(a.dataOrdine || 0).getTime() - new Date(b.dataOrdine || 0).getTime();
+      });
+
+      let remainingQty = quantity;
+      const consumed = [];
+
+      for(let i = 0; i < lots.length && remainingQty > 0; i++){
+        const lotRemaining = Number(lots[i].quantitàRimanente ?? lots[i].quantità ?? 0) || 0;
+        if(lotRemaining <= 0) continue;
+        const qtyFromLot = Math.min(remainingQty, lotRemaining);
+        lots[i].quantitàRimanente = lotRemaining - qtyFromLot;
+        consumed.push({ batchId: lots[i].batchId, quantità: qtyFromLot });
+        lots[i].consumptions = Array.isArray(lots[i].consumptions) ? lots[i].consumptions : [];
+        lots[i].consumptions.push({
+          data: consumptionDate,
+          quantità: qtyFromLot,
+          operatore: operator,
+          timestamp: new Date().toISOString()
+        });
+        remainingQty -= qtyFromLot;
+      }
+
+      if(remainingQty > 0){
+        alert('Quantità insufficiente nel magazzino implantare');
+        return;
+      }
+
+      implant.batches = lots;
+      implant.quantity = implant.batches.reduce((sum, b) => sum + (Number(b.quantitàRimanente || 0) || 0), 0);
+      implant.expiry = recomputeImplantExpiryFromBatches(implant.batches);
+      implant.updatedAt = new Date().toISOString();
+      implant.consumptionHistory = Array.isArray(implant.consumptionHistory) ? implant.consumptionHistory : [];
+      implant.consumptionHistory.push({
+        data: consumptionDate,
+        quantità: quantity,
+        operatore: operator,
+        type: implant.type || '--',
+        company: implant.company || '--',
+        model: getImplantDisplayModel(implant) || '--',
+        batchesConsumed: consumed,
+        timestamp: new Date().toISOString()
+      });
+
+      implants[implantIdx] = implant;
+      saveImplantsToStorage(implants);
+      saveOperator(operator);
+
+      if(firebaseReady && typeof db !== 'undefined'){
+        try {
+          await db.collection('implants').doc(implant.id).set({
+            batches: implant.batches,
+            quantity: implant.quantity,
+            expiry: implant.expiry,
+            consumptionHistory: implant.consumptionHistory,
+            updatedAt: implant.updatedAt
+          }, { merge: true });
+        } catch(err){
+          console.warn('Firebase sync consumo impianti non riuscita:', err && err.message ? err.message : err);
+        }
+      }
+
+      const lotInfo = consumed.map(c => `${c.quantità} pz da lotto ${c.batchId}`).join(', ');
+      showAlert(`✅ ${operator} ha consumato ${quantity} pz impianti da: ${lotInfo}`, 'info');
+
+      closeImplantConsumptionModal();
+      initImplantFilters();
+      renderImplantsList();
+    });
+
+    // ===== IMPLANTS OUTGOING REGISTER =====
+    function openImplantsOutgoingRegisterModal(){
+      const modal = document.getElementById('implantsOutgoingRegisterModal');
+      if(!modal) return;
+      modal.style.display = 'flex';
+      modal.style.alignItems = 'flex-start';
+      modal.style.justifyContent = 'center';
+      setTimeout(() => initImplantsOutgoingRegisterFilters(), 100);
+    }
+
+    function closeImplantsOutgoingRegisterModal(){
+      const modal = document.getElementById('implantsOutgoingRegisterModal');
+      if(!modal) return;
+      modal.style.display = 'none';
+    }
+
+    function initImplantsOutgoingRegisterFilters(){
+      const implants = loadImplantsFromStorage();
+      const types = Array.from(new Set(implants.map(i => i.type).filter(Boolean))).sort();
+      const typeSelect = document.getElementById('implantsOutgoingTypeFilter');
+      typeSelect.innerHTML = '<option value="Tutti">Tutti</option>';
+      types.forEach(type => {
+        const opt = document.createElement('option');
+        opt.value = type;
+        opt.textContent = type;
+        typeSelect.appendChild(opt);
+      });
+
+      const operators = loadOperators();
+      const operatorSelect = document.getElementById('implantsOutgoingOperatorFilter');
+      operatorSelect.innerHTML = '<option value="Tutti">Tutti</option>';
+      operators.forEach(op => {
+        const opt = document.createElement('option');
+        opt.value = op;
+        opt.textContent = op;
+        operatorSelect.appendChild(opt);
+      });
+
+      updateImplantsOutgoingRegisterData();
+    }
+
+    function getFilteredImplantsOutgoingData(){
+      const implants = loadImplantsFromStorage();
+      const typeFilter = document.getElementById('implantsOutgoingTypeFilter').value;
+      const operatorFilter = document.getElementById('implantsOutgoingOperatorFilter').value;
+      const periodFilter = document.getElementById('implantsOutgoingPeriodFilter').value;
+
+      let allConsumptions = [];
+      implants.forEach(i => {
+        const history = Array.isArray(i.consumptionHistory) ? i.consumptionHistory : [];
+        history.forEach(entry => {
+          const operator = String(entry.operatore || entry.operator || '').trim() || '--';
+          const batches = Array.isArray(entry.batchesConsumed)
+            ? entry.batchesConsumed.map(b => `${b.quantità || 0}pz da lotto ${b.batchId || '-'}`).join(', ')
+            : '--';
+          allConsumptions.push({
+            date: entry.data || entry.timestamp,
+            type: i.type || '--',
+            company: i.company || '--',
+            model: getImplantDisplayModel(i) || '--',
+            operator,
+            quantity: Number(entry.quantità || 0) || 0,
+            batches
+          });
+        });
+      });
+
+      allConsumptions = allConsumptions.filter(c => {
+        if(typeFilter !== 'Tutti' && c.type !== typeFilter) return false;
+        if(operatorFilter !== 'Tutti' && c.operator !== operatorFilter) return false;
+        return true;
+      });
+
+      if(periodFilter !== 'all'){
+        const days = parseInt(periodFilter, 10);
+        if(Number.isInteger(days) && days > 0){
+          const cutoffDate = new Date();
+          cutoffDate.setDate(cutoffDate.getDate() - days);
+          allConsumptions = allConsumptions.filter(c => {
+            const d = parseFlexibleDate(c.date);
+            return d && d >= cutoffDate;
+          });
+        }
+      }
+
+      allConsumptions.sort((a,b) => {
+        const da = parseFlexibleDate(a.date);
+        const db = parseFlexibleDate(b.date);
+        return (db ? db.getTime() : 0) - (da ? da.getTime() : 0);
+      });
+
+      return allConsumptions;
+    }
+
+    function updateImplantsOutgoingRegisterData(){
+      const filtered = getFilteredImplantsOutgoingData();
+      const totalCount = filtered.length;
+      const totalQuantity = filtered.reduce((sum, c) => sum + (Number(c.quantity || 0) || 0), 0);
+      const lastDate = filtered.length > 0 ? formatDate(filtered[0].date) : '--';
+
+      document.getElementById('implantsOutgoingTotalCount').textContent = totalCount;
+      document.getElementById('implantsOutgoingTotalQuantity').textContent = totalQuantity;
+      document.getElementById('implantsOutgoingLastDate').textContent = lastDate;
+
+      const tbody = document.getElementById('implantsOutgoingRegisterTableBody');
+      tbody.innerHTML = '';
+      filtered.forEach(c => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${formatDate(c.date)}</td>
+          <td>${c.type || '--'}</td>
+          <td>${c.company || '--'}</td>
+          <td>${c.model || '--'}</td>
+          <td>${c.operator || '--'}</td>
+          <td>${c.quantity || 0}</td>
+          <td>${c.batches || '--'}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      if(filtered.length === 0){
+        const tr = document.createElement('tr');
+        tr.innerHTML = '<td colspan="7" style="text-align:center;color:#999;padding:20px">Nessuna uscita impianti trovata</td>';
+        tbody.appendChild(tr);
+      }
+    }
+
+    function resetImplantsOutgoingFilters(){
+      document.getElementById('implantsOutgoingTypeFilter').value = 'Tutti';
+      document.getElementById('implantsOutgoingOperatorFilter').value = 'Tutti';
+      document.getElementById('implantsOutgoingPeriodFilter').value = '30';
+      updateImplantsOutgoingRegisterData();
     }
 
     // ===== NUOVO ORDINE FUNCTIONS =====
@@ -5562,7 +6493,9 @@
         .sort((a, b) => (a.name || '').localeCompare((b.name || ''), 'it-IT'))
         .forEach(m => {
         const itemName = (m.name || '').trim();
-        const displayName = itemName + ' (' + (m.quantity || 0) + ' pz disponibili)';
+        const batchesCount = Array.isArray(m.batches) ? m.batches.length : 0;
+        const latestOrder = formatDate(m.orderDate || m.createdAt);
+        const displayName = itemName + ' (' + (m.quantity || 0) + ' pz, ' + batchesCount + ' lotti, ultimo ordine ' + latestOrder + ')';
         consumptionMaterialLookup.push({
           id: m.id,
           name: itemName,
@@ -5613,7 +6546,7 @@
       });
       
       if (batches.length === 0) {
-        previewDiv.innerHTML = '⚠️ Nessun batch disponibile per questo materiale';
+        previewDiv.innerHTML = '⚠️ Nessun lotto disponibile per questo materiale';
         return;
       }
 
@@ -5633,10 +6566,10 @@
           
           previewHtml += `
             <div class="consumption-preview-line">
-              <span>📦 <strong>${batch.batchId}</strong> (Ordine: ${batch.dataOrdine})</span>
+              <span>📦 <strong>Lotto ${batch.batchId}</strong> (Ordine: ${formatDate(batch.dataOrdine)})</span>
             </div>
             <div class="consumption-preview-line">
-              <span style="margin-left:20px">Scadenza: ${batch.scadenza}</span>
+              <span style="margin-left:20px">Scadenza: ${formatDate(batch.scadenza)}</span>
             </div>
             <div class="consumption-preview-line">
               <span style="margin-left:20px">Riducibile: <strong>${qtyFromBatch} pz</strong></span>
@@ -5746,7 +6679,7 @@
       }
 
       // Mostra notifica di conferma
-      const batchInfo = consumed.map(c => `${c.quantità} pz da ${c.batchId}`).join(', ');
+      const batchInfo = consumed.map(c => `${c.quantità} pz da lotto ${c.batchId}`).join(', ');
       showAlert(`✅ ${operator} ha consumato ${quantity} pz da: ${batchInfo}`, 'info');
       
       closeConsumptionModal();
