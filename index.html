@@ -446,6 +446,10 @@
             📤 Registro Uscite
           </button>
 
+          <button onclick="openActiveUsageModal()" style="background:linear-gradient(135deg,#fbc02d 0%,#f9a825 100%);color:#3e2723;padding:12px 20px;font-size:15px;border:none;border-radius:8px;cursor:pointer;font-weight:700;box-shadow:0 4px 12px rgba(249,168,37,0.35);transition:all 0.2s;display:flex;align-items:center;gap:6px">
+            🟡 Magazzino Attivo
+          </button>
+
           <button id="alertsReportBtn" onclick="openAlertsReportModal()" style="background:linear-gradient(135deg,#f57c00 0%,#e65100 100%);color:#fff;padding:12px 20px;font-size:15px;border:none;border-radius:8px;cursor:pointer;font-weight:600;box-shadow:0 4px 12px rgba(230,81,0,0.35);transition:all 0.2s;display:flex;align-items:center;gap:8px">
             🧾 Report Avvisi <span id="alertsReportCount" class="alerts-report-badge">0</span>
           </button>
@@ -912,6 +916,14 @@
               <option value="all" selected>Tutto</option>
             </select>
           </div>
+          <div class="report-filter-group">
+            <label>Stato</label>
+            <select id="outgoingStatusFilter" onchange="updateOutgoingRegisterData()">
+              <option value="Tutti" selected>Tutti</option>
+              <option value="in_uso">In uso</option>
+              <option value="consumato">Consumato</option>
+            </select>
+          </div>
           <div class="report-filter-group" style="margin-top:24px">
             <button onclick="resetOutgoingFilters()" style="padding:8px 16px;background:#d32f2f;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:600">Azzera Filtri</button>
           </div>
@@ -942,10 +954,56 @@
                 <th>Nome Materiale</th>
                 <th>Operatore</th>
                 <th>Quantità</th>
+                <th>Stato</th>
                 <th>Lotti (data)</th>
               </tr>
             </thead>
             <tbody id="outgoingRegisterTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Magazzino Attivo (In Uso) Modal -->
+  <div id="activeUsageModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:10000;overflow-y:auto;padding:20px">
+    <div class="report-modal-content">
+      <div class="report-header" style="background:linear-gradient(135deg,#fbc02d 0%,#f9a825 100%);color:#3e2723">
+        <h2>🟡 Magazzino Attivo (Materiali in uso)</h2>
+        <button class="report-close" onclick="closeActiveUsageModal()" style="border-color:#3e2723;color:#3e2723">×</button>
+      </div>
+      <div class="report-body">
+        <div class="report-stats">
+          <div class="report-stat">
+            <div class="report-stat-label">Voci In Uso</div>
+            <div class="report-stat-value" id="activeUsageTotalCount">0</div>
+          </div>
+          <div class="report-stat">
+            <div class="report-stat-label">Quantità In Uso</div>
+            <div class="report-stat-value" id="activeUsageTotalQuantity">0</div>
+          </div>
+          <div class="report-stat">
+            <div class="report-stat-label">Ultimo Prelievo</div>
+            <div class="report-stat-value" id="activeUsageLastDate" style="font-size:16px">--</div>
+          </div>
+        </div>
+
+        <h3 style="color:#003d7a;margin-bottom:12px">📋 Materiali Attualmente in Uso</h3>
+        <div class="report-table-container">
+          <table class="report-table">
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>Categoria</th>
+                <th>Materiale</th>
+                <th>Operatore</th>
+                <th>Quantità</th>
+                <th>Lotti (data)</th>
+                <th>Stato</th>
+                <th>Azione</th>
+              </tr>
+            </thead>
+            <tbody id="activeUsageTableBody"></tbody>
           </table>
         </div>
       </div>
@@ -1142,6 +1200,14 @@
             <datalist id="consumptionOperatorList"></datalist>
           </div>
 
+          <div class="consumption-group">
+            <label for="consumptionStatus">Stato</label>
+            <select id="consumptionStatus" onchange="updateConsumptionPreview()">
+              <option value="in_uso" selected>🟡 In uso</option>
+              <option value="consumato">🔴 Consumato</option>
+            </select>
+          </div>
+
           <!-- Preview FEFO -->
           <div class="consumption-preview">
             <div class="consumption-preview-title">📋 Preview Riduzione FEFO</div>
@@ -1152,7 +1218,7 @@
 
           <div class="consumption-buttons">
             <button type="button" class="consumption-btn cancel" onclick="closeConsumptionModal()">Annulla</button>
-            <button type="submit" class="consumption-btn confirm">✓ Conferma Consumo</button>
+            <button type="submit" class="consumption-btn confirm">✓ Conferma Movimento</button>
           </div>
         </form>
       </div>
@@ -2645,6 +2711,28 @@
       return d
         ? new Intl.DateTimeFormat('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(d)
         : '--';
+    }
+
+    function getLotDisplayLabel(lot, index){
+      const lotDate = formatDate(
+        lot && typeof lot === 'object'
+          ? (lot.dataOrdine || lot.orderDate || lot.createdAt)
+          : null
+      );
+      const base = lotDate !== '--' ? `Lotto del ${lotDate}` : 'Lotto senza data';
+      return Number.isInteger(index) ? `${base} · n.${index + 1}` : base;
+    }
+
+    function getConsumptionStatusLabel(status){
+      return status === 'in_uso' ? 'In uso' : 'Consumato';
+    }
+
+    function getConsumptionStatusBadge(status){
+      const label = getConsumptionStatusLabel(status);
+      const style = status === 'in_uso'
+        ? 'background:#fff8e1;color:#8a6d00;border:1px solid #f9a825;'
+        : 'background:#ffebee;color:#b71c1c;border:1px solid #e53935;';
+      return `<span style="display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;font-weight:700;${style}">${label}</span>`;
     }
 
     function clampNumber(value, min, max, fallback){
@@ -4793,6 +4881,7 @@
       const categoryFilter = document.getElementById('outgoingCategoryFilter').value;
       const operatorFilter = document.getElementById('outgoingOperatorFilter').value;
       const periodFilterValue = document.getElementById('outgoingPeriodFilter').value;
+      const statusFilterValue = (document.getElementById('outgoingStatusFilter') || {}).value || 'Tutti';
 
       let allConsumptions = [];
       materials.forEach(m => {
@@ -4801,6 +4890,7 @@
           const qty = Number(entry.quantità || 0) || 0;
           const operator = String(entry.operatore || entry.operator || '').trim() || '--';
           const dateValue = entry.data || entry.timestamp;
+          const status = entry.status === 'in_uso' ? 'in_uso' : 'consumato';
           const batchInfo = Array.isArray(entry.batchesConsumed)
             ? entry.batchesConsumed.map((b, idx) => `${b.quantità || 0}pz da ${getLotDisplayLabel(b, idx)}`).join(', ')
             : '--';
@@ -4811,6 +4901,7 @@
             materialName: m.name || '--',
             operator,
             quantity: qty,
+            status,
             batches: batchInfo
           });
         });
@@ -4819,6 +4910,7 @@
       allConsumptions = allConsumptions.filter(c => {
         if (categoryFilter !== 'Tutti' && c.category !== categoryFilter) return false;
         if (operatorFilter !== 'Tutti' && c.operator !== operatorFilter) return false;
+        if (statusFilterValue !== 'Tutti' && c.status !== statusFilterValue) return false;
         return true;
       });
 
@@ -4863,6 +4955,7 @@
           <td>${c.materialName || '--'}</td>
           <td>${c.operator || '--'}</td>
           <td>${c.quantity || 0}</td>
+          <td>${getConsumptionStatusBadge(c.status)}</td>
           <td>${c.batches || '--'}</td>
         `;
         tbody.appendChild(tr);
@@ -4870,7 +4963,7 @@
 
       if (filtered.length === 0) {
         const tr = document.createElement('tr');
-        tr.innerHTML = '<td colspan="6" style="text-align:center;color:#999;padding:20px">Nessuna uscita trovata</td>';
+        tr.innerHTML = '<td colspan="7" style="text-align:center;color:#999;padding:20px">Nessuna uscita trovata</td>';
         tbody.appendChild(tr);
       }
     }
@@ -4879,7 +4972,143 @@
       document.getElementById('outgoingCategoryFilter').value = 'Tutti';
       document.getElementById('outgoingOperatorFilter').value = 'Tutti';
       document.getElementById('outgoingPeriodFilter').value = 'all';
+      const statusFilter = document.getElementById('outgoingStatusFilter');
+      if (statusFilter) statusFilter.value = 'Tutti';
       updateOutgoingRegisterData();
+    }
+
+    function getActiveUsageData(){
+      const materials = loadFromLocalStorage();
+      const rows = [];
+      materials.forEach(material => {
+        const history = Array.isArray(material.consumptionHistory) ? material.consumptionHistory : [];
+        history.forEach((entry, index) => {
+          const status = entry.status === 'in_uso' ? 'in_uso' : 'consumato';
+          if(status !== 'in_uso' || entry.closedAt) return;
+          rows.push({
+            materialId: material.id,
+            usageId: String(entry.usageId || `${material.id}_${index}`),
+            date: entry.data || entry.timestamp,
+            category: material.category || '--',
+            materialName: material.name || '--',
+            operator: String(entry.operatore || entry.operator || '').trim() || '--',
+            quantity: Number(entry.quantità || 0) || 0,
+            batches: Array.isArray(entry.batchesConsumed)
+              ? entry.batchesConsumed.map((b, idx) => `${b.quantità || 0}pz da ${getLotDisplayLabel(b, idx)}`).join(', ')
+              : '--',
+            status
+          });
+        });
+      });
+
+      rows.sort((a, b) => {
+        const da = parseFlexibleDate(a.date);
+        const db = parseFlexibleDate(b.date);
+        return (db ? db.getTime() : 0) - (da ? da.getTime() : 0);
+      });
+      return rows;
+    }
+
+    function openActiveUsageModal(){
+      const modal = document.getElementById('activeUsageModal');
+      if(!modal) return;
+      modal.style.display = 'flex';
+      modal.style.alignItems = 'flex-start';
+      modal.style.justifyContent = 'center';
+      updateActiveUsageData();
+    }
+
+    function closeActiveUsageModal(){
+      const modal = document.getElementById('activeUsageModal');
+      if(!modal) return;
+      modal.style.display = 'none';
+    }
+
+    async function markUsageAsConsumed(materialId, usageId){
+      const materials = loadFromLocalStorage();
+      const materialIdx = materials.findIndex(m => m.id === materialId);
+      if(materialIdx < 0){
+        showAlert('Materiale non trovato', 'warn');
+        return;
+      }
+
+      const material = materials[materialIdx];
+      material.consumptionHistory = Array.isArray(material.consumptionHistory) ? material.consumptionHistory : [];
+      const entry = material.consumptionHistory.find((h, idx) => String(h.usageId || `${material.id}_${idx}`) === String(usageId));
+      if(!entry){
+        showAlert('Voce in uso non trovata', 'warn');
+        return;
+      }
+      if(entry.closedAt || entry.status === 'consumato'){
+        showAlert('Voce già chiusa come consumata', 'warn');
+        return;
+      }
+
+      const suggestedOperator = String(localStorage.getItem(LAST_OPERATOR_KEY) || entry.operatore || '').trim();
+      const closingOperator = prompt('Operatore che chiude il consumo:', suggestedOperator);
+      if(closingOperator === null) return;
+      const operator = String(closingOperator || '').trim() || String(entry.operatore || '--').trim();
+
+      entry.status = 'consumato';
+      entry.closedAt = new Date().toISOString();
+      entry.closedBy = operator;
+      entry.updatedAt = new Date().toISOString();
+
+      materials[materialIdx] = material;
+      saveToLocalStorage(materials);
+      saveOperator(operator);
+
+      if(firebaseReady && typeof db !== 'undefined'){
+        db.collection('materials').doc(material.id).set({
+          consumptionHistory: material.consumptionHistory,
+          updatedAt: new Date().toISOString()
+        }, { merge: true }).catch(err => {
+          console.warn('Firebase sync chiusura in uso non riuscita:', err && err.message ? err.message : err);
+        });
+      }
+
+      showAlert(`✅ ${operator} ha chiuso come consumato il materiale in uso`, 'info');
+      updateActiveUsageData();
+      updateOutgoingRegisterData();
+    }
+
+    function updateActiveUsageData(){
+      const rows = getActiveUsageData();
+      const totalCount = rows.length;
+      const totalQuantity = rows.reduce((sum, row) => sum + (Number(row.quantity || 0) || 0), 0);
+      const lastDate = rows.length > 0 ? formatDate(rows[0].date) : '--';
+
+      const totalCountEl = document.getElementById('activeUsageTotalCount');
+      const totalQtyEl = document.getElementById('activeUsageTotalQuantity');
+      const lastDateEl = document.getElementById('activeUsageLastDate');
+      if(totalCountEl) totalCountEl.textContent = String(totalCount);
+      if(totalQtyEl) totalQtyEl.textContent = String(totalQuantity);
+      if(lastDateEl) lastDateEl.textContent = lastDate;
+
+      const tbody = document.getElementById('activeUsageTableBody');
+      if(!tbody) return;
+      tbody.innerHTML = '';
+
+      rows.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${formatDate(row.date)}</td>
+          <td>${row.category || '--'}</td>
+          <td>${row.materialName || '--'}</td>
+          <td>${row.operator || '--'}</td>
+          <td>${row.quantity || 0}</td>
+          <td>${row.batches || '--'}</td>
+          <td>${getConsumptionStatusBadge(row.status)}</td>
+          <td><button style="padding:6px 10px;background:#d32f2f;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:600" onclick="markUsageAsConsumed('${row.materialId}','${row.usageId}')">Segna consumato</button></td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      if(rows.length === 0){
+        const tr = document.createElement('tr');
+        tr.innerHTML = '<td colspan="8" style="text-align:center;color:#999;padding:20px">Nessun materiale attualmente in uso</td>';
+        tbody.appendChild(tr);
+      }
     }
 
     // ===== IMPLANTS REPORT FUNCTIONS =====
@@ -6557,6 +6786,8 @@
       document.getElementById('consumptionForm').reset();
       document.getElementById('consumptionMaterialSearch').value = '';
       document.getElementById('consumptionMaterial').value = '';
+      const statusEl = document.getElementById('consumptionStatus');
+      if(statusEl) statusEl.value = 'in_uso';
     }
 
     function initConsumptionModal() {
@@ -6601,6 +6832,8 @@
 
       const today = new Date().toISOString().split('T')[0];
       document.getElementById('consumptionDate').value = today;
+      const statusEl = document.getElementById('consumptionStatus');
+      if(statusEl) statusEl.value = 'in_uso';
       initConsumptionOperator();
     }
 
@@ -6687,6 +6920,7 @@
       const quantity = parseInt(document.getElementById('consumptionQuantity').value);
       const consumptionDate = document.getElementById('consumptionDate').value;
       const operator = String(document.getElementById('consumptionOperator').value || '').trim();
+      const movementStatus = (document.getElementById('consumptionStatus') || {}).value === 'consumato' ? 'consumato' : 'in_uso';
 
       if (!materialId || !quantity || quantity <= 0 || !operator) {
         alert('Compila tutti i campi, operatore incluso, e seleziona un materiale valido');
@@ -6743,10 +6977,13 @@
       material.quantity = material.batches.reduce((sum, b) => sum + (Number(b.quantitàRimanente || 0) || 0), 0);
       material.expiry = recomputeMaterialExpiryFromBatches(material.batches);
       material.consumptionHistory = material.consumptionHistory || [];
+      const usageId = 'use_' + String(material.id || 'mat') + '_' + Date.now();
       material.consumptionHistory.push({
+        usageId,
         data: consumptionDate,
         quantità: quantity,
         operatore: operator,
+        status: movementStatus,
         batchesConsumed: consumed,
         timestamp: new Date().toISOString()
       });
@@ -6770,9 +7007,12 @@
 
       // Mostra notifica di conferma
       const batchInfo = consumed.map((c, idx) => `${c.quantità} pz da ${getLotDisplayLabel(c, idx)}`).join(', ');
-      showAlert(`✅ ${operator} ha consumato ${quantity} pz da: ${batchInfo}`, 'info');
+      const statusLabel = getConsumptionStatusLabel(movementStatus);
+      showAlert(`✅ ${operator} ha registrato "${statusLabel}" (${quantity} pz) da: ${batchInfo}`, 'info');
       
       closeConsumptionModal();
+      updateActiveUsageData();
+      updateOutgoingRegisterData();
       loadMaterialsFromStorage(); // Ricarica tabella
     });
 
