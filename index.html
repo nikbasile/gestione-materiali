@@ -942,7 +942,7 @@
                 <th>Nome Materiale</th>
                 <th>Operatore</th>
                 <th>Quantità</th>
-                <th>Lotti Utilizzati</th>
+                <th>Lotti (data)</th>
               </tr>
             </thead>
             <tbody id="outgoingRegisterTableBody"></tbody>
@@ -1429,7 +1429,7 @@
                 <th>Modello</th>
                 <th>Operatore</th>
                 <th>Quantità</th>
-                <th>Lotti Utilizzati</th>
+                <th>Lotti (data)</th>
               </tr>
             </thead>
             <tbody id="implantsOutgoingRegisterTableBody"></tbody>
@@ -4096,7 +4096,7 @@
         return;
       }
 
-      const headers = ['Data', 'Tipo', 'Azienda', 'Modello', 'Operatore', 'Quantità', 'Lotti Utilizzati'];
+      const headers = ['Data', 'Tipo', 'Azienda', 'Modello', 'Operatore', 'Quantità', 'Lotti (data)'];
       let csvContent = headers.join(',') + '\n';
 
       rowsData.forEach(row => {
@@ -4162,7 +4162,7 @@
         return;
       }
 
-      const headers = ['Data', 'Tipo', 'Azienda', 'Modello', 'Operatore', 'Qta', 'Lotti Utilizzati'];
+      const headers = ['Data', 'Tipo', 'Azienda', 'Modello', 'Operatore', 'Qta', 'Lotti (data)'];
       const rows = rowsData.map(row => [
         formatDate(row.date),
         row.type || '--',
