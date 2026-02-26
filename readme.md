@@ -4,10 +4,22 @@ Single-file web app per gestire i materiali di consumo di uno studio dentistico.
 
 Caratteristiche:
 - Entrate di magazzino gestite da Nuovo Ordine e Nuovo Materiale
-- Uscite di magazzino gestite dal Registro Consumi con scarico automatico FIFO
+- Uscite di magazzino gestite dal Registro Consumi con scarico automatico FEFO
 - Scadenza e soglia quantità gestite direttamente dalla vista Magazzino
 - Notifiche in-app e notifiche browser quando la scadenza si avvicina o il materiale è in esaurimento (<=2)
 - Salvataggio e sincronizzazione su Firebase Firestore
+
+Flag rapido restrizioni eliminazione (UI principale):
+- Nella schermata principale è disponibile il toggle: "🔒 Restrizioni elimina admin".
+- Toggle OFF: modalità test veloce (eliminazione consentita agli utenti autenticati).
+- Toggle ON: elimina consentito solo agli admin definiti in `ADMIN_DELETE_UIDS` dentro `index.html`.
+- Lo stato del toggle è salvato in localStorage (persistente tra refresh e riaperture).
+
+Quando vuoi passare a modalità admin sicura:
+1. Inserisci gli UID admin reali nell'array `ADMIN_DELETE_UIDS` in `index.html`.
+2. Attiva il toggle "🔒 Restrizioni elimina admin" dalla schermata principale.
+3. In `firestore.rules`, imposta `allow delete: if isDeleteAdmin();` per `materials` e `implants`.
+4. Pubblica le regole con: `firebase deploy --only firestore:rules`.
 
 Deploy:
 - Sostituire la configurazione Firebase in `index.html` con i valori del tuo progetto Firebase.
