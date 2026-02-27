@@ -5655,7 +5655,11 @@
     function openIncomingRegisterModal() {
       const modal = document.getElementById('incomingRegisterModal');
       modal.classList.add('active');
-      setTimeout(() => initIncomingRegisterFilters(), 100);
+      setTimeout(() => {
+        initIncomingRegisterFilters();
+        const input = document.getElementById('incomingMaterialNameFilter');
+        if (input) refreshIncomingMaterialNameSuggestions(input.value);
+      }, 100);
     }
 
     function closeIncomingRegisterModal() {
