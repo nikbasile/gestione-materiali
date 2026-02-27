@@ -39,6 +39,10 @@ Deploy automatico da GitHub a Firebase Hosting:
 - Valore del secret: JSON dell'account di servizio Firebase con permessi Hosting Admin (e Firestore se necessario).
 - Dopo aver aggiunto il secret, ogni push su `main` pubblica automaticamente su Firebase Hosting (canale `live`).
 
+Regola operativa deploy (sempre):
+- Eseguire il deploy solo tramite GitHub (`push` su `main`), evitando deploy manuali da terminale.
+- Flusso standard: modifica locale → commit → push su GitHub → deploy automatico via workflow.
+
 Note importanti:
 - `index.html` usa la build compat di Firebase per semplicità. Per produzione valutare l'uso del SDK modulare e regole di sicurezza Firestore.
 - Le chiavi di Firebase (apiKey ecc.) vanno tenute con attenzione. Le regole Firestore devono essere configurate per limitare l'accesso.

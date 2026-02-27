@@ -141,6 +141,10 @@
     .main-dashboard-btn{width:230px !important;height:88px !important;padding:12px 16px !important;border-radius:8px !important;box-sizing:border-box;font-size:15px !important;font-weight:600 !important;display:flex !important;align-items:center !important;justify-content:center !important;gap:6px;line-height:1.15;text-align:center;white-space:normal}
     .main-dashboard-btn .alerts-report-badge{margin-left:8px}
     .active-status-icon{display:inline-block;font-size:20px;line-height:1;vertical-align:middle;margin-right:2px}
+    .dashboard-secondary-row{display:flex;gap:12px;align-items:center;justify-content:space-between}
+    .dashboard-warehouse-group{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+    .dashboard-tools-group{display:flex;gap:12px;align-items:center;margin-left:auto;justify-content:flex-end;flex-wrap:wrap}
+    .dashboard-toggle-label{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #d0dce6;border-radius:8px;padding:8px 12px;font-size:13px;color:#003d7a;font-weight:600;white-space:nowrap}
     .main-dashboard-row.top-row{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));align-items:stretch}
     .main-dashboard-row.top-row > .main-dashboard-group{display:contents}
     .main-dashboard-row.top-row .main-dashboard-btn{width:100% !important;min-width:0}
@@ -155,8 +159,15 @@
     @media (max-width:900px){
       .main-dashboard-row,.main-dashboard-group{justify-content:center}
       .main-dashboard-btn{width:100% !important;max-width:320px;height:72px !important}
-      .main-dashboard-row.top-row{display:flex}
-      .main-dashboard-row.top-row > .main-dashboard-group{display:flex}
+      .main-dashboard-row.top-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+      .main-dashboard-row.top-row > .main-dashboard-group{display:contents}
+      .main-dashboard-row.top-row .main-dashboard-btn{max-width:none;height:68px !important}
+      .dashboard-secondary-row{flex-direction:column;align-items:stretch;gap:10px}
+      .dashboard-warehouse-group,.dashboard-tools-group{width:100%;justify-content:center;margin-left:0}
+      .implants-btn-main,.dashboard-toggle-label{width:100%;max-width:320px;justify-content:center}
+      .dashboard-tools-group > div{width:100%;max-width:320px}
+      .dashboard-tools-group .action-menu-btn{width:100%;justify-content:center}
+      .dashboard-tools-group .action-menu{left:0 !important;right:auto !important;top:48px !important;width:100%;min-width:0}
     }
 
     /* Consumption Modal Styles */
@@ -331,6 +342,27 @@
     .implants-toolbar-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
     .implants-toolbar-row.right{justify-content:flex-end}
     .implants-toolbar .action-menu-btn{height:46px;padding:0 18px;font-size:15px;font-weight:600;justify-content:center;text-align:center;line-height:1.15}
+    #implantOrderModal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:10002;overflow-y:auto;padding:20px}
+    #implantOrderModal.active{display:flex;align-items:flex-start;justify-content:center}
+    .implant-order-content{background:#fff;border-radius:12px;max-width:1200px;width:100%;margin:20px auto;box-shadow:0 8px 32px rgba(0,0,0,0.3)}
+    .implant-order-header{background:linear-gradient(135deg,#2e7d32 0%,#1b5e20 100%);color:#fff;padding:20px;border-radius:12px 12px 0 0;display:flex;justify-content:space-between;align-items:center}
+    .implant-order-header h2{margin:0;font-size:22px}
+    .implant-order-close{background:transparent;color:#fff;border:2px solid #fff;width:36px;height:36px;border-radius:50%;font-size:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s}
+    .implant-order-close:hover{background:#fff;color:#2e7d32}
+    .implant-order-body{padding:24px}
+    .implant-order-info{display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:16px}
+    .implant-order-info label{font-weight:700;color:#003d7a;font-size:12px;text-transform:uppercase;letter-spacing:0.4px}
+    .implant-order-info input{padding:10px 12px;border:1px solid #d0dce6;border-radius:6px;font-size:14px}
+    .implant-order-table-wrap{border:1px solid #d0dce6;border-radius:8px;overflow:auto;max-height:460px}
+    .implant-order-table{width:100%;border-collapse:collapse;min-width:980px}
+    .implant-order-table th,.implant-order-table td{padding:8px;border:1px solid #d0dce6;font-size:12px}
+    .implant-order-table th{background:#f0f4f8;color:#003d7a;font-weight:700;text-align:left}
+    .implant-order-table input,.implant-order-table select{width:100%;padding:7px 8px;border:1px solid #d0dce6;border-radius:6px;font-size:12px}
+    .implant-order-actions{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+    .implant-order-btn{padding:10px 14px;border:none;border-radius:6px;cursor:pointer;font-weight:600}
+    .implant-order-btn.add{background:#2e7d32;color:#fff}
+    .implant-order-btn.cancel{background:#e0e0e0;color:#333}
+    .implant-order-btn.submit{background:#1976d2;color:#fff}
     .modal-header{background:#003d7a;color:#fff;padding:20px;border-radius:12px 12px 0 0;display:flex;justify-content:space-between;align-items:center}
     .modal-header h2{margin:0;font-size:22px}
     .modal-close{background:transparent;color:#fff;border:2px solid #fff;width:36px;height:36px;border-radius:50%;font-size:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s}
@@ -357,6 +389,8 @@
       body{font-size:14px}
       .container{padding:12px}
       .header-wrapper{align-items:flex-start;gap:12px}
+      .main-dashboard-row.top-row{grid-template-columns:1fr}
+      .main-dashboard-row.top-row .main-dashboard-btn{height:64px !important;font-size:14px !important;padding:10px 12px !important}
       .logo-circle{width:48px;height:48px;font-size:18px}
       .header-content h1{font-size:20px}
       .header-content .studio-name{font-size:13px}
@@ -372,6 +406,7 @@
       .filter-label::before{width:5px;height:5px}
       .filter-select{display:block;width:100%;min-width:0;font-size:13px;padding:9px 10px;border-radius:6px}
       .filters-reset-btn{width:100%;padding:10px 14px;font-size:12px}
+      .dashboard-warehouse-group .implants-btn-main,.dashboard-tools-group > div,.dashboard-toggle-label{max-width:none}
 
       table{border:none;box-shadow:none;background:transparent}
       thead{display:none}
@@ -478,8 +513,8 @@
       </div>
 
       <!-- Seconda fila: Magazzini a sinistra, Scarica e Backup a destra -->
-      <div style="display:flex;gap:12px;align-items:center;justify-content:space-between">
-        <div style="display:flex;gap:12px;align-items:center">
+      <div class="dashboard-secondary-row">
+        <div class="dashboard-warehouse-group">
           <button id="materialsBtn" class="implants-btn-main" onclick="openMaterialsWarehouse()" style="background:linear-gradient(135deg,#0066cc 0%,#003d7a 100%);color:#fff;padding:12px 20px;font-size:15px;border:none;border-radius:8px;cursor:pointer;font-weight:600;box-shadow:0 4px 12px rgba(0,61,122,0.35);transition:all 0.2s;display:flex;align-items:center;gap:6px">
             📦 Magazzino Materiali
           </button>
@@ -489,8 +524,8 @@
           </button>
         </div>
 
-        <div style="display:flex;gap:12px;align-items:center;margin-left:auto;justify-content:flex-end">
-          <label style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #d0dce6;border-radius:8px;padding:8px 12px;font-size:13px;color:#003d7a;font-weight:600;white-space:nowrap;">
+        <div class="dashboard-tools-group">
+          <label class="dashboard-toggle-label">
             <input type="checkbox" id="deleteRestrictionsToggle" />
             🔒 Restrizioni elimina admin
           </label>
@@ -663,7 +698,10 @@
           <label>Quantità</label>
           <input id="implantQuantity" type="number" min="0" value="1" required />
         </div>
-        <button type="submit" style="grid-column:span 1;align-self:flex-end">Aggiungi impianto</button>
+        <div style="grid-column:1/-1;display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap">
+          <button type="submit">Aggiungi materiale implantare</button>
+          <button type="button" onclick="openImplantOrderModal()" style="background:#2e7d32;color:#fff">Aggiungi ordine implantare</button>
+        </div>
       </form>
 
       <h3 style="margin:24px 0 12px;color:#003d7a;font-size:18px">📋 Inventario Impianti</h3>
@@ -742,6 +780,49 @@
       </div>
     </div>
   </div>
+  </div>
+
+  <!-- Ordine Implantare Modal -->
+  <div id="implantOrderModal">
+    <div class="implant-order-content">
+      <div class="implant-order-header">
+        <h2>🧾 Nuovo Ordine Implantare</h2>
+        <button class="implant-order-close" onclick="closeImplantOrderModal()">×</button>
+      </div>
+      <div class="implant-order-body">
+        <form id="implantOrderForm">
+          <div class="implant-order-info">
+            <div>
+              <label for="implantOrderDateBulk">Data Ordine</label>
+              <input id="implantOrderDateBulk" type="date" required />
+            </div>
+          </div>
+          <div class="implant-order-table-wrap">
+            <table class="implant-order-table">
+              <thead>
+                <tr>
+                  <th>Tipo</th>
+                  <th>Azienda</th>
+                  <th>Modello / Nomenclatura</th>
+                  <th>Ø (mm)</th>
+                  <th>L (mm)</th>
+                  <th>Scadenza</th>
+                  <th>Prezzo (€)</th>
+                  <th>Qtà</th>
+                  <th>Azioni</th>
+                </tr>
+              </thead>
+              <tbody id="implantOrderRows"></tbody>
+            </table>
+          </div>
+          <div class="implant-order-actions">
+            <button type="button" class="implant-order-btn add" onclick="addImplantOrderRow()">➕ Aggiungi Riga</button>
+            <button type="button" class="implant-order-btn cancel" onclick="closeImplantOrderModal()">Annulla</button>
+            <button type="submit" class="implant-order-btn submit">✓ Salva Ordine Implantare</button>
+          </div>
+        </form>
+      </div>
+    </div>
   </div>
 
   <!-- Analisi Spese Modal -->
@@ -2722,6 +2803,61 @@
       document.getElementById('implantsModal').classList.remove('active');
     }
 
+    function openImplantOrderModal(){
+      const modal = document.getElementById('implantOrderModal');
+      if(!modal) return;
+      modal.classList.add('active');
+      initImplantOrderModal();
+    }
+
+    function closeImplantOrderModal(){
+      const modal = document.getElementById('implantOrderModal');
+      if(!modal) return;
+      modal.classList.remove('active');
+      const form = document.getElementById('implantOrderForm');
+      if(form) form.reset();
+      const rows = document.getElementById('implantOrderRows');
+      if(rows) rows.innerHTML = '';
+    }
+
+    function initImplantOrderModal(){
+      const dateInput = document.getElementById('implantOrderDateBulk');
+      if(dateInput) dateInput.value = new Date().toISOString().split('T')[0];
+      const rows = document.getElementById('implantOrderRows');
+      if(rows) rows.innerHTML = '';
+      addImplantOrderRow();
+    }
+
+    function addImplantOrderRow(){
+      const tbody = document.getElementById('implantOrderRows');
+      if(!tbody) return;
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>
+          <select class="implant-order-type" required>
+            <option value="">-- Seleziona --</option>
+            <option value="Impianto">Impianto</option>
+            <option value="Vite tappo">Vite tappo</option>
+            <option value="Vite di guarigione">Vite di guarigione</option>
+            <option value="Kit chirurgico">Kit chirurgico</option>
+            <option value="Cacciavite">Cacciavite</option>
+            <option value="Cricchetto">Cricchetto</option>
+            <option value="Componenti protesiche">Componenti protesiche</option>
+            <option value="Altro">Altro</option>
+          </select>
+        </td>
+        <td><input class="implant-order-company" type="text" placeholder="Azienda" required /></td>
+        <td><input class="implant-order-model" type="text" placeholder="Es. BLX / NC / componente" /></td>
+        <td><input class="implant-order-diameter" type="number" step="0.1" min="0" placeholder="Ø" /></td>
+        <td><input class="implant-order-length" type="number" step="0.1" min="0" placeholder="L" /></td>
+        <td><input class="implant-order-expiry" type="date" /></td>
+        <td><input class="implant-order-price" type="number" step="0.01" min="0" placeholder="0.00" /></td>
+        <td><input class="implant-order-qty" type="number" min="1" step="1" value="1" required /></td>
+        <td><button type="button" class="implant-order-btn cancel" style="padding:6px 10px" onclick="this.closest('tr').remove()">✕</button></td>
+      `;
+      tbody.appendChild(tr);
+    }
+
     function initImplantFilters(){
       const implants = loadImplantsFromStorage();
       
@@ -4549,8 +4685,82 @@
 
       document.getElementById('implantForm').reset();
       document.getElementById('implantQuantity').value = 1;
-      showAlert('✓ Carico impianto registrato', 'info');
+      showAlert('✓ Materiale implantare registrato', 'info');
       initImplantFilters(); // Aggiorna i filtri
+      renderImplantsList();
+    });
+
+    document.getElementById('implantOrderForm')?.addEventListener('submit', async function(e){
+      e.preventDefault();
+      const orderDate = document.getElementById('implantOrderDateBulk')?.value;
+      const rows = Array.from(document.querySelectorAll('#implantOrderRows tr'));
+      if(!orderDate){
+        alert('Inserisci la data ordine');
+        return;
+      }
+      if(rows.length === 0){
+        alert('Aggiungi almeno una riga ordine');
+        return;
+      }
+
+      const toSyncIds = [];
+      let inserted = 0;
+
+      for(const row of rows){
+        const type = String(row.querySelector('.implant-order-type')?.value || '').trim();
+        const company = toTitleCase(String(row.querySelector('.implant-order-company')?.value || '').trim());
+        const modelInput = String(row.querySelector('.implant-order-model')?.value || '').trim();
+        const diameterRaw = String(row.querySelector('.implant-order-diameter')?.value || '').trim();
+        const lengthRaw = String(row.querySelector('.implant-order-length')?.value || '').trim();
+        const expiryInput = String(row.querySelector('.implant-order-expiry')?.value || '').trim();
+        const price = parseFloat(String(row.querySelector('.implant-order-price')?.value || '0')) || 0;
+        const quantity = parseInt(String(row.querySelector('.implant-order-qty')?.value || '0'), 10) || 0;
+
+        if(!type || !company || quantity <= 0) continue;
+
+        if(modelInput) saveImplantModel(modelInput, type);
+        if(type === 'Kit chirurgico' && modelInput) saveKitComponent(modelInput);
+
+        const implantPayload = {
+          type,
+          company,
+          model: type === 'Kit chirurgico' ? null : (modelInput || null),
+          kitComponents: type === 'Kit chirurgico' ? (modelInput || null) : null,
+          diameter: diameterRaw || null,
+          length: lengthRaw || null,
+          orderDate: new Date(orderDate),
+          expiry: expiryInput ? new Date(expiryInput) : null,
+          price,
+          quantity,
+          createdAt: new Date()
+        };
+
+        const implantId = addImplantToStorage(implantPayload);
+        toSyncIds.push(implantId);
+        inserted += 1;
+      }
+
+      if(inserted === 0){
+        alert('Compila almeno una riga valida (tipo, azienda, quantità)');
+        return;
+      }
+
+      if(firebaseReady && typeof db !== 'undefined'){
+        for(const implantId of toSyncIds){
+          try {
+            const storedImplant = loadImplantsFromStorage().find(i => i.id === implantId);
+            if(storedImplant){
+              await db.collection('implants').doc(implantId).set(toFirestoreImplantData(storedImplant), { merge: true });
+            }
+          } catch(err) {
+            console.warn('Firebase sync ordine impianto non riuscita:', err && err.message ? err.message : err);
+          }
+        }
+      }
+
+      closeImplantOrderModal();
+      showAlert(`✓ Ordine implantare registrato (${inserted} voci)`, 'info');
+      initImplantFilters();
       renderImplantsList();
     });
 
