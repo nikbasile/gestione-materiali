@@ -5702,7 +5702,7 @@
       });
 
       // Filtra per categoria, distributore e nome materiale
-      const materialNameFilter = (document.getElementById('incomingMaterialNameFilter') || {}).value || '';
+      const materialNameFilter = (document.getElementById('incomingMaterialNameFilterInput') || {}).value || '';
       allBatches = allBatches.filter(b => {
         if (categoryFilter !== 'Tutti' && b.category !== categoryFilter) return false;
         if (distributorFilter !== 'Tutti' && b.distributor !== distributorFilter) return false;
