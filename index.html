@@ -344,25 +344,27 @@
     .implants-toolbar .action-menu-btn{height:46px;padding:0 18px;font-size:15px;font-weight:600;justify-content:center;text-align:center;line-height:1.15}
     #implantOrderModal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:10002;overflow-y:auto;padding:20px}
     #implantOrderModal.active{display:flex;align-items:flex-start;justify-content:center}
-    .implant-order-content{background:#fff;border-radius:12px;max-width:1200px;width:100%;margin:20px auto;box-shadow:0 8px 32px rgba(0,0,0,0.3)}
+    .implant-order-content{background:#fff;border-radius:12px;max-width:1400px;width:100%;margin:20px auto;box-shadow:0 8px 32px rgba(0,0,0,0.3)}
     .implant-order-header{background:linear-gradient(135deg,#2e7d32 0%,#1b5e20 100%);color:#fff;padding:20px;border-radius:12px 12px 0 0;display:flex;justify-content:space-between;align-items:center}
     .implant-order-header h2{margin:0;font-size:22px}
     .implant-order-close{background:transparent;color:#fff;border:2px solid #fff;width:36px;height:36px;border-radius:50%;font-size:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s}
     .implant-order-close:hover{background:#fff;color:#2e7d32}
     .implant-order-body{padding:24px}
-    .implant-order-info{display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:16px}
+    .implant-order-info{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:16px;background:#f0f4f8;padding:14px;border-radius:8px;border:1px solid #d0dce6}
     .implant-order-info label{font-weight:700;color:#003d7a;font-size:12px;text-transform:uppercase;letter-spacing:0.4px}
     .implant-order-info input{padding:10px 12px;border:1px solid #d0dce6;border-radius:6px;font-size:14px}
-    .implant-order-table-wrap{border:1px solid #d0dce6;border-radius:8px;overflow:auto;max-height:460px}
-    .implant-order-table{width:100%;border-collapse:collapse;min-width:980px}
+    .implant-order-table-wrap{border:1px solid #d0dce6;border-radius:8px;overflow:auto;max-height:520px;width:100%}
+    .implant-order-table{width:100%;border-collapse:collapse;min-width:1180px}
     .implant-order-table th,.implant-order-table td{padding:8px;border:1px solid #d0dce6;font-size:12px}
     .implant-order-table th{background:#f0f4f8;color:#003d7a;font-weight:700;text-align:left}
     .implant-order-table input,.implant-order-table select{width:100%;padding:7px 8px;border:1px solid #d0dce6;border-radius:6px;font-size:12px}
-    .implant-order-actions{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+    .implant-order-actions{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;justify-content:flex-end}
     .implant-order-btn{padding:10px 14px;border:none;border-radius:6px;cursor:pointer;font-weight:600}
     .implant-order-btn.add{background:#2e7d32;color:#fff}
     .implant-order-btn.cancel{background:#e0e0e0;color:#333}
     .implant-order-btn.submit{background:#1976d2;color:#fff}
+    #implantPdfImportModal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:10003;overflow-y:auto;padding:20px}
+    #implantPdfImportModal.active{display:flex;align-items:flex-start;justify-content:center}
     .modal-header{background:#003d7a;color:#fff;padding:20px;border-radius:12px 12px 0 0;display:flex;justify-content:space-between;align-items:center}
     .modal-header h2{margin:0;font-size:22px}
     .modal-close{background:transparent;color:#fff;border:2px solid #fff;width:36px;height:36px;border-radius:50%;font-size:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s}
@@ -383,6 +385,7 @@
       #articlesContainer th,#articlesContainer td{padding:5px 6px;font-size:11px}
       #articlesContainer table{min-width:860px}
       .order-buttons{padding:14px 16px;margin-top:12px}
+      .implant-order-info{grid-template-columns:1fr}
     }
 
     @media (max-width:700px){
@@ -796,13 +799,17 @@
               <label for="implantOrderDateBulk">Data Ordine</label>
               <input id="implantOrderDateBulk" type="date" required />
             </div>
+            <div>
+              <label for="implantOrderCompanyBulk">Azienda</label>
+              <input id="implantOrderCompanyBulk" type="text" placeholder="Es. Straumann" required />
+            </div>
           </div>
           <div class="implant-order-table-wrap">
             <table class="implant-order-table">
               <thead>
                 <tr>
+                  <th>Materiale implantare</th>
                   <th>Tipo</th>
-                  <th>Azienda</th>
                   <th>Modello / Nomenclatura</th>
                   <th>Ø (mm)</th>
                   <th>L (mm)</th>
@@ -817,10 +824,56 @@
           </div>
           <div class="implant-order-actions">
             <button type="button" class="implant-order-btn add" onclick="addImplantOrderRow()">➕ Aggiungi Riga</button>
+            <button type="button" class="implant-order-btn add" style="background:#1976d2" onclick="openImplantPdfImportModal()">📄 Importa PDF</button>
             <button type="button" class="implant-order-btn cancel" onclick="closeImplantOrderModal()">Annulla</button>
             <button type="submit" class="implant-order-btn submit">✓ Salva Ordine Implantare</button>
           </div>
         </form>
+      </div>
+    </div>
+  </div>
+
+  <div id="implantPdfImportModal">
+    <div class="pdf-import-content" style="max-width:1200px">
+      <div class="pdf-import-header" style="background:linear-gradient(135deg,#2e7d32 0%,#1b5e20 100%)">
+        <h2>📄 Importa PDF Ordine Implantare</h2>
+        <button class="pdf-import-close" onclick="closeImplantPdfImportModal()">×</button>
+      </div>
+      <div class="pdf-import-body">
+        <div class="pdf-import-actions">
+          <label class="pdf-upload-btn" style="background:linear-gradient(135deg,#2e7d32 0%,#1b5e20 100%)">
+            📥 Carica PDF
+            <input type="file" id="implantPdfImportFile" accept="application/pdf" onchange="handleImplantPdfImportFile(event)" />
+          </label>
+          <button type="button" class="pdf-import-addrow" onclick="addImplantPdfImportRow()">➕ Riga manuale</button>
+        </div>
+        <div class="pdf-import-raw">
+          <label for="implantPdfImportRaw">Testo estratto (facoltativo)</label>
+          <textarea id="implantPdfImportRaw" placeholder="Testo estratto dal PDF..."></textarea>
+        </div>
+        <div class="pdf-import-table-wrap">
+          <table class="pdf-import-table">
+            <thead>
+              <tr>
+                <th>Materiale implantare</th>
+                <th>Quantità</th>
+                <th>Prezzo (€)</th>
+                <th>Totale netto (€)</th>
+                <th>IVA %</th>
+                <th>IVA (€)</th>
+                <th>Tipo</th>
+                <th>Modello / Nomenclatura</th>
+                <th>Azioni</th>
+              </tr>
+            </thead>
+            <tbody id="implantPdfImportTableBody"></tbody>
+          </table>
+        </div>
+        <datalist id="implantMaterialNameList"></datalist>
+        <div class="pdf-import-buttons">
+          <button type="button" class="pdf-import-btn cancel" onclick="closeImplantPdfImportModal()">Annulla</button>
+          <button type="button" class="pdf-import-btn submit" style="background:linear-gradient(135deg,#2e7d32 0%,#1b5e20 100%)" onclick="applyImplantPdfImportRows()">Importa nell'ordine</button>
+        </div>
       </div>
     </div>
   </div>
@@ -2823,16 +2876,39 @@
     function initImplantOrderModal(){
       const dateInput = document.getElementById('implantOrderDateBulk');
       if(dateInput) dateInput.value = new Date().toISOString().split('T')[0];
+      const companyInput = document.getElementById('implantOrderCompanyBulk');
+      if(companyInput){
+        const implants = loadImplantsFromStorage();
+        const latestCompany = implants
+          .slice()
+          .sort((a,b)=>{
+            const da = parseFlexibleDate(a.orderDate || a.createdAt);
+            const db = parseFlexibleDate(b.orderDate || b.createdAt);
+            return (db ? db.getTime() : 0) - (da ? da.getTime() : 0);
+          })
+          .find(i => i.company);
+        companyInput.value = latestCompany ? String(latestCompany.company || '') : '';
+      }
       const rows = document.getElementById('implantOrderRows');
       if(rows) rows.innerHTML = '';
+      renderImplantMaterialDatalist();
       addImplantOrderRow();
     }
 
-    function addImplantOrderRow(){
+    function addImplantOrderRow(data = {}){
       const tbody = document.getElementById('implantOrderRows');
       if(!tbody) return;
       const tr = document.createElement('tr');
+      const normalizedType = String(data.type || '').trim();
+      const normalizedName = String(data.name || '').trim();
+      const normalizedModel = String(data.model || '').trim();
+      const normalizedDiameter = data.diameter !== undefined && data.diameter !== null ? String(data.diameter) : '';
+      const normalizedLength = data.length !== undefined && data.length !== null ? String(data.length) : '';
+      const normalizedExpiry = String(data.expiry || '').trim();
+      const normalizedPrice = data.price !== undefined && data.price !== null ? String(data.price) : '';
+      const normalizedQty = data.quantity !== undefined && data.quantity !== null ? String(data.quantity) : '1';
       tr.innerHTML = `
+        <td><input class="implant-order-name" type="text" placeholder="Nome materiale implantare" list="implantMaterialNameList" value="${escapeHtml(normalizedName)}" /></td>
         <td>
           <select class="implant-order-type" required>
             <option value="">-- Seleziona --</option>
@@ -2846,15 +2922,18 @@
             <option value="Altro">Altro</option>
           </select>
         </td>
-        <td><input class="implant-order-company" type="text" placeholder="Azienda" required /></td>
-        <td><input class="implant-order-model" type="text" placeholder="Es. BLX / NC / componente" /></td>
-        <td><input class="implant-order-diameter" type="number" step="0.1" min="0" placeholder="Ø" /></td>
-        <td><input class="implant-order-length" type="number" step="0.1" min="0" placeholder="L" /></td>
-        <td><input class="implant-order-expiry" type="date" /></td>
-        <td><input class="implant-order-price" type="number" step="0.01" min="0" placeholder="0.00" /></td>
-        <td><input class="implant-order-qty" type="number" min="1" step="1" value="1" required /></td>
+        <td><input class="implant-order-model" type="text" placeholder="Es. BLX / NC / componente" value="${escapeHtml(normalizedModel)}" /></td>
+        <td><input class="implant-order-diameter" type="number" step="0.1" min="0" placeholder="Ø" value="${escapeHtml(normalizedDiameter)}" /></td>
+        <td><input class="implant-order-length" type="number" step="0.1" min="0" placeholder="L" value="${escapeHtml(normalizedLength)}" /></td>
+        <td><input class="implant-order-expiry" type="date" value="${escapeHtml(normalizedExpiry)}" /></td>
+        <td><input class="implant-order-price" type="number" step="0.01" min="0" placeholder="0.00" value="${escapeHtml(normalizedPrice)}" /></td>
+        <td><input class="implant-order-qty" type="number" min="1" step="1" value="${escapeHtml(normalizedQty)}" required /></td>
         <td><button type="button" class="implant-order-btn cancel" style="padding:6px 10px" onclick="this.closest('tr').remove()">✕</button></td>
       `;
+      const typeSelect = tr.querySelector('.implant-order-type');
+      if(typeSelect && normalizedType){
+        typeSelect.value = normalizedType;
+      }
       tbody.appendChild(tr);
     }
 
@@ -4693,9 +4772,14 @@
     document.getElementById('implantOrderForm')?.addEventListener('submit', async function(e){
       e.preventDefault();
       const orderDate = document.getElementById('implantOrderDateBulk')?.value;
+      const companyBulk = toTitleCase(String(document.getElementById('implantOrderCompanyBulk')?.value || '').trim());
       const rows = Array.from(document.querySelectorAll('#implantOrderRows tr'));
       if(!orderDate){
         alert('Inserisci la data ordine');
+        return;
+      }
+      if(!companyBulk){
+        alert('Inserisci l\'azienda dell\'ordine');
         return;
       }
       if(rows.length === 0){
@@ -4708,7 +4792,7 @@
 
       for(const row of rows){
         const type = String(row.querySelector('.implant-order-type')?.value || '').trim();
-        const company = toTitleCase(String(row.querySelector('.implant-order-company')?.value || '').trim());
+        const materialName = String(row.querySelector('.implant-order-name')?.value || '').trim();
         const modelInput = String(row.querySelector('.implant-order-model')?.value || '').trim();
         const diameterRaw = String(row.querySelector('.implant-order-diameter')?.value || '').trim();
         const lengthRaw = String(row.querySelector('.implant-order-length')?.value || '').trim();
@@ -4716,14 +4800,15 @@
         const price = parseFloat(String(row.querySelector('.implant-order-price')?.value || '0')) || 0;
         const quantity = parseInt(String(row.querySelector('.implant-order-qty')?.value || '0'), 10) || 0;
 
-        if(!type || !company || quantity <= 0) continue;
+        if(!type || quantity <= 0) continue;
 
         if(modelInput) saveImplantModel(modelInput, type);
         if(type === 'Kit chirurgico' && modelInput) saveKitComponent(modelInput);
 
         const implantPayload = {
           type,
-          company,
+          company: companyBulk,
+          name: materialName || null,
           model: type === 'Kit chirurgico' ? null : (modelInput || null),
           kitComponents: type === 'Kit chirurgico' ? (modelInput || null) : null,
           diameter: diameterRaw || null,
@@ -4741,7 +4826,7 @@
       }
 
       if(inserted === 0){
-        alert('Compila almeno una riga valida (tipo, azienda, quantità)');
+        alert('Compila almeno una riga valida (tipo e quantità)');
         return;
       }
 
@@ -4763,6 +4848,232 @@
       initImplantFilters();
       renderImplantsList();
     });
+
+    function getImplantsForImport(){
+      return loadImplantsFromStorage();
+    }
+
+    function renderImplantMaterialDatalist(){
+      const list = document.getElementById('implantMaterialNameList');
+      if(!list) return;
+      const implants = getImplantsForImport();
+      const names = implants
+        .map(i => [i.type || '', getImplantDisplayModel(i) || '', i.company || ''].join(' ').replace(/\s+/g, ' ').trim())
+        .filter(Boolean);
+      const uniqueNames = Array.from(new Set(names));
+      list.innerHTML = '';
+      uniqueNames.forEach(name => {
+        const opt = document.createElement('option');
+        opt.value = name;
+        list.appendChild(opt);
+      });
+    }
+
+    function recognizeImplantFromText(name){
+      const normalizedName = String(name || '').toLowerCase().trim();
+      const implants = getImplantsForImport();
+      let best = null;
+      let bestScore = 0;
+      implants.forEach(implant => {
+        const type = String(implant.type || '').toLowerCase().trim();
+        const model = String(getImplantDisplayModel(implant) || '').toLowerCase().trim();
+        let score = 0;
+        if(type && normalizedName.includes(type)) score += 2;
+        if(model && normalizedName.includes(model)) score += 3;
+        if(score > bestScore){
+          bestScore = score;
+          best = implant;
+        }
+      });
+      if(best && bestScore > 0){
+        return {
+          type: best.type || 'Impianto',
+          model: getImplantDisplayModel(best) || '',
+          diameter: best.diameter || '',
+          length: best.length || ''
+        };
+      }
+      return { type: 'Impianto', model: '', diameter: '', length: '' };
+    }
+
+    function openImplantPdfImportModal(){
+      const modal = document.getElementById('implantPdfImportModal');
+      if(!modal) return;
+      modal.classList.add('active');
+      const fileInput = document.getElementById('implantPdfImportFile');
+      const rawInput = document.getElementById('implantPdfImportRaw');
+      const tableBody = document.getElementById('implantPdfImportTableBody');
+      if(fileInput) fileInput.value = '';
+      if(rawInput) rawInput.value = '';
+      if(tableBody) tableBody.innerHTML = '';
+      renderImplantMaterialDatalist();
+    }
+
+    function closeImplantPdfImportModal(){
+      const modal = document.getElementById('implantPdfImportModal');
+      if(!modal) return;
+      modal.classList.remove('active');
+    }
+
+    function addImplantPdfImportRow(data = {}){
+      const tbody = document.getElementById('implantPdfImportTableBody');
+      if(!tbody) return;
+      const recognized = recognizeImplantFromText(data.name || '');
+      const tr = document.createElement('tr');
+
+      const nameInput = document.createElement('input');
+      nameInput.type = 'text';
+      nameInput.className = 'implant-pdf-import-name';
+      nameInput.setAttribute('list', 'implantMaterialNameList');
+      nameInput.value = data.name || '';
+
+      const qtyInput = document.createElement('input');
+      qtyInput.type = 'number';
+      qtyInput.min = '1';
+      qtyInput.className = 'implant-pdf-import-qty';
+      qtyInput.value = data.quantity || '';
+
+      const priceInput = document.createElement('input');
+      priceInput.type = 'number';
+      priceInput.min = '0';
+      priceInput.step = '0.01';
+      priceInput.className = 'implant-pdf-import-price';
+      priceInput.value = data.price !== undefined ? data.price : '';
+
+      const totalNetInput = document.createElement('input');
+      totalNetInput.type = 'number';
+      totalNetInput.min = '0';
+      totalNetInput.step = '0.01';
+      totalNetInput.className = 'implant-pdf-import-total-net';
+      totalNetInput.value = data.totalNet !== undefined ? data.totalNet : '';
+
+      const ivaPercentInput = document.createElement('input');
+      ivaPercentInput.type = 'number';
+      ivaPercentInput.min = '0';
+      ivaPercentInput.step = '0.01';
+      ivaPercentInput.className = 'implant-pdf-import-iva-percent';
+      ivaPercentInput.value = data.ivaPercent !== undefined ? data.ivaPercent : '';
+
+      const ivaAmountInput = document.createElement('input');
+      ivaAmountInput.type = 'number';
+      ivaAmountInput.step = '0.01';
+      ivaAmountInput.className = 'implant-pdf-import-iva-amount';
+      ivaAmountInput.readOnly = true;
+
+      const typeSelect = document.createElement('select');
+      typeSelect.className = 'implant-pdf-import-type';
+      typeSelect.innerHTML = '<option value="Impianto">Impianto</option><option value="Vite tappo">Vite tappo</option><option value="Vite di guarigione">Vite di guarigione</option><option value="Kit chirurgico">Kit chirurgico</option><option value="Cacciavite">Cacciavite</option><option value="Cricchetto">Cricchetto</option><option value="Componenti protesiche">Componenti protesiche</option><option value="Altro">Altro</option>';
+      typeSelect.value = data.type || recognized.type || 'Impianto';
+
+      const modelInput = document.createElement('input');
+      modelInput.type = 'text';
+      modelInput.className = 'implant-pdf-import-model';
+      modelInput.value = data.model || recognized.model || '';
+
+      const removeBtn = document.createElement('button');
+      removeBtn.type = 'button';
+      removeBtn.className = 'pdf-import-remove';
+      removeBtn.textContent = 'Rimuovi';
+      removeBtn.onclick = () => tr.remove();
+
+      const cells = [nameInput, qtyInput, priceInput, totalNetInput, ivaPercentInput, ivaAmountInput, typeSelect, modelInput, removeBtn];
+      cells.forEach(c => {
+        const td = document.createElement('td');
+        td.appendChild(c);
+        tr.appendChild(td);
+      });
+
+      const updateIva = () => {
+        const qty = parseFloat(String(qtyInput.value || '0')) || 0;
+        const price = parseFloat(String(priceInput.value || '0')) || 0;
+        const totalNet = parseFloat(String(totalNetInput.value || '0')) || 0;
+        const ivaPercent = parseFloat(String(ivaPercentInput.value || '0')) || 0;
+        const base = totalNet > 0 ? totalNet : (qty * price);
+        const ivaAmount = base * (ivaPercent / 100);
+        ivaAmountInput.value = ivaAmount ? ivaAmount.toFixed(2) : '';
+      };
+      qtyInput.addEventListener('input', updateIva);
+      priceInput.addEventListener('input', updateIva);
+      totalNetInput.addEventListener('input', updateIva);
+      ivaPercentInput.addEventListener('input', updateIva);
+      nameInput.addEventListener('change', () => {
+        const rec = recognizeImplantFromText(nameInput.value);
+        if(!modelInput.value) modelInput.value = rec.model || '';
+        if(typeSelect.value === 'Impianto' && rec.type) typeSelect.value = rec.type;
+      });
+      updateIva();
+
+      tbody.appendChild(tr);
+    }
+
+    async function handleImplantPdfImportFile(event){
+      const file = event.target.files && event.target.files[0];
+      if(!file) return;
+      if (!window.pdfjsLib) {
+        alert('PDF.js non disponibile');
+        return;
+      }
+      if (window.pdfjsLib.GlobalWorkerOptions && !window.pdfjsLib.GlobalWorkerOptions.workerSrc) {
+        window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+      }
+
+      const buffer = await file.arrayBuffer();
+      const pdf = await window.pdfjsLib.getDocument({ data: buffer }).promise;
+      let fullText = '';
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const text = await page.getTextContent();
+        const pageText = text.items.map(it => it.str).join(' ');
+        fullText += pageText + '\n';
+      }
+
+      const raw = document.getElementById('implantPdfImportRaw');
+      if(raw) raw.value = fullText.trim();
+
+      const items = extractPdfLineItems(fullText);
+      const tbody = document.getElementById('implantPdfImportTableBody');
+      if(tbody) tbody.innerHTML = '';
+      if (!items.length) {
+        showAlert('Nessuna riga riconosciuta nel PDF impianti. Inserisci righe manuali.', 'warn');
+        return;
+      }
+      items.forEach(item => addImplantPdfImportRow(item));
+    }
+
+    function applyImplantPdfImportRows(){
+      const rows = Array.from(document.querySelectorAll('#implantPdfImportTableBody tr'));
+      if(!rows.length){
+        alert('Nessuna riga da importare');
+        return;
+      }
+      let imported = 0;
+      rows.forEach(row => {
+        const name = String(row.querySelector('.implant-pdf-import-name')?.value || '').trim();
+        const type = String(row.querySelector('.implant-pdf-import-type')?.value || '').trim();
+        const model = String(row.querySelector('.implant-pdf-import-model')?.value || '').trim();
+        const qty = parseInt(String(row.querySelector('.implant-pdf-import-qty')?.value || '0'), 10) || 0;
+        const price = parseFloat(String(row.querySelector('.implant-pdf-import-price')?.value || '0')) || 0;
+        if(!name || !type || qty <= 0) return;
+        const recognized = recognizeImplantFromText(name);
+        addImplantOrderRow({
+          name,
+          type,
+          model: model || recognized.model || '',
+          diameter: recognized.diameter || '',
+          length: recognized.length || '',
+          price,
+          quantity: qty
+        });
+        imported += 1;
+      });
+
+      if(!imported){
+        alert('Nessuna riga valida da importare');
+        return;
+      }
+      closeImplantPdfImportModal();
+      showAlert(`✓ Importate ${imported} righe nell'ordine implantare`, 'info');
+    }
 
     // ===== ANALISI SPESE FUNCTIONS =====
     let reportCharts = { trend: null, distribution: null };
