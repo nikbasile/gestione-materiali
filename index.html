@@ -866,7 +866,8 @@
               </div>
               <div>
                 <label for="implantOrderCompanyBulk">Azienda</label>
-                <input id="implantOrderCompanyBulk" type="text" placeholder="Es. Straumann" required />
+                <input id="implantOrderCompanyBulk" type="text" placeholder="Es. Straumann" list="implantOrderCompanyList" required />
+                <datalist id="implantOrderCompanyList"></datalist>
               </div>
             </div>
             <div class="implant-order-actions">
@@ -2480,6 +2481,46 @@
       return saved ? JSON.parse(saved) : ['Frese chirurgiche'];
     }
 
+    function loadImplantCompanies(){
+      const defaults = ['Straumann', 'Nobel Biocare', 'Zimmer Biomet', 'Dentsply Sirona', 'Osstem', 'Biomet 3i'];
+      const saved = localStorage.getItem('implant_companies');
+      const savedList = saved ? JSON.parse(saved) : [];
+      const fromStorage = Array.isArray(savedList) ? savedList.filter(Boolean) : [];
+      const fromImplants = loadImplantsFromStorage().map(i => String(i.company || '').trim()).filter(Boolean);
+      const merged = [...defaults, ...fromStorage, ...fromImplants]
+        .map(v => String(v).trim())
+        .filter(Boolean);
+      const unique = [];
+      merged.forEach(item => {
+        if(!unique.some(u => u.toLowerCase() === item.toLowerCase())) unique.push(item);
+      });
+      unique.sort((a,b) => a.localeCompare(b, 'it-IT'));
+      return unique;
+    }
+
+    function saveImplantCompany(company){
+      const value = String(company || '').trim();
+      if(!value) return;
+      const companies = loadImplantCompanies();
+      if(!companies.some(c => c.toLowerCase() === value.toLowerCase())){
+        companies.push(value);
+        companies.sort((a,b) => a.localeCompare(b, 'it-IT'));
+        localStorage.setItem('implant_companies', JSON.stringify(companies));
+      }
+    }
+
+    function populateImplantOrderCompanyList(){
+      const datalist = document.getElementById('implantOrderCompanyList');
+      if(!datalist) return;
+      const companies = loadImplantCompanies();
+      datalist.innerHTML = '';
+      companies.forEach(company => {
+        const opt = document.createElement('option');
+        opt.value = company;
+        datalist.appendChild(opt);
+      });
+    }
+
     function saveKitComponent(component){
       if(!component || component.trim() === '') return;
       const components = loadKitComponents();
@@ -2987,6 +3028,7 @@
     function initImplantOrderModal(){
       const dateInput = document.getElementById('implantOrderDateBulk');
       if(dateInput) dateInput.value = new Date().toISOString().split('T')[0];
+      populateImplantOrderCompanyList();
       const companyInput = document.getElementById('implantOrderCompanyBulk');
       if(companyInput){
         const implants = loadImplantsFromStorage();
@@ -4815,6 +4857,7 @@
       const type = document.getElementById('implantType').value;
       let company = document.getElementById('implantCompany').value;
       if(company === 'Other') company = document.getElementById('implantCompanyCustom').value.trim();
+      if(company) saveImplantCompany(company);
       
       // Prendi il valore dall'input personalizzato (sempre visibile ora)
       let model = document.getElementById('implantModelCustom').value.trim();
@@ -4902,6 +4945,7 @@
         alert('Inserisci l\'azienda dell\'ordine');
         return;
       }
+      saveImplantCompany(companyBulk);
       if(rows.length === 0){
         alert('Aggiungi almeno una riga ordine');
         return;
