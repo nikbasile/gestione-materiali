@@ -7073,6 +7073,7 @@
       const modal = document.getElementById('addSelectionModal');
       modal.classList.add('active');
     }
+    window.openAddSelectionModal = openAddSelectionModal;
     
     function closeAddSelectionModal() {
       const modal = document.getElementById('addSelectionModal');
@@ -7087,6 +7088,7 @@
         setTimeout(() => initOrderModal(), 100);
       }, 200);
     }
+    window.continueWithOrder = continueWithOrder;
     
     function continueWithMaterial() {
       closeAddSelectionModal();
@@ -7096,6 +7098,7 @@
         setupMaterialCustomFields();
       }, 200);
     }
+    window.continueWithMaterial = continueWithMaterial;
 
     function openMaterialsWarehouse() {
       currentFilter = 'Tutti';
@@ -7133,6 +7136,7 @@
       setupMaterialCustomFields();
       refreshMatNameSuggestions('');
     }
+    window.openMaterialModal = openMaterialModal;
 
     function closeMaterialModal() {
       const modal = document.getElementById('materialModal');
