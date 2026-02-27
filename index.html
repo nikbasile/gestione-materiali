@@ -5719,9 +5719,10 @@
             ) || 0;
             const batchIdentifier = batch.batchId || batch.id || '';
             const entryType = batch.ordinoId ? 'Ordine' : 'Materiale';
-
+            // Assicura che ogni batch abbia il nome materiale
+            const batchMaterialName = batch.materialName || m.name;
             allBatches.push({
-              materialName: m.name,
+              materialName: batchMaterialName,
               category: m.category,
               distributor: m.distributor,
               orderDate: batchOrderDate,
