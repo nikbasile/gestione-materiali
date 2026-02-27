@@ -1133,7 +1133,7 @@
         <div class="report-filters">
           <div class="report-filter-group">
             <label>Nome materiale</label>
-            <input id="incomingMaterialNameFilter" list="incomingMaterialNameSuggestions" placeholder="Filtra per nome..." style="min-width:140px" oninput="updateIncomingRegisterData();refreshIncomingMaterialNameSuggestions(this.value)">
+            <input id="incomingMaterialNameFilter" class="filter-select" type="text" placeholder="Cerca per nome..." list="incomingMaterialNameSuggestions" autocomplete="off" oninput="updateIncomingRegisterData();refreshIncomingMaterialNameSuggestions(this.value)">
             <datalist id="incomingMaterialNameSuggestions"></datalist>
           </div>
           <div class="report-filter-group">
@@ -1218,7 +1218,7 @@
           </div>
           <div class="report-filter-group">
             <label>Nome materiale</label>
-            <input id="outgoingMaterialNameFilter" list="outgoingMaterialNameSuggestions" placeholder="Filtra per nome..." style="min-width:140px" oninput="updateOutgoingRegisterData();refreshOutgoingMaterialNameSuggestions(this.value)">
+            <input id="outgoingMaterialNameFilter" class="filter-select" type="text" placeholder="Cerca per nome..." list="outgoingMaterialNameSuggestions" autocomplete="off" oninput="updateOutgoingRegisterData();refreshOutgoingMaterialNameSuggestions(this.value)">
             <datalist id="outgoingMaterialNameSuggestions"></datalist>
           </div>
           <div class="report-filter-group">
