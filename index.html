@@ -342,6 +342,7 @@
     .implants-toolbar-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
     .implants-toolbar-row.right{justify-content:flex-end}
     .implants-toolbar .action-menu-btn{height:46px;padding:0 18px;font-size:15px;font-weight:600;justify-content:center;text-align:center;line-height:1.15}
+    .implants-add-entry{display:flex;justify-content:flex-end;margin-bottom:16px}
     #implantOrderModal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:10002;overflow-y:auto;padding:20px}
     #implantOrderModal.active{display:flex;align-items:flex-start;justify-content:center}
     .implant-order-content{background:#fff;border-radius:12px;max-width:1400px;width:100%;margin:20px auto;box-shadow:0 8px 32px rgba(0,0,0,0.3)}
@@ -361,19 +362,32 @@
     .implant-order-table th{background:#f0f4f8;color:#003d7a;font-weight:700;text-align:left}
     .implant-order-table input,.implant-order-table select{width:100%;padding:7px 8px;border:1px solid #d0dce6;border-radius:6px;font-size:12px}
     .implant-order-table th:nth-child(1),.implant-order-table td:nth-child(1){width:26%}
-    .implant-order-table th:nth-child(2),.implant-order-table td:nth-child(2){width:14%}
-    .implant-order-table th:nth-child(3),.implant-order-table td:nth-child(3){width:18%}
+    .implant-order-table th:nth-child(2),.implant-order-table td:nth-child(2){width:13%}
+    .implant-order-table th:nth-child(3),.implant-order-table td:nth-child(3){width:16%}
     .implant-order-table th:nth-child(4),.implant-order-table td:nth-child(4){width:7%}
     .implant-order-table th:nth-child(5),.implant-order-table td:nth-child(5){width:7%}
     .implant-order-table th:nth-child(6),.implant-order-table td:nth-child(6){width:10%}
     .implant-order-table th:nth-child(7),.implant-order-table td:nth-child(7){width:8%}
-    .implant-order-table th:nth-child(8),.implant-order-table td:nth-child(8){width:5%}
+    .implant-order-table th:nth-child(8),.implant-order-table td:nth-child(8){width:4%}
     .implant-order-table th:nth-child(9),.implant-order-table td:nth-child(9){width:5%}
+    .implant-order-table th:nth-child(10),.implant-order-table td:nth-child(10){width:4%}
     .implant-order-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;align-items:center;margin-left:auto}
     .implant-order-btn{padding:10px 14px;border:none;border-radius:6px;cursor:pointer;font-weight:600}
     .implant-order-btn.add{background:#2e7d32;color:#fff}
     .implant-order-btn.cancel{background:#e0e0e0;color:#333}
     .implant-order-btn.submit{background:#1976d2;color:#fff}
+    #implantAddSelectionModal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:10004;overflow-y:auto;padding:20px}
+    #implantAddSelectionModal.active{display:flex;align-items:center;justify-content:center}
+    #implantMaterialModal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:10005;overflow-y:auto;padding:20px}
+    #implantMaterialModal.active{display:flex;align-items:flex-start;justify-content:center}
+    .implant-material-content{background:#fff;border-radius:12px;max-width:1400px;width:100%;margin:20px auto;box-shadow:0 8px 32px rgba(0,0,0,0.3)}
+    .implant-material-header{background:linear-gradient(135deg,#1976d2 0%,#0d47a1 100%);color:#fff;padding:20px;border-radius:12px 12px 0 0;display:flex;justify-content:space-between;align-items:center}
+    .implant-material-header h2{margin:0;font-size:22px}
+    .implant-material-close{background:transparent;color:#fff;border:2px solid #fff;width:36px;height:36px;border-radius:50%;font-size:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s}
+    .implant-material-close:hover{background:#fff;color:#1976d2}
+    .implant-material-body{padding:24px}
+    #implantForm{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;background:#f5f5f5;padding:20px;border-radius:8px;margin:0;box-shadow:none}
+    #implantForm .full-row{grid-column:1/-1;display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap}
     #implantPdfImportModal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:10003;overflow-y:auto;padding:20px}
     #implantPdfImportModal.active{display:flex;align-items:flex-start;justify-content:center}
     .modal-header{background:#003d7a;color:#fff;padding:20px;border-radius:12px 12px 0 0;display:flex;justify-content:space-between;align-items:center}
@@ -399,6 +413,7 @@
       .implant-order-top{flex-direction:column;align-items:stretch}
       .implant-order-info{grid-template-columns:1fr;max-width:none;width:100%}
       .implant-order-actions{width:100%;justify-content:flex-end}
+      #implantForm{grid-template-columns:repeat(2,minmax(0,1fr))}
     }
 
     @media (max-width:700px){
@@ -622,103 +637,9 @@
         <button class="modal-close" onclick="closeImplantsModal()">×</button>
       </div>
       <div class="modal-body">
-      
-      <form id="implantForm" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px;padding:24px;background:#f5f5f5;border-radius:8px;margin-bottom:24px">
-        <div class="form-group">
-          <label>Tipo</label>
-          <select id="implantType" required>
-            <option value="">-- Seleziona --</option>
-            <option value="Impianto">Impianto</option>
-            <option value="Vite tappo">Vite tappo</option>
-            <option value="Vite di guarigione">Vite di guarigione</option>
-            <option value="Kit chirurgico">Kit chirurgico</option>
-            <option value="Cacciavite">Cacciavite</option>
-            <option value="Cricchetto">Cricchetto</option>
-            <option value="Componenti protesiche">Componenti protesiche</option>
-            <option value="Altro">Altro</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Azienda</label>
-          <select id="implantCompany" required>
-            <option value="">-- Seleziona --</option>
-            <option value="Straumann">Straumann</option>
-            <option value="Nobel Biocare">Nobel Biocare</option>
-            <option value="Zimmer Biomet">Zimmer Biomet</option>
-            <option value="Dentsply Sirona">Dentsply Sirona</option>
-            <option value="Osstem">Osstem</option>
-            <option value="Biomet 3i">Biomet 3i</option>
-            <option value="Other">Altro...</option>
-          </select>
-          <input id="implantCompanyCustom" placeholder="Azienda personalizzata" style="display:none;margin-top:6px" />
-        </div>
-        <div class="form-group" id="implantModelGroup">
-          <label>Modello / Nomenclatura</label>
-          <select id="implantModel">
-            <option value="">-- Seleziona o scrivi sotto --</option>
-          </select>
-          <input id="implantModelCustom" placeholder="Scrivi modello/nomenclatura (es. BLX, NC, RC)" style="margin-top:6px" />
-        </div>
-        <div class="form-group" id="implantKitComponentsGroup" style="display:none">
-          <label>Componenti Kit</label>
-          <select id="implantKitComponents">
-            <option value="">-- Seleziona o scrivi sotto --</option>
-          </select>
-          <input id="implantKitComponentsCustom" placeholder="Scrivi componente (es. Frese chirurgiche, Maschiatore, ecc.)" style="margin-top:6px" />
-        </div>
-        <div class="form-group" id="implantDiameterGroup">
-          <label>Diametro (mm)</label>
-          <select id="implantDiameter">
-            <option value="">-- Seleziona --</option>
-            <option value="2.9">2.9 mm</option>
-            <option value="3.3">3.3 mm</option>
-            <option value="3.5">3.5 mm</option>
-            <option value="4.0">4.0 mm</option>
-            <option value="4.1">4.1 mm</option>
-            <option value="4.5">4.5 mm</option>
-            <option value="4.8">4.8 mm</option>
-            <option value="5.0">5.0 mm</option>
-            <option value="6.0">6.0 mm</option>
-            <option value="Other">Altro...</option>
-          </select>
-          <input id="implantDiameterCustom" type="number" step="0.1" placeholder="Personalizzato" style="display:none;margin-top:6px" />
-        </div>
-        <div class="form-group" id="implantLengthGroup">
-          <label>Lunghezza (mm)</label>
-          <select id="implantLength">
-            <option value="">-- Seleziona --</option>
-            <option value="6">6 mm</option>
-            <option value="8">8 mm</option>
-            <option value="10">10 mm</option>
-            <option value="12">12 mm</option>
-            <option value="14">14 mm</option>
-            <option value="16">16 mm</option>
-            <option value="18">18 mm</option>
-            <option value="Other">Altro...</option>
-          </select>
-          <input id="implantLengthCustom" type="number" step="0.5" placeholder="Personalizzato" style="display:none;margin-top:6px" />
-        </div>
-        <div class="form-group">
-          <label>📅 Data Ordine</label>
-          <input id="implantOrderDate" type="date" required />
-        </div>
-        <div class="form-group">
-          <label>⏰ Data Scadenza (gestita dal magazzino)</label>
-          <input id="implantExpiry" type="date" />
-        </div>
-        <div class="form-group">
-          <label>Prezzo (€)</label>
-          <input id="implantPrice" type="number" step="0.01" placeholder="0.00" />
-        </div>
-        <div class="form-group">
-          <label>Quantità</label>
-          <input id="implantQuantity" type="number" min="0" value="1" required />
-        </div>
-        <div style="grid-column:1/-1;display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap">
-          <button type="submit">Aggiungi materiale implantare</button>
-          <button type="button" onclick="openImplantOrderModal()" style="background:#2e7d32;color:#fff">Aggiungi ordine implantare</button>
-        </div>
-      </form>
+      <div class="implants-add-entry">
+        <button class="action-menu-btn" onclick="openImplantAddSelectionModal()" style="background:#1976d2">➕ Nuovo Ordine/Materiale Implantare</button>
+      </div>
 
       <h3 style="margin:24px 0 12px;color:#003d7a;font-size:18px">📋 Inventario Impianti</h3>
       
@@ -798,6 +719,136 @@
   </div>
   </div>
 
+  <div id="implantAddSelectionModal">
+    <div class="selection-modal-content">
+      <div class="selection-header" style="background:linear-gradient(135deg,#2e7d32 0%,#1b5e20 100%)">
+        <h2>Cosa vuoi aggiungere?</h2>
+        <p>Magazzino implantare</p>
+      </div>
+      <div class="selection-body">
+        <button type="button" class="selection-btn order" onclick="continueWithImplantOrder()">
+          <span>🧾</span>
+          <span>Nuovo Ordine Implantare</span>
+        </button>
+        <button type="button" class="selection-btn material" onclick="continueWithImplantMaterial()" style="background:linear-gradient(135deg,#1976d2 0%,#0d47a1 100%)">
+          <span>📝</span>
+          <span>Materiale Implantare Singolo</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="implantMaterialModal">
+    <div class="implant-material-content">
+      <div class="implant-material-header">
+        <h2>📝 Materiale Implantare Singolo</h2>
+        <button class="implant-material-close" onclick="closeImplantMaterialModal()">×</button>
+      </div>
+      <div class="implant-material-body">
+        <form id="implantForm">
+          <div class="form-group">
+            <label>Tipo</label>
+            <select id="implantType" required>
+              <option value="">-- Seleziona --</option>
+              <option value="Impianto">Impianto</option>
+              <option value="Vite tappo">Vite tappo</option>
+              <option value="Vite di guarigione">Vite di guarigione</option>
+              <option value="Kit chirurgico">Kit chirurgico</option>
+              <option value="Cacciavite">Cacciavite</option>
+              <option value="Cricchetto">Cricchetto</option>
+              <option value="Componenti protesiche">Componenti protesiche</option>
+              <option value="Altro">Altro</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Azienda</label>
+            <select id="implantCompany" required>
+              <option value="">-- Seleziona --</option>
+              <option value="Straumann">Straumann</option>
+              <option value="Nobel Biocare">Nobel Biocare</option>
+              <option value="Zimmer Biomet">Zimmer Biomet</option>
+              <option value="Dentsply Sirona">Dentsply Sirona</option>
+              <option value="Osstem">Osstem</option>
+              <option value="Biomet 3i">Biomet 3i</option>
+              <option value="Other">Altro...</option>
+            </select>
+            <input id="implantCompanyCustom" placeholder="Azienda personalizzata" style="display:none;margin-top:6px" />
+          </div>
+          <div class="form-group" id="implantModelGroup">
+            <label>Modello / Nomenclatura</label>
+            <select id="implantModel">
+              <option value="">-- Seleziona o scrivi sotto --</option>
+            </select>
+            <input id="implantModelCustom" placeholder="Scrivi modello/nomenclatura (es. BLX, NC, RC)" style="margin-top:6px" />
+          </div>
+          <div class="form-group" id="implantKitComponentsGroup" style="display:none">
+            <label>Componenti Kit</label>
+            <select id="implantKitComponents">
+              <option value="">-- Seleziona o scrivi sotto --</option>
+            </select>
+            <input id="implantKitComponentsCustom" placeholder="Scrivi componente (es. Frese chirurgiche, Maschiatore, ecc.)" style="margin-top:6px" />
+          </div>
+          <div class="form-group" id="implantDiameterGroup">
+            <label>Diametro (mm)</label>
+            <select id="implantDiameter">
+              <option value="">-- Seleziona --</option>
+              <option value="2.9">2.9 mm</option>
+              <option value="3.3">3.3 mm</option>
+              <option value="3.5">3.5 mm</option>
+              <option value="4.0">4.0 mm</option>
+              <option value="4.1">4.1 mm</option>
+              <option value="4.5">4.5 mm</option>
+              <option value="4.8">4.8 mm</option>
+              <option value="5.0">5.0 mm</option>
+              <option value="6.0">6.0 mm</option>
+              <option value="Other">Altro...</option>
+            </select>
+            <input id="implantDiameterCustom" type="number" step="0.1" placeholder="Personalizzato" style="display:none;margin-top:6px" />
+          </div>
+          <div class="form-group" id="implantLengthGroup">
+            <label>Lunghezza (mm)</label>
+            <select id="implantLength">
+              <option value="">-- Seleziona --</option>
+              <option value="6">6 mm</option>
+              <option value="8">8 mm</option>
+              <option value="10">10 mm</option>
+              <option value="12">12 mm</option>
+              <option value="14">14 mm</option>
+              <option value="16">16 mm</option>
+              <option value="18">18 mm</option>
+              <option value="Other">Altro...</option>
+            </select>
+            <input id="implantLengthCustom" type="number" step="0.5" placeholder="Personalizzato" style="display:none;margin-top:6px" />
+          </div>
+          <div class="form-group">
+            <label>📅 Data Ordine</label>
+            <input id="implantOrderDate" type="date" required />
+          </div>
+          <div class="form-group">
+            <label>⏰ Data Scadenza (gestita dal magazzino)</label>
+            <input id="implantExpiry" type="date" />
+          </div>
+          <div class="form-group">
+            <label>Prezzo (€)</label>
+            <input id="implantPrice" type="number" step="0.01" placeholder="0.00" />
+          </div>
+          <div class="form-group">
+            <label>IVA (%)</label>
+            <select id="implantVatRate"><option value="22" selected>22%</option><option value="10">10%</option><option value="4">4%</option></select>
+          </div>
+          <div class="form-group">
+            <label>Quantità</label>
+            <input id="implantQuantity" type="number" min="0" value="1" required />
+          </div>
+          <div class="full-row">
+            <button type="button" onclick="closeImplantMaterialModal()" style="background:#e0e0e0;color:#333">Annulla</button>
+            <button type="submit">✓ Aggiungi materiale implantare</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <!-- Ordine Implantare Modal -->
   <div id="implantOrderModal">
     <div class="implant-order-content">
@@ -836,6 +887,7 @@
                   <th>L (mm)</th>
                   <th>Scadenza</th>
                   <th>Prezzo (€)</th>
+                  <th>IVA %</th>
                   <th>Qtà</th>
                   <th>Azioni</th>
                 </tr>
@@ -2871,6 +2923,50 @@
       document.getElementById('implantsModal').classList.remove('active');
     }
 
+    function openImplantAddSelectionModal(){
+      const modal = document.getElementById('implantAddSelectionModal');
+      if(!modal) return;
+      modal.classList.add('active');
+    }
+
+    function closeImplantAddSelectionModal(){
+      const modal = document.getElementById('implantAddSelectionModal');
+      if(!modal) return;
+      modal.classList.remove('active');
+    }
+
+    function continueWithImplantOrder(){
+      closeImplantAddSelectionModal();
+      setTimeout(() => openImplantOrderModal(), 120);
+    }
+
+    function continueWithImplantMaterial(){
+      closeImplantAddSelectionModal();
+      setTimeout(() => openImplantMaterialModal(), 120);
+    }
+
+    function openImplantMaterialModal(){
+      const modal = document.getElementById('implantMaterialModal');
+      if(!modal) return;
+      modal.classList.add('active');
+      populateImplantModelSelect();
+      populateKitComponentsSelect();
+      const dateInput = document.getElementById('implantOrderDate');
+      if(dateInput) dateInput.value = new Date().toISOString().split('T')[0];
+      const qtyInput = document.getElementById('implantQuantity');
+      if(qtyInput) qtyInput.value = 1;
+    }
+
+    function closeImplantMaterialModal(){
+      const modal = document.getElementById('implantMaterialModal');
+      if(!modal) return;
+      modal.classList.remove('active');
+      const form = document.getElementById('implantForm');
+      if(form) form.reset();
+      const qtyInput = document.getElementById('implantQuantity');
+      if(qtyInput) qtyInput.value = 1;
+    }
+
     function openImplantOrderModal(){
       const modal = document.getElementById('implantOrderModal');
       if(!modal) return;
@@ -2922,6 +3018,7 @@
       const normalizedExpiry = String(data.expiry || '').trim();
       const normalizedPrice = data.price !== undefined && data.price !== null ? String(data.price) : '';
       const normalizedQty = data.quantity !== undefined && data.quantity !== null ? String(data.quantity) : '1';
+      const normalizedVat = data.vatRate !== undefined && data.vatRate !== null ? String(data.vatRate) : '22';
       tr.innerHTML = `
         <td><input class="implant-order-name" type="text" placeholder="Nome materiale implantare" list="implantMaterialNameList" value="${escapeHtml(normalizedName)}" /></td>
         <td>
@@ -2942,12 +3039,17 @@
         <td><input class="implant-order-length" type="number" step="0.1" min="0" placeholder="L" value="${escapeHtml(normalizedLength)}" /></td>
         <td><input class="implant-order-expiry" type="date" value="${escapeHtml(normalizedExpiry)}" /></td>
         <td><input class="implant-order-price" type="number" step="0.01" min="0" placeholder="0.00" value="${escapeHtml(normalizedPrice)}" /></td>
+        <td><select class="implant-order-vat"><option value="22">22%</option><option value="10">10%</option><option value="4">4%</option></select></td>
         <td><input class="implant-order-qty" type="number" min="1" step="1" value="${escapeHtml(normalizedQty)}" required /></td>
         <td><button type="button" class="implant-order-btn cancel" style="padding:6px 10px" onclick="this.closest('tr').remove()">✕</button></td>
       `;
       const typeSelect = tr.querySelector('.implant-order-type');
       if(typeSelect && normalizedType){
         typeSelect.value = normalizedType;
+      }
+      const vatSelect = tr.querySelector('.implant-order-vat');
+      if(vatSelect){
+        vatSelect.value = normalizedVat;
       }
       tbody.appendChild(tr);
     }
@@ -4747,6 +4849,7 @@
       const orderDate = document.getElementById('implantOrderDate').value;
       const expiryInput = document.getElementById('implantExpiry').value;
       const price = parseFloat(document.getElementById('implantPrice').value) || 0;
+      const vatRate = parseInt(document.getElementById('implantVatRate').value, 10) || 22;
       const quantity = parseInt(document.getElementById('implantQuantity').value, 10) || 0;
 
       const newImplant = {
@@ -4759,6 +4862,7 @@
         orderDate: new Date(orderDate),
         expiry: expiryInput ? new Date(expiryInput) : null,
         price,
+        vatRate,
         quantity,
         createdAt: new Date()
       };
@@ -4780,6 +4884,7 @@
       document.getElementById('implantForm').reset();
       document.getElementById('implantQuantity').value = 1;
       showAlert('✓ Materiale implantare registrato', 'info');
+      closeImplantMaterialModal();
       initImplantFilters(); // Aggiorna i filtri
       renderImplantsList();
     });
@@ -4813,6 +4918,7 @@
         const lengthRaw = String(row.querySelector('.implant-order-length')?.value || '').trim();
         const expiryInput = String(row.querySelector('.implant-order-expiry')?.value || '').trim();
         const price = parseFloat(String(row.querySelector('.implant-order-price')?.value || '0')) || 0;
+        const vatRate = parseInt(String(row.querySelector('.implant-order-vat')?.value || '22'), 10) || 22;
         const quantity = parseInt(String(row.querySelector('.implant-order-qty')?.value || '0'), 10) || 0;
 
         if(!type || quantity <= 0) continue;
@@ -4831,6 +4937,7 @@
           orderDate: new Date(orderDate),
           expiry: expiryInput ? new Date(expiryInput) : null,
           price,
+          vatRate,
           quantity,
           createdAt: new Date()
         };
@@ -5068,6 +5175,7 @@
         const model = String(row.querySelector('.implant-pdf-import-model')?.value || '').trim();
         const qty = parseInt(String(row.querySelector('.implant-pdf-import-qty')?.value || '0'), 10) || 0;
         const price = parseFloat(String(row.querySelector('.implant-pdf-import-price')?.value || '0')) || 0;
+        const vatRate = parseInt(String(row.querySelector('.implant-pdf-import-iva-percent')?.value || '22'), 10) || 22;
         if(!name || !type || qty <= 0) return;
         const recognized = recognizeImplantFromText(name);
         addImplantOrderRow({
@@ -5077,6 +5185,7 @@
           diameter: recognized.diameter || '',
           length: recognized.length || '',
           price,
+          vatRate,
           quantity: qty
         });
         imported += 1;
