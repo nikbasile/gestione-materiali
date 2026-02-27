@@ -618,7 +618,8 @@
       </div>
       <div>
         <label for="materialNameFilterInput" class="filter-label">🔎 Nome materiale</label>
-        <input id="materialNameFilterInput" class="filter-select" type="text" placeholder="Cerca per nome..." />
+        <input id="materialNameFilterInput" class="filter-select" type="text" placeholder="Cerca per nome..." list="materialNameFilterSuggestions" autocomplete="off" />
+        <datalist id="materialNameFilterSuggestions"></datalist>
       </div>
       <button id="resetFiltersBtn" class="filters-reset-btn hidden">⟲ Azzera Filtri</button>
     </div>
@@ -3535,6 +3536,7 @@
         });
         distributorFilterSelect.value = currentDistributorFilter;
       }
+      refreshMaterialNameFilterSuggestions(currentMaterialNameFilter);
     }
 
     function updateCategoryFilters(){
@@ -3639,6 +3641,33 @@
     // Funzione per convertire in Title Case (iniziali maiuscole)
     function toTitleCase(str) {
       return str.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+    }
+
+    function refreshMaterialNameFilterSuggestions(filterText = '') {
+      const datalist = document.getElementById('materialNameFilterSuggestions');
+      if (!datalist) return;
+
+      const normalizedFilter = String(filterText || '').toLowerCase().trim();
+      const uniqueNames = Array.from(new Set(
+        allDocs
+          .map(doc => (doc && typeof doc.data === 'function' ? String(doc.data().name || '').trim() : ''))
+          .filter(Boolean)
+      ));
+
+      const filteredNames = uniqueNames
+        .filter(name => {
+          if (!normalizedFilter) return true;
+          return name.toLowerCase().includes(normalizedFilter);
+        })
+        .sort((a, b) => a.localeCompare(b, 'it-IT'))
+        .slice(0, 40);
+
+      datalist.innerHTML = '';
+      filteredNames.forEach(name => {
+        const option = document.createElement('option');
+        option.value = name;
+        datalist.appendChild(option);
+      });
     }
 
     function refreshMatNameSuggestions(filterText = '') {
@@ -4106,8 +4135,12 @@
     if (materialNameFilterInput) {
       materialNameFilterInput.addEventListener('input', function() {
         currentMaterialNameFilter = this.value.trim();
+        refreshMaterialNameFilterSuggestions(currentMaterialNameFilter);
         renderFilteredMaterials();
         updateResetButtonVisibility();
+      });
+      materialNameFilterInput.addEventListener('focus', function() {
+        refreshMaterialNameFilterSuggestions(this.value.trim());
       });
     }
 
