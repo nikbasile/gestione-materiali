@@ -3966,10 +3966,11 @@
       const batches = data.batches || [];
       let batchesHtml = '<div class="batches-list">';
       
-      if (batches.length === 0) {
+      const visibleBatches = batches.filter(batch => Number(batch.quantitàRimanente || 0) > 0);
+      if (visibleBatches.length === 0) {
         batchesHtml += '<div style="color:#666;font-size:13px">Nessun lotto disponibile</div>';
       } else {
-        const sortedBatchesForDisplay = [...batches].sort((a, b) => new Date(b.dataOrdine || 0) - new Date(a.dataOrdine || 0));
+        const sortedBatchesForDisplay = [...visibleBatches].sort((a, b) => new Date(b.dataOrdine || 0) - new Date(a.dataOrdine || 0));
         sortedBatchesForDisplay.forEach((batch, batchIndex) => {
           const batchExpiry = batch.scadenza ? new Date(batch.scadenza) : null;
           const batchDays = batchExpiry ? daysBetween(now, batchExpiry) : null;
