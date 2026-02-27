@@ -1163,49 +1163,10 @@
         <div class="report-filters">
           <div class="report-filter-group">
             <label>Nome materiale</label>
-            <div id="incomingMaterialQuickList" style="margin-bottom:8px;display:flex;flex-wrap:wrap;gap:6px;"></div>
             <input id="incomingMaterialNameFilter" class="filter-select" type="text" placeholder="Cerca per nome..." list="incomingMaterialNameSuggestions" autocomplete="off" oninput="updateIncomingRegisterData();refreshIncomingMaterialNameSuggestions(this.value)">
             <datalist id="incomingMaterialNameSuggestions"></datalist>
-                  // --- Lista rapida materiali per registro entrate ---
-                  function renderIncomingMaterialQuickList() {
-                    const container = document.getElementById('incomingMaterialQuickList');
-                    if (!container) return;
-                    const materials = loadFromLocalStorage();
-                    // Raccogli tutti i nomi materiali unici dai batch
-                    let names = [];
-                    materials.forEach(m => {
-                      if (m.batches && Array.isArray(m.batches)) {
-                        m.batches.forEach(batch => {
-                          const name = batch.materialName ? String(batch.materialName).trim() : (m.name ? String(m.name).trim() : '');
-                          if (name) names.push(name);
-                        });
-                      }
-                    });
-                    const uniqueNames = Array.from(new Set(names.filter(Boolean))).sort((a,b)=>a.localeCompare(b,'it-IT'));
-                    container.innerHTML = '';
-                    uniqueNames.forEach(name => {
-                      const btn = document.createElement('button');
-                      btn.textContent = name;
-                      btn.type = 'button';
-                      btn.className = 'quick-material-btn';
-                      btn.style = 'padding:2px 8px;border-radius:12px;border:1px solid #bbb;background:#f7f7f7;cursor:pointer;font-size:13px;margin-bottom:2px;';
-                      btn.onclick = function() {
-                        document.getElementById('incomingMaterialNameFilter').value = name;
-                        updateIncomingRegisterData();
-                        refreshIncomingMaterialNameSuggestions(name);
-                      };
-                      container.appendChild(btn);
-                    });
-                  }
-
-                  // Richiama la lista rapida ogni volta che si aggiorna la pagina o i dati
-                  document.addEventListener('DOMContentLoaded', renderIncomingMaterialQuickList);
-                  // Aggiorna anche dopo ogni modifica ai dati
-                  const origSaveToLocalStorage = window.saveToLocalStorage;
-                  window.saveToLocalStorage = function(data) {
-                    origSaveToLocalStorage.call(this, data);
-                    renderIncomingMaterialQuickList();
-                  };
+                  <!-- ...existing code... -->
+          <!-- Rimossa la lista rapida materiali: ora solo ricerca con suggerimenti datalist -->
           </div>
           <div class="report-filter-group">
             <label>Categoria</label>
