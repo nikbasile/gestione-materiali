@@ -1001,6 +1001,16 @@
         <div class="report-filters">
             <div class="report-filter-group">
               <label>Nome materiale</label>
+              <input id="reportMaterialNameFilterInput" class="filter-select" type="text" placeholder="Cerca per nome..." list="reportMaterialNameSuggestions" autocomplete="off" />
+              <datalist id="reportMaterialNameSuggestions"></datalist>
+            </div>
+            <div class="report-filter-group">
+              <label>Nome materiale</label>
+              <input id="incomingMaterialNameFilterInput" class="filter-select" type="text" placeholder="Cerca per nome..." list="incomingMaterialNameSuggestions" autocomplete="off" />
+              <datalist id="incomingMaterialNameSuggestions"></datalist>
+            </div>
+            <div class="report-filter-group">
+              <label>Nome materiale</label>
               <input id="outgoingMaterialNameFilterInput" class="filter-select" type="text" placeholder="Cerca per nome..." list="outgoingMaterialNameSuggestions" autocomplete="off" />
               <datalist id="outgoingMaterialNameSuggestions"></datalist>
             </div>
@@ -5439,10 +5449,12 @@
       const distributorFilter = document.getElementById('reportDistributorFilter').value;
       const statusFilter = (document.getElementById('reportStatusFilter') || {}).value || 'Tutti';
 
+      const materialNameFilter = (document.getElementById('reportMaterialNameFilter') || {}).value || '';
       return materials.filter(m => {
         if (categoryFilter !== 'Tutti' && m.category !== categoryFilter) return false;
         if (companyFilter !== 'Tutte' && m.company !== companyFilter) return false;
         if (distributorFilter !== 'Tutti' && m.distributor !== distributorFilter) return false;
+        if (materialNameFilter && m.name && !m.name.toLowerCase().includes(materialNameFilter.toLowerCase())) return false;
         if (statusFilter !== 'Tutti') {
           const history = Array.isArray(m.consumptionHistory) ? m.consumptionHistory : [];
           const hasStatus = history.some(entry => {
@@ -5662,10 +5674,12 @@
         }
       });
 
-      // Filtra per categoria e distributore
+      // Filtra per categoria, distributore e nome materiale
+      const materialNameFilter = (document.getElementById('incomingMaterialNameFilter') || {}).value || '';
       allBatches = allBatches.filter(b => {
         if (categoryFilter !== 'Tutti' && b.category !== categoryFilter) return false;
         if (distributorFilter !== 'Tutti' && b.distributor !== distributorFilter) return false;
+        if (materialNameFilter && b.materialName && !b.materialName.toLowerCase().includes(materialNameFilter.toLowerCase())) return false;
         return true;
       });
 
@@ -5955,12 +5969,18 @@
         });
       });
 
-      rows.sort((a, b) => {
+      // Filtra per nome materiale
+      const materialNameFilter = (document.getElementById('activeUsageMaterialNameFilter') || {}).value || '';
+      let filteredRows = rows;
+      if (materialNameFilter) {
+        filteredRows = rows.filter(row => row.materialName && row.materialName.toLowerCase().includes(materialNameFilter.toLowerCase()));
+      }
+      filteredRows.sort((a, b) => {
         const da = parseFlexibleDate(a.date);
         const db = parseFlexibleDate(b.date);
         return (db ? db.getTime() : 0) - (da ? da.getTime() : 0);
       });
-      return rows;
+      return filteredRows;
     }
 
     function openActiveUsageModal(){
