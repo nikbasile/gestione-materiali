@@ -1,3 +1,24 @@
+            // Attiva suggerimenti dinamici su focus per tutti i filtri nome materiale
+            document.addEventListener('DOMContentLoaded', function() {
+              const incomingInput = document.getElementById('incomingMaterialNameFilter');
+              if (incomingInput) {
+                incomingInput.addEventListener('focus', function() {
+                  refreshIncomingMaterialNameSuggestions(this.value);
+                });
+              }
+              const outgoingInput = document.getElementById('outgoingMaterialNameFilter');
+              if (outgoingInput) {
+                outgoingInput.addEventListener('focus', function() {
+                  refreshOutgoingMaterialNameSuggestions(this.value);
+                });
+              }
+              const reportInput = document.getElementById('reportMaterialNameFilterInput');
+              if (reportInput && typeof refreshMaterialNameFilterSuggestions === 'function') {
+                reportInput.addEventListener('focus', function() {
+                  refreshMaterialNameFilterSuggestions(this.value);
+                });
+              }
+            });
         function refreshIncomingMaterialNameSuggestions(filterText = '') {
           const datalist = document.getElementById('incomingMaterialNameSuggestions');
           if (!datalist) return;
