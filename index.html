@@ -1160,9 +1160,37 @@
           <div class="report-filter-group">
             <label>Nome materiale</label>
              <label for="incomingMaterialNameFilter" style="font-weight:600;margin-bottom:4px;display:block">Nome materiale</label>
-             <label for="incomingMaterialNameFilter" style="font-weight:600;margin-bottom:4px;display:block">Nome materiale</label>
-             <input id="incomingMaterialNameFilter" class="filter-select" type="text" placeholder="Cerca per nome materiale..." list="incomingMaterialNameSuggestions" autocomplete="off" style="margin-bottom:8px;width:100%;max-width:400px" oninput="updateIncomingRegisterData();refreshIncomingMaterialNameSuggestions(this.value)">
-             <datalist id="incomingMaterialNameSuggestions"></datalist>
+             <div style="display:flex;flex-wrap:wrap;gap:18px 24px;align-items:flex-end;margin-bottom:16px;">
+               <div style="flex:1 1 260px;min-width:220px;max-width:350px;">
+                 <label for="incomingMaterialNameFilter" style="font-weight:600;margin-bottom:6px;display:block;color:#1a237e;font-size:15px;">Nome materiale</label>
+                 <input id="incomingMaterialNameFilter" class="filter-select" type="text" placeholder="Cerca per nome materiale..." list="incomingMaterialNameSuggestions" autocomplete="off" style="width:100%;padding:10px 14px;border:1.5px solid #90caf9;border-radius:8px;font-size:15px;box-shadow:0 1px 4px #e3eafc;transition:border-color .2s;outline:none;margin-bottom:0;" onfocus="this.style.borderColor='#1976d2'" onblur="this.style.borderColor='#90caf9'" oninput="updateIncomingRegisterData();refreshIncomingMaterialNameSuggestions(this.value)">
+                 <datalist id="incomingMaterialNameSuggestions"></datalist>
+               </div>
+               <div style="flex:0 1 160px;min-width:120px;">
+                 <label for="incomingCategoryFilter" style="font-weight:600;margin-bottom:6px;display:block;color:#1a237e;font-size:15px;">Categoria</label>
+                 <select id="incomingCategoryFilter" onchange="updateIncomingRegisterData()" style="width:100%;padding:10px 14px;border:1.5px solid #90caf9;border-radius:8px;font-size:15px;box-shadow:0 1px 4px #e3eafc;outline:none;">
+                   <option value="Tutti">Tutti</option>
+                   <!-- ...opzioni categoria... -->
+                 </select>
+               </div>
+               <div style="flex:0 1 160px;min-width:120px;">
+                 <label for="incomingDistributorFilter" style="font-weight:600;margin-bottom:6px;display:block;color:#1a237e;font-size:15px;">Distributore</label>
+                 <select id="incomingDistributorFilter" onchange="updateIncomingRegisterData()" style="width:100%;padding:10px 14px;border:1.5px solid #90caf9;border-radius:8px;font-size:15px;box-shadow:0 1px 4px #e3eafc;outline:none;">
+                   <option value="Tutti">Tutti</option>
+                   <!-- ...opzioni distributore... -->
+                 </select>
+               </div>
+               <div style="flex:0 1 120px;min-width:100px;">
+                 <label for="incomingPeriodFilter" style="font-weight:600;margin-bottom:6px;display:block;color:#1a237e;font-size:15px;">Periodo</label>
+                 <select id="incomingPeriodFilter" onchange="updateIncomingRegisterData()" style="width:100%;padding:10px 14px;border:1.5px solid #90caf9;border-radius:8px;font-size:15px;box-shadow:0 1px 4px #e3eafc;outline:none;">
+                   <option value="all">Tutto</option>
+                   <!-- ...opzioni periodo... -->
+                 </select>
+               </div>
+               <div style="flex:0 1 120px;min-width:100px;display:flex;align-items:end;">
+                 <button onclick="resetIncomingFilters()" style="width:100%;padding:10px 0;border-radius:8px;background:#d32f2f;color:#fff;font-weight:600;font-size:15px;border:none;box-shadow:0 1px 4px #e3eafc;cursor:pointer;transition:background .2s;">Azzera Filtri</button>
+               </div>
+             </div>
                   <!-- ...existing code... -->
           <!-- Rimossa la lista rapida materiali: ora solo ricerca con suggerimenti datalist -->
           </div>
