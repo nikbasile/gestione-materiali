@@ -5873,7 +5873,7 @@
       const operatorFilter = document.getElementById('outgoingOperatorFilter').value;
       const periodFilterValue = document.getElementById('outgoingPeriodFilter').value;
       const statusFilterValue = (document.getElementById('outgoingStatusFilter') || {}).value || 'Tutti';
-      const materialNameFilter = String(document.getElementById('outgoingMaterialNameFilterInput')?.value || '').trim().toLowerCase();
+      const materialNameFilter = String(document.getElementById('outgoingMaterialNameFilter')?.value || '').trim().toLowerCase();
 
       let allConsumptions = [];
       materials.forEach(m => {
