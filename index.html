@@ -1,3 +1,52 @@
+        function refreshIncomingMaterialNameSuggestions(filterText = '') {
+          const datalist = document.getElementById('incomingMaterialNameSuggestions');
+          if (!datalist) return;
+          const normalizedFilter = String(filterText || '').toLowerCase().trim();
+          const materials = loadFromLocalStorage();
+          const uniqueNames = Array.from(new Set(
+            materials
+              .map(m => (m && m.name ? String(m.name).trim() : ''))
+              .filter(Boolean)
+          ));
+          const filteredNames = uniqueNames
+            .filter(name => {
+              if (!normalizedFilter) return true;
+              return name.toLowerCase().includes(normalizedFilter);
+            })
+            .sort((a, b) => a.localeCompare(b, 'it-IT'))
+            .slice(0, 40);
+          datalist.innerHTML = '';
+          filteredNames.forEach(name => {
+            const option = document.createElement('option');
+            option.value = name;
+            datalist.appendChild(option);
+          });
+        }
+
+        function refreshOutgoingMaterialNameSuggestions(filterText = '') {
+          const datalist = document.getElementById('outgoingMaterialNameSuggestions');
+          if (!datalist) return;
+          const normalizedFilter = String(filterText || '').toLowerCase().trim();
+          const materials = loadFromLocalStorage();
+          const uniqueNames = Array.from(new Set(
+            materials
+              .map(m => (m && m.name ? String(m.name).trim() : ''))
+              .filter(Boolean)
+          ));
+          const filteredNames = uniqueNames
+            .filter(name => {
+              if (!normalizedFilter) return true;
+              return name.toLowerCase().includes(normalizedFilter);
+            })
+            .sort((a, b) => a.localeCompare(b, 'it-IT'))
+            .slice(0, 40);
+          datalist.innerHTML = '';
+          filteredNames.forEach(name => {
+            const option = document.createElement('option');
+            option.value = name;
+            datalist.appendChild(option);
+          });
+        }
     
 <!doctype html>
 <html lang="it">
