@@ -1158,8 +1158,6 @@
         <!-- Filtri -->
         <div class="report-filters">
           <div class="report-filter-group">
-            <label>Nome materiale</label>
-             <label for="incomingMaterialNameFilter" style="font-weight:600;margin-bottom:4px;display:block">Nome materiale</label>
              <div style="display:flex;flex-wrap:wrap;gap:18px 24px;align-items:flex-end;margin-bottom:16px;">
                <div style="flex:1 1 260px;min-width:220px;max-width:350px;">
                  <label for="incomingMaterialNameFilter" style="font-weight:600;margin-bottom:6px;display:block;color:#1a237e;font-size:15px;">Nome materiale</label>
@@ -1196,29 +1194,6 @@
           </div>
           <div class="report-filter-group">
             <label>Categoria</label>
-            <select id="incomingCategoryFilter" onchange="updateIncomingRegisterData()">
-              <option value="Tutti">Tutti</option>
-            </select>
-          </div>
-          <div class="report-filter-group">
-            <label>Distributore</label>
-            <select id="incomingDistributorFilter" onchange="updateIncomingRegisterData()">
-              <option value="Tutti">Tutti</option>
-            </select>
-          </div>
-          <div class="report-filter-group">
-            <label>Periodo</label>
-            <select id="incomingPeriodFilter" onchange="updateIncomingRegisterData()">
-              <option value="7">Ultimi 7 giorni</option>
-              <option value="30">Ultimi 30 giorni</option>
-              <option value="90">Ultimi 90 giorni</option>
-              <option value="365">Ultimo anno</option>
-              <option value="all" selected>Tutto</option>
-            </select>
-          </div>
-          <div class="report-filter-group" style="margin-top:24px">
-            <button onclick="resetIncomingFilters()" style="padding:8px 16px;background:#d32f2f;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:600">Azzera Filtri</button>
-          </div>
         </div>
 
         <!-- Statistiche -->
@@ -6007,7 +5982,7 @@
     }
 
     function updateOutgoingRegisterData() {
-      refreshOutgoingMaterialNameSuggestions(document.getElementById('outgoingMaterialNameFilterInput')?.value || '');
+      refreshOutgoingMaterialNameSuggestions(document.getElementById('outgoingMaterialNameFilter')?.value || '');
       const filtered = getFilteredOutgoingData();
       const totalCount = filtered.length;
       const totalQuantity = filtered.reduce((sum, c) => sum + (Number(c.quantity || 0) || 0), 0);
