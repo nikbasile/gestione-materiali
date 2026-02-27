@@ -350,15 +350,25 @@
     .implant-order-close{background:transparent;color:#fff;border:2px solid #fff;width:36px;height:36px;border-radius:50%;font-size:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s}
     .implant-order-close:hover{background:#fff;color:#2e7d32}
     .implant-order-body{padding:24px}
-    .implant-order-info{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:16px;background:#f0f4f8;padding:14px;border-radius:8px;border:1px solid #d0dce6}
+    .implant-order-top{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;margin-bottom:14px;flex-wrap:wrap}
+    .implant-order-info{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;background:#f0f4f8;padding:14px;border-radius:8px;border:1px solid #d0dce6;max-width:760px;flex:1 1 560px}
     .implant-order-info label{font-weight:700;color:#003d7a;font-size:12px;text-transform:uppercase;letter-spacing:0.4px}
     .implant-order-info input{padding:10px 12px;border:1px solid #d0dce6;border-radius:6px;font-size:14px}
-    .implant-order-table-wrap{border:1px solid #d0dce6;border-radius:8px;overflow:auto;max-height:520px;width:100%}
-    .implant-order-table{width:100%;border-collapse:collapse;min-width:1180px}
-    .implant-order-table th,.implant-order-table td{padding:8px;border:1px solid #d0dce6;font-size:12px}
+    .implant-order-table-wrap{border:1px solid #d0dce6;border-radius:8px;overflow-x:hidden;overflow-y:auto;max-height:520px;width:100%}
+    .implant-order-table{width:100%;border-collapse:collapse;table-layout:fixed}
+    .implant-order-table th,.implant-order-table td{padding:8px;border:1px solid #d0dce6;font-size:12px;white-space:normal}
     .implant-order-table th{background:#f0f4f8;color:#003d7a;font-weight:700;text-align:left}
     .implant-order-table input,.implant-order-table select{width:100%;padding:7px 8px;border:1px solid #d0dce6;border-radius:6px;font-size:12px}
-    .implant-order-actions{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;justify-content:flex-end}
+    .implant-order-table th:nth-child(1),.implant-order-table td:nth-child(1){width:26%}
+    .implant-order-table th:nth-child(2),.implant-order-table td:nth-child(2){width:14%}
+    .implant-order-table th:nth-child(3),.implant-order-table td:nth-child(3){width:18%}
+    .implant-order-table th:nth-child(4),.implant-order-table td:nth-child(4){width:7%}
+    .implant-order-table th:nth-child(5),.implant-order-table td:nth-child(5){width:7%}
+    .implant-order-table th:nth-child(6),.implant-order-table td:nth-child(6){width:10%}
+    .implant-order-table th:nth-child(7),.implant-order-table td:nth-child(7){width:8%}
+    .implant-order-table th:nth-child(8),.implant-order-table td:nth-child(8){width:5%}
+    .implant-order-table th:nth-child(9),.implant-order-table td:nth-child(9){width:5%}
+    .implant-order-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;align-items:center;margin-left:auto}
     .implant-order-btn{padding:10px 14px;border:none;border-radius:6px;cursor:pointer;font-weight:600}
     .implant-order-btn.add{background:#2e7d32;color:#fff}
     .implant-order-btn.cancel{background:#e0e0e0;color:#333}
@@ -385,7 +395,9 @@
       #articlesContainer th,#articlesContainer td{padding:5px 6px;font-size:11px}
       #articlesContainer table{min-width:860px}
       .order-buttons{padding:14px 16px;margin-top:12px}
-      .implant-order-info{grid-template-columns:1fr}
+      .implant-order-top{flex-direction:column;align-items:stretch}
+      .implant-order-info{grid-template-columns:1fr;max-width:none;width:100%}
+      .implant-order-actions{width:100%;justify-content:flex-end}
     }
 
     @media (max-width:700px){
@@ -794,14 +806,22 @@
       </div>
       <div class="implant-order-body">
         <form id="implantOrderForm">
-          <div class="implant-order-info">
-            <div>
-              <label for="implantOrderDateBulk">Data Ordine</label>
-              <input id="implantOrderDateBulk" type="date" required />
+          <div class="implant-order-top">
+            <div class="implant-order-info">
+              <div>
+                <label for="implantOrderDateBulk">Data Ordine</label>
+                <input id="implantOrderDateBulk" type="date" required />
+              </div>
+              <div>
+                <label for="implantOrderCompanyBulk">Azienda</label>
+                <input id="implantOrderCompanyBulk" type="text" placeholder="Es. Straumann" required />
+              </div>
             </div>
-            <div>
-              <label for="implantOrderCompanyBulk">Azienda</label>
-              <input id="implantOrderCompanyBulk" type="text" placeholder="Es. Straumann" required />
+            <div class="implant-order-actions">
+              <button type="button" class="implant-order-btn add" onclick="addImplantOrderRow()">➕ Aggiungi Riga</button>
+              <button type="button" class="implant-order-btn add" style="background:#1976d2" onclick="openImplantPdfImportModal()">📄 Importa PDF</button>
+              <button type="button" class="implant-order-btn cancel" onclick="closeImplantOrderModal()">Annulla</button>
+              <button type="submit" class="implant-order-btn submit">✓ Salva Ordine Implantare</button>
             </div>
           </div>
           <div class="implant-order-table-wrap">
@@ -821,12 +841,6 @@
               </thead>
               <tbody id="implantOrderRows"></tbody>
             </table>
-          </div>
-          <div class="implant-order-actions">
-            <button type="button" class="implant-order-btn add" onclick="addImplantOrderRow()">➕ Aggiungi Riga</button>
-            <button type="button" class="implant-order-btn add" style="background:#1976d2" onclick="openImplantPdfImportModal()">📄 Importa PDF</button>
-            <button type="button" class="implant-order-btn cancel" onclick="closeImplantOrderModal()">Annulla</button>
-            <button type="submit" class="implant-order-btn submit">✓ Salva Ordine Implantare</button>
           </div>
         </form>
       </div>
