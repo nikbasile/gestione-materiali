@@ -5455,6 +5455,7 @@
       modal.classList.add('active');
       setTimeout(() => initReportFilters(), 100);
     }
+    window.openReportModal = openReportModal;
 
     function closeReportModal() {
       const modal = document.getElementById('reportModal');
@@ -5673,6 +5674,7 @@
         if (input) refreshIncomingMaterialNameSuggestions(input.value);
       }, 100);
     }
+    window.openIncomingRegisterModal = openIncomingRegisterModal;
 
     function closeIncomingRegisterModal() {
       const modal = document.getElementById('incomingRegisterModal');
@@ -5888,6 +5890,7 @@
       modal.style.justifyContent = 'center';
       setTimeout(() => initOutgoingRegisterFilters(), 100);
     }
+    window.openOutgoingRegisterModal = openOutgoingRegisterModal;
 
     function closeOutgoingRegisterModal() {
       const modal = document.getElementById('outgoingRegisterModal');
