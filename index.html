@@ -5,6 +5,9 @@
                 incomingInput.addEventListener('focus', function() {
                   refreshIncomingMaterialNameSuggestions(this.value);
                 });
+                incomingInput.addEventListener('input', function() {
+                  refreshIncomingMaterialNameSuggestions(this.value);
+                });
               }
               const outgoingInput = document.getElementById('outgoingMaterialNameFilter');
               if (outgoingInput) {
