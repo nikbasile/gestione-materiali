@@ -1050,11 +1050,7 @@
               <input id="reportMaterialNameFilterInput" class="filter-select" type="text" placeholder="Cerca per nome..." list="reportMaterialNameSuggestions" autocomplete="off" />
               <datalist id="reportMaterialNameSuggestions"></datalist>
             </div>
-            <div class="report-filter-group">
-              <label>Nome materiale</label>
-              <input id="incomingMaterialNameFilter" class="filter-select" type="text" placeholder="Cerca per nome..." list="incomingMaterialNameSuggestions" autocomplete="off" />
-              <datalist id="incomingMaterialNameSuggestions"></datalist>
-            </div>
+            <!-- Rimossa duplicazione input ricerca materiale -->
             <div class="report-filter-group">
               <label>Nome materiale</label>
               <input id="outgoingMaterialNameFilterInput" class="filter-select" type="text" placeholder="Cerca per nome..." list="outgoingMaterialNameSuggestions" autocomplete="off" />
@@ -1163,8 +1159,10 @@
         <div class="report-filters">
           <div class="report-filter-group">
             <label>Nome materiale</label>
-            <input id="incomingMaterialNameFilter" class="filter-select" type="text" placeholder="Cerca per nome..." list="incomingMaterialNameSuggestions" autocomplete="off" oninput="updateIncomingRegisterData();refreshIncomingMaterialNameSuggestions(this.value)">
-            <datalist id="incomingMaterialNameSuggestions"></datalist>
+             <label for="incomingMaterialNameFilter" style="font-weight:600;margin-bottom:4px;display:block">Nome materiale</label>
+             <label for="incomingMaterialNameFilter" style="font-weight:600;margin-bottom:4px;display:block">Nome materiale</label>
+             <input id="incomingMaterialNameFilter" class="filter-select" type="text" placeholder="Cerca per nome materiale..." list="incomingMaterialNameSuggestions" autocomplete="off" style="margin-bottom:8px;width:100%;max-width:400px" oninput="updateIncomingRegisterData();refreshIncomingMaterialNameSuggestions(this.value)">
+             <datalist id="incomingMaterialNameSuggestions"></datalist>
                   <!-- ...existing code... -->
           <!-- Rimossa la lista rapida materiali: ora solo ricerca con suggerimenti datalist -->
           </div>
