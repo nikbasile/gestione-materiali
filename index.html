@@ -3563,8 +3563,8 @@
     function renderFilteredMaterials(){
       listEl.innerHTML = '';
       let filtered = currentFilter === 'Tutti' 
-        ? allDocs 
-        : allDocs.filter(doc=>doc.data().category === currentFilter);
+        ? allDocs.filter(doc => (doc.data().quantity || 0) > 0) 
+        : allDocs.filter(doc=>doc.data().category === currentFilter && (doc.data().quantity || 0) > 0);
       if(currentCompanyFilter !== 'Tutte'){
         filtered = filtered.filter(doc => (doc.data().company || '') === currentCompanyFilter);
       }
