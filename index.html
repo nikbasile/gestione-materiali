@@ -587,6 +587,11 @@
 
     <div id="materialsFilters" class="filters-row">
       <div>
+        <label for="materialNameFilterInput" class="filter-label">🔎 Nome materiale</label>
+        <input id="materialNameFilterInput" class="filter-select" type="text" placeholder="Cerca per nome..." list="materialNameFilterSuggestions" autocomplete="off" />
+        <datalist id="materialNameFilterSuggestions"></datalist>
+      </div>
+      <div>
         <label for="expiryFilterSelect" class="filter-label">📅 Scadenza</label>
         <select id="expiryFilterSelect" class="filter-select">
           <option value="Tutte">Tutte</option>
@@ -615,11 +620,6 @@
         <select id="distributorFilterSelect" class="filter-select">
           <option value="Tutti">Tutti</option>
         </select>
-      </div>
-      <div>
-        <label for="materialNameFilterInput" class="filter-label">🔎 Nome materiale</label>
-        <input id="materialNameFilterInput" class="filter-select" type="text" placeholder="Cerca per nome..." list="materialNameFilterSuggestions" autocomplete="off" />
-        <datalist id="materialNameFilterSuggestions"></datalist>
       </div>
       <button id="resetFiltersBtn" class="filters-reset-btn hidden">⟲ Azzera Filtri</button>
     </div>
