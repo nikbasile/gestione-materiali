@@ -866,8 +866,11 @@
               </div>
               <div>
                 <label for="implantOrderCompanyBulk">Azienda</label>
-                <input id="implantOrderCompanyBulk" type="text" placeholder="Es. Straumann" list="implantOrderCompanyList" required />
-                <datalist id="implantOrderCompanyList"></datalist>
+                <select id="implantOrderCompanyBulk" required>
+                  <option value="">-- Seleziona --</option>
+                  <option value="Other">Altro...</option>
+                </select>
+                <input id="implantOrderCompanyBulkCustom" placeholder="Azienda personalizzata" style="display:none;margin-top:6px" />
               </div>
             </div>
             <div class="implant-order-actions">
@@ -2510,15 +2513,20 @@
     }
 
     function populateImplantOrderCompanyList(){
-      const datalist = document.getElementById('implantOrderCompanyList');
-      if(!datalist) return;
+      const select = document.getElementById('implantOrderCompanyBulk');
+      if(!select) return;
       const companies = loadImplantCompanies();
-      datalist.innerHTML = '';
+      select.innerHTML = '<option value="">-- Seleziona --</option>';
       companies.forEach(company => {
         const opt = document.createElement('option');
         opt.value = company;
-        datalist.appendChild(opt);
+        opt.textContent = company;
+        select.appendChild(opt);
       });
+      const otherOpt = document.createElement('option');
+      otherOpt.value = 'Other';
+      otherOpt.textContent = 'Altro...';
+      select.appendChild(otherOpt);
     }
 
     function saveKitComponent(component){
@@ -3021,6 +3029,11 @@
       modal.classList.remove('active');
       const form = document.getElementById('implantOrderForm');
       if(form) form.reset();
+      const companyCustom = document.getElementById('implantOrderCompanyBulkCustom');
+      if(companyCustom){
+        companyCustom.style.display = 'none';
+        companyCustom.value = '';
+      }
       const rows = document.getElementById('implantOrderRows');
       if(rows) rows.innerHTML = '';
     }
@@ -3029,8 +3042,13 @@
       const dateInput = document.getElementById('implantOrderDateBulk');
       if(dateInput) dateInput.value = new Date().toISOString().split('T')[0];
       populateImplantOrderCompanyList();
-      const companyInput = document.getElementById('implantOrderCompanyBulk');
-      if(companyInput){
+      const companySelect = document.getElementById('implantOrderCompanyBulk');
+      const companyCustom = document.getElementById('implantOrderCompanyBulkCustom');
+      if(companyCustom){
+        companyCustom.style.display = 'none';
+        companyCustom.value = '';
+      }
+      if(companySelect){
         const implants = loadImplantsFromStorage();
         const latestCompany = implants
           .slice()
@@ -3040,7 +3058,18 @@
             return (db ? db.getTime() : 0) - (da ? da.getTime() : 0);
           })
           .find(i => i.company);
-        companyInput.value = latestCompany ? String(latestCompany.company || '') : '';
+        const latestValue = latestCompany ? String(latestCompany.company || '').trim() : '';
+        if(!latestValue){
+          companySelect.value = '';
+        } else if(Array.from(companySelect.options).some(o => o.value === latestValue)){
+          companySelect.value = latestValue;
+        } else {
+          companySelect.value = 'Other';
+          if(companyCustom){
+            companyCustom.style.display = '';
+            companyCustom.value = latestValue;
+          }
+        }
       }
       const rows = document.getElementById('implantOrderRows');
       if(rows) rows.innerHTML = '';
@@ -4800,6 +4829,17 @@
       custom.style.display = this.value === 'Other' ? '' : 'none';
     });
 
+    document.getElementById('implantOrderCompanyBulk')?.addEventListener('change', function() {
+      const custom = document.getElementById('implantOrderCompanyBulkCustom');
+      if(!custom) return;
+      if(this.value === 'Other'){
+        custom.style.display = '';
+      } else {
+        custom.style.display = 'none';
+        custom.value = '';
+      }
+    });
+
     // Mostra/nascondi campi in base al tipo di impianto
     document.getElementById('implantType').addEventListener('change', function() {
       const type = this.value;
@@ -4935,14 +4975,16 @@
     document.getElementById('implantOrderForm')?.addEventListener('submit', async function(e){
       e.preventDefault();
       const orderDate = document.getElementById('implantOrderDateBulk')?.value;
-      const companyBulk = toTitleCase(String(document.getElementById('implantOrderCompanyBulk')?.value || '').trim());
+      const companySelection = String(document.getElementById('implantOrderCompanyBulk')?.value || '').trim();
+      const companyCustom = String(document.getElementById('implantOrderCompanyBulkCustom')?.value || '').trim();
+      const companyBulk = toTitleCase(companySelection === 'Other' ? companyCustom : companySelection);
       const rows = Array.from(document.querySelectorAll('#implantOrderRows tr'));
       if(!orderDate){
         alert('Inserisci la data ordine');
         return;
       }
       if(!companyBulk){
-        alert('Inserisci l\'azienda dell\'ordine');
+        alert('Seleziona l\'azienda dell\'ordine oppure inseriscila in Altro');
         return;
       }
       saveImplantCompany(companyBulk);
