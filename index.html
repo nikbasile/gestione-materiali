@@ -27,11 +27,15 @@
           if (!datalist) return;
           const normalizedFilter = String(filterText || '').toLowerCase().trim();
           const materials = loadFromLocalStorage();
-          const uniqueNames = Array.from(new Set(
-            materials
-              .map(m => (m && m.name ? String(m.name).trim() : ''))
-              .filter(Boolean)
-          ));
+          let batchNames = [];
+          materials.forEach(m => {
+            if (m.batches && Array.isArray(m.batches)) {
+              m.batches.forEach(batch => {
+                if (m.name) batchNames.push(String(m.name).trim());
+              });
+            }
+          });
+          const uniqueNames = Array.from(new Set(batchNames.filter(Boolean)));
           const filteredNames = uniqueNames
             .filter(name => {
               if (!normalizedFilter) return true;
