@@ -616,6 +616,10 @@
           <option value="Tutti">Tutti</option>
         </select>
       </div>
+      <div>
+        <label for="materialNameFilterInput" class="filter-label">🔎 Nome materiale</label>
+        <input id="materialNameFilterInput" class="filter-select" type="text" placeholder="Cerca per nome..." />
+      </div>
       <button id="resetFiltersBtn" class="filters-reset-btn hidden">⟲ Azzera Filtri</button>
     </div>
     <div class="table-wrapper">
@@ -2006,6 +2010,7 @@
     const categoryFiltersEl = document.getElementById('categoryFilters');
     const companyFilterSelect = document.getElementById('companyFilterSelect');
     const distributorFilterSelect = document.getElementById('distributorFilterSelect');
+    const materialNameFilterInput = document.getElementById('materialNameFilterInput');
 
     const CATEGORIES = ['Tutti', 'Strumentario', 'Consumabili Generici', 'Monouso', 'Disinfezione e Sterilizzazione', 'Chirurgia', 'Endodonzia', 'Conservativa e Protesi', 'Frese e Lucidatura', 'Anestesia e Farmaci', 'Impronte e Laboratorio', 'Radiografia e Fotografia', 'Profilassi e Igiene Orale', 'Ortodonzia'];
     const COMPANY_OPTIONS = ['3M', 'Ivoclar', 'GC', 'Dentsply Sirona', 'Coltene', 'Kerr', 'Voco', 'Septodont', 'Zhermack', 'DMG', 'VOCO', 'Other'];
@@ -2015,6 +2020,7 @@
     let currentDistributorFilter = 'Tutti';
     let currentExpiryFilter = 'Tutte';
     let currentQuantityFilter = 'Tutte';
+    let currentMaterialNameFilter = '';
     let allDocs = []; // store all docs for filtering
     let alertsReportData = { materials: [], implants: [] };
     const ALERTS_SETTINGS_KEY = 'magazzino_alert_settings_v1';
@@ -3563,6 +3569,10 @@
       if(currentDistributorFilter !== 'Tutti'){
         filtered = filtered.filter(doc => (doc.data().distributor || '') === currentDistributorFilter);
       }
+      if(currentMaterialNameFilter){
+        const search = currentMaterialNameFilter.toLowerCase();
+        filtered = filtered.filter(doc => String(doc.data().name || '').toLowerCase().includes(search));
+      }
       // Filtro scadenza semaforo
       if(currentExpiryFilter !== 'Tutte'){
         const now = new Date();
@@ -4093,6 +4103,13 @@
         updateResetButtonVisibility();
       });
     }
+    if (materialNameFilterInput) {
+      materialNameFilterInput.addEventListener('input', function() {
+        currentMaterialNameFilter = this.value.trim();
+        renderFilteredMaterials();
+        updateResetButtonVisibility();
+      });
+    }
 
     // Funzione per controllare visualizzazione pulsante reset
     function updateResetButtonVisibility() {
@@ -4101,7 +4118,8 @@
         currentExpiryFilter !== 'Tutte' ||
         currentQuantityFilter !== 'Tutte' ||
         currentCompanyFilter !== 'Tutte' ||
-        currentDistributorFilter !== 'Tutti';
+        currentDistributorFilter !== 'Tutti' ||
+        currentMaterialNameFilter !== '';
       
       if (hasActiveFilters) {
         resetBtn.classList.remove('hidden');
@@ -4118,11 +4136,13 @@
         document.getElementById('quantityFilterSelect').value = 'Tutte';
         document.getElementById('companyFilterSelect').value = 'Tutte';
         document.getElementById('distributorFilterSelect').value = 'Tutti';
+        document.getElementById('materialNameFilterInput').value = '';
         
         currentExpiryFilter = 'Tutte';
         currentQuantityFilter = 'Tutte';
         currentCompanyFilter = 'Tutte';
         currentDistributorFilter = 'Tutti';
+        currentMaterialNameFilter = '';
         
         renderFilteredMaterials();
         updateResetButtonVisibility();
@@ -6904,16 +6924,19 @@
       currentDistributorFilter = 'Tutti';
       currentExpiryFilter = 'Tutte';
       currentQuantityFilter = 'Tutte';
+      currentMaterialNameFilter = '';
 
       const expiryFilterSelect = document.getElementById('expiryFilterSelect');
       const quantityFilterSelect = document.getElementById('quantityFilterSelect');
       const companyFilterSelectEl = document.getElementById('companyFilterSelect');
       const distributorFilterSelectEl = document.getElementById('distributorFilterSelect');
+      const materialNameFilterInputEl = document.getElementById('materialNameFilterInput');
 
       if (expiryFilterSelect) expiryFilterSelect.value = 'Tutte';
       if (quantityFilterSelect) quantityFilterSelect.value = 'Tutte';
       if (companyFilterSelectEl) companyFilterSelectEl.value = 'Tutte';
       if (distributorFilterSelectEl) distributorFilterSelectEl.value = 'Tutti';
+      if (materialNameFilterInputEl) materialNameFilterInputEl.value = '';
 
       updateCategoryFilters();
       renderFilteredMaterials();
