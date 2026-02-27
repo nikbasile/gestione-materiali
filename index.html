@@ -31,7 +31,9 @@
           materials.forEach(m => {
             if (m.batches && Array.isArray(m.batches)) {
               m.batches.forEach(batch => {
-                if (m.name) batchNames.push(String(m.name).trim());
+                // Preferisci batch.materialName, altrimenti m.name
+                const name = batch.materialName ? String(batch.materialName).trim() : (m.name ? String(m.name).trim() : '');
+                if (name) batchNames.push(name);
               });
             }
           });
@@ -5708,6 +5710,22 @@
       const distributorFilter = document.getElementById('incomingDistributorFilter').value;
       const periodFilterValue = document.getElementById('incomingPeriodFilter').value;
 
+      // Aggiorna ogni batch nei dati originali con materialName
+      let updated = false;
+      materials.forEach(m => {
+        if (m.batches && Array.isArray(m.batches)) {
+          m.batches.forEach(batch => {
+            if (!batch.materialName && m.name) {
+              batch.materialName = m.name;
+              updated = true;
+            }
+          });
+        }
+      });
+      if (updated) {
+        saveToLocalStorage(materials);
+      }
+
       // Estrai tutti i batch da tutti i materiali
       let allBatches = [];
       materials.forEach(m => {
@@ -5719,7 +5737,6 @@
             ) || 0;
             const batchIdentifier = batch.batchId || batch.id || '';
             const entryType = batch.ordinoId ? 'Ordine' : 'Materiale';
-            // Assicura che ogni batch abbia il nome materiale
             const batchMaterialName = batch.materialName || m.name;
             allBatches.push({
               materialName: batchMaterialName,
