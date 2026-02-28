@@ -12,6 +12,15 @@
 // Funzioni per backup, esportazione, importazione
 
 // --- Filtri e Tabelle ---
+// Filtro ricerca materiale magazzino
+document.addEventListener('DOMContentLoaded', function() {
+	const materialSearchInput = document.getElementById('materialSearchInput');
+	if (materialSearchInput) {
+		materialSearchInput.addEventListener('input', function() {
+			renderFilteredMaterials();
+		});
+	}
+});
 // Funzioni per filtri, aggiornamento tabelle, report
 
 // --- Utility Generali ---
