@@ -1,0 +1,46 @@
+/* style.css ottimizzato e raggruppato */
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;background:#f5f8fb;color:#2c3e50;line-height:1.6}
+.container{max-width:1200px;margin:0 auto;padding:24px}
+h1{color:#003d7a;margin-bottom:8px;font-size:28px;font-weight:600}
+.subtitle{color:#7f8c8d;margin-bottom:24px;font-size:14px}
+#alerts{margin-bottom:20px}
+.alert{padding:12px 16px;border-radius:8px;margin-bottom:8px;font-size:14px;border-left:4px solid}
+.alert.info{background:#e6f0ff;border-color:#0066cc;color:#003d7a}
+.alert.warn{background:#fff3e6;border-color:#ff9800;color:#e65100}
+form{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:24px;background:#fff;padding:20px;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.08)}
+.form-group{display:flex;flex-direction:column}
+.form-group label{font-size:12px;font-weight:600;color:#003d7a;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px}
+input,select{padding:10px 12px;font-size:14px;border:1px solid #d0dce6;border-radius:6px;background:#fff;color:#2c3e50;transition:border-color 0.2s}
+input:focus,select:focus{outline:none;border-color:#0066cc;box-shadow:0 0 0 3px rgba(0,102,204,0.1)}
+button{padding:10px 16px;font-size:14px;border:none;border-radius:6px;cursor:pointer;font-weight:500;transition:all 0.2s}
+form button{background:#0066cc;color:#fff}
+form button:hover{background:#0052a3}
+table{width:100%;border-collapse:collapse;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.08)}
+thead{background:#003d7a;color:#fff}
+th{padding:14px 12px;text-align:left;font-weight:600;font-size:13px;text-transform:uppercase;letter-spacing:0.5px}
+td{padding:12px;border-bottom:1px solid #e8ecf1;font-size:14px;vertical-align:middle}
+tbody tr:hover{background:#f9fbfd}
+.badge{display:inline-block;padding:6px 10px;border-radius:6px;color:#fff;font-weight:600;font-size:12px}
+.expired{background:#d32f2f}
+.soon{background:#f57c00}
+.ok{background:#388e3c}
+.low{background:#d32f2f}
+.btn-action{width:32px;height:32px;padding:0;font-size:18px;font-weight:bold;border:2px solid;border-radius:6px;cursor:pointer;transition:all 0.15s;margin:0 2px;display:inline-flex;align-items:center;justify-content:center;}
+.btn-inc{background:#e8f5e9;color:#2e7d32;border-color:#2e7d32;}
+.btn-inc:hover{background:#2e7d32;color:#fff;}
+.btn-dec{background:#fff3e0;color:#ef6c00;border-color:#ef6c00;}
+.btn-dec:hover{background:#ef6c00;color:#fff;}
+.btn-del{background:#ffebee;color:#c62828;border-color:#c62828;}
+.btn-del:hover{background:#c62828;color:#fff;}
+.action-buttons{display:flex;gap:10px;margin-bottom:20px;justify-content:flex-end}
+.action-buttons button{padding:10px 16px;font-size:14px;border:none;border-radius:6px;cursor:pointer;font-weight:500;transition:all 0.2s;background:#0066cc;color:#fff}
+.action-buttons button:hover{background:#0052a3}
+.action-buttons button.export{background:#388e3c}
+.action-buttons button.export:hover{background:#2e7d32}
+.action-menu-btn{height:44px;box-sizing:border-box;padding:0 16px;font-size:14px;border:none;border-radius:6px;cursor:pointer;font-weight:500;transition:all 0.2s;background:#0066cc;color:#fff;display:flex;align-items:center;gap:6px}
+.action-menu-btn:hover{background:#0052a3}
+.action-menu{position:absolute;background:white;border:1px solid #ddd;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.15);z-index:1000;min-width:250px}
+.action-menu button.menu-item{width:100%;padding:12px 16px;border:none;background:none;color:#2c3e50;text-align:left;cursor:pointer;font-size:14px;transition:background 0.2s;display:flex;align-items:center;gap:8px;font-family:inherit}
+.action-menu button.menu-item:hover{background:#f5f5f5}
+/* ...continua con le regole raggruppate e ottimizzate ... */

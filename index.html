@@ -1,89 +1,13 @@
-            // Attiva suggerimenti dinamici su focus per tutti i filtri nome materiale
-            document.addEventListener('DOMContentLoaded', function() {
-              const incomingInput = document.getElementById('incomingMaterialNameFilter');
-              if (incomingInput) {
-                incomingInput.addEventListener('focus', function() {
-                  refreshIncomingMaterialNameSuggestions(this.value);
-                });
-                incomingInput.addEventListener('input', function() {
-                  refreshIncomingMaterialNameSuggestions(this.value);
-                });
-              }
-              const outgoingInput = document.getElementById('outgoingMaterialNameFilter');
-              if (outgoingInput) {
-                outgoingInput.addEventListener('focus', function() {
-                  refreshOutgoingMaterialNameSuggestions(this.value);
-                });
-              }
-              const reportInput = document.getElementById('reportMaterialNameFilterInput');
-              if (reportInput && typeof refreshMaterialNameFilterSuggestions === 'function') {
-                reportInput.addEventListener('focus', function() {
-                  refreshMaterialNameFilterSuggestions(this.value);
-                });
-              }
-            });
-        function refreshIncomingMaterialNameSuggestions(filterText = '') {
-          const datalist = document.getElementById('incomingMaterialNameSuggestions');
-          if (!datalist) return;
-          const normalizedFilter = String(filterText || '').toLowerCase().trim();
-          const materials = loadFromLocalStorage();
-          let batchNames = [];
-          materials.forEach(m => {
-            if (m.batches && Array.isArray(m.batches)) {
-              m.batches.forEach(batch => {
-                // Preferisci batch.materialName, altrimenti m.name
-                const name = batch.materialName ? String(batch.materialName).trim() : (m.name ? String(m.name).trim() : '');
-                if (name) batchNames.push(name);
-              });
-            }
-          });
-          const uniqueNames = Array.from(new Set(batchNames.filter(Boolean)));
-          const filteredNames = uniqueNames
-            .filter(name => {
-              if (!normalizedFilter) return true;
-              return name.toLowerCase().includes(normalizedFilter);
-            })
-            .sort((a, b) => a.localeCompare(b, 'it-IT'))
-            .slice(0, 40);
-          datalist.innerHTML = '';
-          filteredNames.forEach(name => {
-            const option = document.createElement('option');
-            option.value = name;
-            datalist.appendChild(option);
-          });
-        }
-
-        function refreshOutgoingMaterialNameSuggestions(filterText = '') {
-          const datalist = document.getElementById('outgoingMaterialNameSuggestions');
-          if (!datalist) return;
-          const normalizedFilter = String(filterText || '').toLowerCase().trim();
-          const materials = loadFromLocalStorage();
-          const uniqueNames = Array.from(new Set(
-            materials
-              .map(m => (m && m.name ? String(m.name).trim() : ''))
-              .filter(Boolean)
-          ));
-          const filteredNames = uniqueNames
-            .filter(name => {
-              if (!normalizedFilter) return true;
-              return name.toLowerCase().includes(normalizedFilter);
-            })
-            .sort((a, b) => a.localeCompare(b, 'it-IT'))
-            .slice(0, 40);
-          datalist.innerHTML = '';
-          filteredNames.forEach(name => {
-            const option = document.createElement('option');
-            option.value = name;
-            datalist.appendChild(option);
-          });
-        }
-    
 <!doctype html>
-<html lang="it">
+<html lang="it" xmlns="http://www.w3.org/1999/xhtml">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Studio Odontoiatrico Basile Ciccarone - Magazzino Materiali</title>
+  <meta name="description" content="Dashboard per la gestione e il monitoraggio dei materiali e impianti odontoiatrici. Backup, esportazione dati, filtri avanzati e integrazione con Firebase.">
+  <meta name="keywords" content="magazzino, materiali, impianti, odontoiatria, backup, esportazione, Firebase, gestione, filtri, CSV, PDF, Basile Ciccarone">
+  <meta name="author" content="NikBa">
+  <meta name="robots" content="index, follow">
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
     body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;background:#f5f8fb;color:#2c3e50;line-height:1.6}
@@ -553,14 +477,14 @@
   <!-- Login disabilitato temporaneamente -->
   <div style="display:none"></div>
 
-  <div class="container" id="mainContent" style="display:block">
-    <div class="header-wrapper">
-      <div class="logo-circle">BC</div>
+  <main class="container" id="mainContent" style="display:block" role="main" aria-label="Contenuto principale">
+    <header class="header-wrapper">
+      <div class="logo-circle" aria-hidden="true">BC</div>
       <div class="header-content">
-        <h1>Studio Odontoiatrico Basile Ciccarone</h1>
+        <h1 id="dashboard-title">Studio Odontoiatrico Basile Ciccarone</h1>
         <p class="studio-name">Gestione Magazzino Materiali di Consumo</p>
       </div>
-    </div>
+    </header>
     <div id="alerts"></div>
     <div class="alert info" style="margin-bottom:18px;">
       <strong>Workflow magazzino (materiali e impianti):</strong>
@@ -589,9 +513,9 @@
     </div>
 
     <!-- Pulsanti Principali -->
-    <div style="background:linear-gradient(135deg,#f0f4f8 0%,#fff 100%);padding:18px 20px;border-radius:10px;border:1px solid #e0e8f0;box-shadow:0 2px 6px rgba(0,61,122,0.05);margin-bottom:20px">
+    <section style="background:linear-gradient(135deg,#f0f4f8 0%,#fff 100%);padding:18px 20px;border-radius:10px;border:1px solid #e0e8f0;box-shadow:0 2px 6px rgba(0,61,122,0.05);margin-bottom:20px">
       <!-- Prima fila: Aggiungi a sinistra, Analisi e Consumo a destra -->
-      <div class="main-dashboard-row top-row" style="margin-bottom:14px">
+      <div class="main-dashboard-row top-row" style="margin-bottom:14px" role="region" aria-labelledby="dashboard-title">
         <button class="main-dashboard-btn" onclick="openAddSelectionModal()" style="background:linear-gradient(135deg,#1976d2 0%,#0d47a1 100%);color:#fff;padding:12px 20px;font-size:15px;border:none;border-radius:8px;cursor:pointer;font-weight:600;box-shadow:0 4px 12px rgba(25,118,210,0.35);transition:all 0.2s;display:flex;align-items:center;gap:6px">
           ➕ Aggiungi Nuovo Materiale/Ordine
         </button>
@@ -661,16 +585,11 @@
           </div>
         </div>
       </div>
-    </div>
+    </section>
 
-    <div id="categoryFilters" class="category-filters"></div>
+    <section id="categoryFilters" class="category-filters"></section>
 
-    <div id="materialsFilters" class="filters-row">
-      <div>
-        <label for="materialNameFilterInput" class="filter-label">🔎 Nome materiale</label>
-        <input id="materialNameFilterInput" class="filter-select" type="text" placeholder="Cerca per nome..." list="materialNameFilterSuggestions" autocomplete="off" />
-        <datalist id="materialNameFilterSuggestions"></datalist>
-      </div>
+    <section id="materialsFilters" class="filters-row">
       <div>
         <label for="expiryFilterSelect" class="filter-label">📅 Scadenza</label>
         <select id="expiryFilterSelect" class="filter-select">
@@ -702,17 +621,17 @@
         </select>
       </div>
       <button id="resetFiltersBtn" class="filters-reset-btn hidden">⟲ Azzera Filtri</button>
-    </div>
-    <div class="table-wrapper">
+    </section>
+    <section class="table-wrapper">
       <table>
         <thead>
           <tr><th>Nome</th><th>Data ordine</th><th style="text-align:center;">Scadenza</th><th class="material-price-col">Prezzo</th><th>Distributore</th><th>Azienda</th><th style="text-align:center;">Quantità</th><th>Azioni</th></tr>
         </thead>
         <tbody id="list"></tbody>
       </table>
-    </div>
+    </section>
 
-  </div>
+  </main>
 
   <!-- Modal Magazzino Implantare -->
   <div id="implantsModal">
@@ -1045,17 +964,6 @@
         
         <!-- Filtri Report -->
         <div class="report-filters">
-            <div class="report-filter-group">
-              <label>Nome materiale</label>
-              <input id="reportMaterialNameFilterInput" class="filter-select" type="text" placeholder="Cerca per nome..." list="reportMaterialNameSuggestions" autocomplete="off" />
-              <datalist id="reportMaterialNameSuggestions"></datalist>
-            </div>
-            <!-- Rimossa duplicazione input ricerca materiale -->
-            <div class="report-filter-group">
-              <label>Nome materiale</label>
-              <input id="outgoingMaterialNameFilterInput" class="filter-select" type="text" placeholder="Cerca per nome..." list="outgoingMaterialNameSuggestions" autocomplete="off" />
-              <datalist id="outgoingMaterialNameSuggestions"></datalist>
-            </div>
           <div class="report-filter-group">
             <label>Categoria / Macroarea</label>
             <select id="reportCategoryFilter" onchange="updateReportData()">
@@ -1158,42 +1066,30 @@
         <!-- Filtri -->
         <div class="report-filters">
           <div class="report-filter-group">
-             <div style="display:flex;flex-wrap:wrap;gap:18px 24px;align-items:flex-end;margin-bottom:16px;">
-               <div style="flex:1 1 260px;min-width:220px;max-width:350px;">
-                 <label for="incomingMaterialNameFilter" style="font-weight:600;margin-bottom:6px;display:block;color:#1a237e;font-size:15px;">Nome materiale</label>
-                 <input id="incomingMaterialNameFilter" class="filter-select" type="text" placeholder="Cerca per nome materiale..." list="incomingMaterialNameSuggestions" autocomplete="off" style="width:100%;padding:10px 14px;border:1.5px solid #90caf9;border-radius:8px;font-size:15px;box-shadow:0 1px 4px #e3eafc;transition:border-color .2s;outline:none;margin-bottom:0;" onfocus="this.style.borderColor='#1976d2'" onblur="this.style.borderColor='#90caf9'" oninput="updateIncomingRegisterData();refreshIncomingMaterialNameSuggestions(this.value)">
-                 <datalist id="incomingMaterialNameSuggestions"></datalist>
-               </div>
-               <div style="flex:0 1 160px;min-width:120px;">
-                 <label for="incomingCategoryFilter" style="font-weight:600;margin-bottom:6px;display:block;color:#1a237e;font-size:15px;">Categoria</label>
-                 <select id="incomingCategoryFilter" onchange="updateIncomingRegisterData()" style="width:100%;padding:10px 14px;border:1.5px solid #90caf9;border-radius:8px;font-size:15px;box-shadow:0 1px 4px #e3eafc;outline:none;">
-                   <option value="Tutti">Tutti</option>
-                   <!-- ...opzioni categoria... -->
-                 </select>
-               </div>
-               <div style="flex:0 1 160px;min-width:120px;">
-                 <label for="incomingDistributorFilter" style="font-weight:600;margin-bottom:6px;display:block;color:#1a237e;font-size:15px;">Distributore</label>
-                 <select id="incomingDistributorFilter" onchange="updateIncomingRegisterData()" style="width:100%;padding:10px 14px;border:1.5px solid #90caf9;border-radius:8px;font-size:15px;box-shadow:0 1px 4px #e3eafc;outline:none;">
-                   <option value="Tutti">Tutti</option>
-                   <!-- ...opzioni distributore... -->
-                 </select>
-               </div>
-               <div style="flex:0 1 120px;min-width:100px;">
-                 <label for="incomingPeriodFilter" style="font-weight:600;margin-bottom:6px;display:block;color:#1a237e;font-size:15px;">Periodo</label>
-                 <select id="incomingPeriodFilter" onchange="updateIncomingRegisterData()" style="width:100%;padding:10px 14px;border:1.5px solid #90caf9;border-radius:8px;font-size:15px;box-shadow:0 1px 4px #e3eafc;outline:none;">
-                   <option value="all">Tutto</option>
-                   <!-- ...opzioni periodo... -->
-                 </select>
-               </div>
-               <div style="flex:0 1 120px;min-width:100px;display:flex;align-items:end;">
-                 <button onclick="resetIncomingFilters()" style="width:100%;padding:10px 0;border-radius:8px;background:#d32f2f;color:#fff;font-weight:600;font-size:15px;border:none;box-shadow:0 1px 4px #e3eafc;cursor:pointer;transition:background .2s;">Azzera Filtri</button>
-               </div>
-             </div>
-                  <!-- ...existing code... -->
-          <!-- Rimossa la lista rapida materiali: ora solo ricerca con suggerimenti datalist -->
+            <label>Categoria</label>
+            <select id="incomingCategoryFilter" onchange="updateIncomingRegisterData()">
+              <option value="Tutti">Tutti</option>
+            </select>
           </div>
           <div class="report-filter-group">
-            <label>Categoria</label>
+            <label>Distributore</label>
+            <select id="incomingDistributorFilter" onchange="updateIncomingRegisterData()">
+              <option value="Tutti">Tutti</option>
+            </select>
+          </div>
+          <div class="report-filter-group">
+            <label>Periodo</label>
+            <select id="incomingPeriodFilter" onchange="updateIncomingRegisterData()">
+              <option value="7">Ultimi 7 giorni</option>
+              <option value="30">Ultimi 30 giorni</option>
+              <option value="90">Ultimi 90 giorni</option>
+              <option value="365">Ultimo anno</option>
+              <option value="all" selected>Tutto</option>
+            </select>
+          </div>
+          <div class="report-filter-group" style="margin-top:24px">
+            <button onclick="resetIncomingFilters()" style="padding:8px 16px;background:#d32f2f;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:600">Azzera Filtri</button>
+          </div>
         </div>
 
         <!-- Statistiche -->
@@ -1248,11 +1144,6 @@
             <select id="outgoingCategoryFilter" onchange="updateOutgoingRegisterData()">
               <option value="Tutti">Tutti</option>
             </select>
-          </div>
-          <div class="report-filter-group">
-            <label>Nome materiale</label>
-            <input id="outgoingMaterialNameFilter" class="filter-select" type="text" placeholder="Cerca per nome..." list="outgoingMaterialNameSuggestions" autocomplete="off" oninput="updateOutgoingRegisterData();refreshOutgoingMaterialNameSuggestions(this.value)">
-            <datalist id="outgoingMaterialNameSuggestions"></datalist>
           </div>
           <div class="report-filter-group">
             <label>Operatore</label>
@@ -2119,7 +2010,6 @@
     const categoryFiltersEl = document.getElementById('categoryFilters');
     const companyFilterSelect = document.getElementById('companyFilterSelect');
     const distributorFilterSelect = document.getElementById('distributorFilterSelect');
-    const materialNameFilterInput = document.getElementById('materialNameFilterInput');
 
     const CATEGORIES = ['Tutti', 'Strumentario', 'Consumabili Generici', 'Monouso', 'Disinfezione e Sterilizzazione', 'Chirurgia', 'Endodonzia', 'Conservativa e Protesi', 'Frese e Lucidatura', 'Anestesia e Farmaci', 'Impronte e Laboratorio', 'Radiografia e Fotografia', 'Profilassi e Igiene Orale', 'Ortodonzia'];
     const COMPANY_OPTIONS = ['3M', 'Ivoclar', 'GC', 'Dentsply Sirona', 'Coltene', 'Kerr', 'Voco', 'Septodont', 'Zhermack', 'DMG', 'VOCO', 'Other'];
@@ -2129,7 +2019,6 @@
     let currentDistributorFilter = 'Tutti';
     let currentExpiryFilter = 'Tutte';
     let currentQuantityFilter = 'Tutte';
-    let currentMaterialNameFilter = '';
     let allDocs = []; // store all docs for filtering
     let alertsReportData = { materials: [], implants: [] };
     const ALERTS_SETTINGS_KEY = 'magazzino_alert_settings_v1';
@@ -3644,7 +3533,6 @@
         });
         distributorFilterSelect.value = currentDistributorFilter;
       }
-      refreshMaterialNameFilterSuggestions(currentMaterialNameFilter);
     }
 
     function updateCategoryFilters(){
@@ -3671,17 +3559,13 @@
     function renderFilteredMaterials(){
       listEl.innerHTML = '';
       let filtered = currentFilter === 'Tutti' 
-        ? allDocs.filter(doc => (doc.data().quantity || 0) > 0) 
-        : allDocs.filter(doc=>doc.data().category === currentFilter && (doc.data().quantity || 0) > 0);
+        ? allDocs 
+        : allDocs.filter(doc=>doc.data().category === currentFilter);
       if(currentCompanyFilter !== 'Tutte'){
         filtered = filtered.filter(doc => (doc.data().company || '') === currentCompanyFilter);
       }
       if(currentDistributorFilter !== 'Tutti'){
         filtered = filtered.filter(doc => (doc.data().distributor || '') === currentDistributorFilter);
-      }
-      if(currentMaterialNameFilter){
-        const search = currentMaterialNameFilter.toLowerCase();
-        filtered = filtered.filter(doc => String(doc.data().name || '').toLowerCase().includes(search));
       }
       // Filtro scadenza semaforo
       if(currentExpiryFilter !== 'Tutte'){
@@ -3749,33 +3633,6 @@
     // Funzione per convertire in Title Case (iniziali maiuscole)
     function toTitleCase(str) {
       return str.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
-    }
-
-    function refreshMaterialNameFilterSuggestions(filterText = '') {
-      const datalist = document.getElementById('materialNameFilterSuggestions');
-      if (!datalist) return;
-
-      const normalizedFilter = String(filterText || '').toLowerCase().trim();
-      const uniqueNames = Array.from(new Set(
-        allDocs
-          .map(doc => (doc && typeof doc.data === 'function' ? String(doc.data().name || '').trim() : ''))
-          .filter(Boolean)
-      ));
-
-      const filteredNames = uniqueNames
-        .filter(name => {
-          if (!normalizedFilter) return true;
-          return name.toLowerCase().includes(normalizedFilter);
-        })
-        .sort((a, b) => a.localeCompare(b, 'it-IT'))
-        .slice(0, 40);
-
-      datalist.innerHTML = '';
-      filteredNames.forEach(name => {
-        const option = document.createElement('option');
-        option.value = name;
-        datalist.appendChild(option);
-      });
     }
 
     function refreshMatNameSuggestions(filterText = '') {
@@ -4025,11 +3882,10 @@
       const batches = data.batches || [];
       let batchesHtml = '<div class="batches-list">';
       
-      const visibleBatches = batches.filter(batch => Number(batch.quantitàRimanente || 0) > 0);
-      if (visibleBatches.length === 0) {
+      if (batches.length === 0) {
         batchesHtml += '<div style="color:#666;font-size:13px">Nessun lotto disponibile</div>';
       } else {
-        const sortedBatchesForDisplay = [...visibleBatches].sort((a, b) => new Date(b.dataOrdine || 0) - new Date(a.dataOrdine || 0));
+        const sortedBatchesForDisplay = [...batches].sort((a, b) => new Date(b.dataOrdine || 0) - new Date(a.dataOrdine || 0));
         sortedBatchesForDisplay.forEach((batch, batchIndex) => {
           const batchExpiry = batch.scadenza ? new Date(batch.scadenza) : null;
           const batchDays = batchExpiry ? daysBetween(now, batchExpiry) : null;
@@ -4241,17 +4097,6 @@
         updateResetButtonVisibility();
       });
     }
-    if (materialNameFilterInput) {
-      materialNameFilterInput.addEventListener('input', function() {
-        currentMaterialNameFilter = this.value.trim();
-        refreshMaterialNameFilterSuggestions(currentMaterialNameFilter);
-        renderFilteredMaterials();
-        updateResetButtonVisibility();
-      });
-      materialNameFilterInput.addEventListener('focus', function() {
-        refreshMaterialNameFilterSuggestions(this.value.trim());
-      });
-    }
 
     // Funzione per controllare visualizzazione pulsante reset
     function updateResetButtonVisibility() {
@@ -4260,8 +4105,7 @@
         currentExpiryFilter !== 'Tutte' ||
         currentQuantityFilter !== 'Tutte' ||
         currentCompanyFilter !== 'Tutte' ||
-        currentDistributorFilter !== 'Tutti' ||
-        currentMaterialNameFilter !== '';
+        currentDistributorFilter !== 'Tutti';
       
       if (hasActiveFilters) {
         resetBtn.classList.remove('hidden');
@@ -4278,13 +4122,11 @@
         document.getElementById('quantityFilterSelect').value = 'Tutte';
         document.getElementById('companyFilterSelect').value = 'Tutte';
         document.getElementById('distributorFilterSelect').value = 'Tutti';
-        document.getElementById('materialNameFilterInput').value = '';
         
         currentExpiryFilter = 'Tutte';
         currentQuantityFilter = 'Tutte';
         currentCompanyFilter = 'Tutte';
         currentDistributorFilter = 'Tutti';
-        currentMaterialNameFilter = '';
         
         renderFilteredMaterials();
         updateResetButtonVisibility();
@@ -5455,7 +5297,6 @@
       modal.classList.add('active');
       setTimeout(() => initReportFilters(), 100);
     }
-    window.openReportModal = openReportModal;
 
     function closeReportModal() {
       const modal = document.getElementById('reportModal');
@@ -5510,12 +5351,10 @@
       const distributorFilter = document.getElementById('reportDistributorFilter').value;
       const statusFilter = (document.getElementById('reportStatusFilter') || {}).value || 'Tutti';
 
-      const materialNameFilter = (document.getElementById('reportMaterialNameFilter') || {}).value || '';
       return materials.filter(m => {
         if (categoryFilter !== 'Tutti' && m.category !== categoryFilter) return false;
         if (companyFilter !== 'Tutte' && m.company !== companyFilter) return false;
         if (distributorFilter !== 'Tutti' && m.distributor !== distributorFilter) return false;
-        if (materialNameFilter && m.name && !m.name.toLowerCase().includes(materialNameFilter.toLowerCase())) return false;
         if (statusFilter !== 'Tutti') {
           const history = Array.isArray(m.consumptionHistory) ? m.consumptionHistory : [];
           const hasStatus = history.some(entry => {
@@ -5668,13 +5507,8 @@
     function openIncomingRegisterModal() {
       const modal = document.getElementById('incomingRegisterModal');
       modal.classList.add('active');
-      setTimeout(() => {
-        initIncomingRegisterFilters();
-        const input = document.getElementById('incomingMaterialNameFilter');
-        if (input) refreshIncomingMaterialNameSuggestions(input.value);
-      }, 100);
+      setTimeout(() => initIncomingRegisterFilters(), 100);
     }
-    window.openIncomingRegisterModal = openIncomingRegisterModal;
 
     function closeIncomingRegisterModal() {
       const modal = document.getElementById('incomingRegisterModal');
@@ -5715,22 +5549,6 @@
       const distributorFilter = document.getElementById('incomingDistributorFilter').value;
       const periodFilterValue = document.getElementById('incomingPeriodFilter').value;
 
-      // Aggiorna ogni batch nei dati originali con materialName
-      let updated = false;
-      materials.forEach(m => {
-        if (m.batches && Array.isArray(m.batches)) {
-          m.batches.forEach(batch => {
-            if (!batch.materialName && m.name) {
-              batch.materialName = m.name;
-              updated = true;
-            }
-          });
-        }
-      });
-      if (updated) {
-        saveToLocalStorage(materials);
-      }
-
       // Estrai tutti i batch da tutti i materiali
       let allBatches = [];
       materials.forEach(m => {
@@ -5742,9 +5560,9 @@
             ) || 0;
             const batchIdentifier = batch.batchId || batch.id || '';
             const entryType = batch.ordinoId ? 'Ordine' : 'Materiale';
-            const batchMaterialName = batch.materialName || m.name;
+
             allBatches.push({
-              materialName: batchMaterialName,
+              materialName: m.name,
               category: m.category,
               distributor: m.distributor,
               orderDate: batchOrderDate,
@@ -5756,12 +5574,10 @@
         }
       });
 
-      // Filtra per categoria, distributore e nome materiale
-      const materialNameFilter = (document.getElementById('incomingMaterialNameFilter') || {}).value || '';
+      // Filtra per categoria e distributore
       allBatches = allBatches.filter(b => {
         if (categoryFilter !== 'Tutti' && b.category !== categoryFilter) return false;
         if (distributorFilter !== 'Tutti' && b.distributor !== distributorFilter) return false;
-        if (materialNameFilter && b.materialName && !b.materialName.toLowerCase().includes(materialNameFilter.toLowerCase())) return false;
         return true;
       });
 
@@ -5890,7 +5706,6 @@
       modal.style.justifyContent = 'center';
       setTimeout(() => initOutgoingRegisterFilters(), 100);
     }
-    window.openOutgoingRegisterModal = openOutgoingRegisterModal;
 
     function closeOutgoingRegisterModal() {
       const modal = document.getElementById('outgoingRegisterModal');
@@ -5929,7 +5744,6 @@
       const operatorFilter = document.getElementById('outgoingOperatorFilter').value;
       const periodFilterValue = document.getElementById('outgoingPeriodFilter').value;
       const statusFilterValue = (document.getElementById('outgoingStatusFilter') || {}).value || 'Tutti';
-      const materialNameFilter = String(document.getElementById('outgoingMaterialNameFilter')?.value || '').trim().toLowerCase();
 
       let allConsumptions = [];
       materials.forEach(m => {
@@ -5959,7 +5773,6 @@
         if (categoryFilter !== 'Tutti' && c.category !== categoryFilter) return false;
         if (operatorFilter !== 'Tutti' && c.operator !== operatorFilter) return false;
         if (statusFilterValue !== 'Tutti' && c.status !== statusFilterValue) return false;
-          if (materialNameFilter && !String(c.materialName || '').toLowerCase().includes(materialNameFilter)) return false;
         return true;
       });
 
@@ -5985,7 +5798,6 @@
     }
 
     function updateOutgoingRegisterData() {
-      refreshOutgoingMaterialNameSuggestions(document.getElementById('outgoingMaterialNameFilter')?.value || '');
       const filtered = getFilteredOutgoingData();
       const totalCount = filtered.length;
       const totalQuantity = filtered.reduce((sum, c) => sum + (Number(c.quantity || 0) || 0), 0);
@@ -6020,7 +5832,6 @@
 
     function resetOutgoingFilters() {
       document.getElementById('outgoingCategoryFilter').value = 'Tutti';
-      document.getElementById('outgoingMaterialNameFilterInput').value = '';
       document.getElementById('outgoingOperatorFilter').value = 'Tutti';
       document.getElementById('outgoingPeriodFilter').value = 'all';
       const statusFilter = document.getElementById('outgoingStatusFilter');
@@ -6052,18 +5863,12 @@
         });
       });
 
-      // Filtra per nome materiale
-      const materialNameFilter = (document.getElementById('activeUsageMaterialNameFilter') || {}).value || '';
-      let filteredRows = rows;
-      if (materialNameFilter) {
-        filteredRows = rows.filter(row => row.materialName && row.materialName.toLowerCase().includes(materialNameFilter.toLowerCase()));
-      }
-      filteredRows.sort((a, b) => {
+      rows.sort((a, b) => {
         const da = parseFlexibleDate(a.date);
         const db = parseFlexibleDate(b.date);
         return (db ? db.getTime() : 0) - (da ? da.getTime() : 0);
       });
-      return filteredRows;
+      return rows;
     }
 
     function openActiveUsageModal(){
@@ -7073,7 +6878,6 @@
       const modal = document.getElementById('addSelectionModal');
       modal.classList.add('active');
     }
-    window.openAddSelectionModal = openAddSelectionModal;
     
     function closeAddSelectionModal() {
       const modal = document.getElementById('addSelectionModal');
@@ -7088,7 +6892,6 @@
         setTimeout(() => initOrderModal(), 100);
       }, 200);
     }
-    window.continueWithOrder = continueWithOrder;
     
     function continueWithMaterial() {
       closeAddSelectionModal();
@@ -7098,7 +6901,6 @@
         setupMaterialCustomFields();
       }, 200);
     }
-    window.continueWithMaterial = continueWithMaterial;
 
     function openMaterialsWarehouse() {
       currentFilter = 'Tutti';
@@ -7106,19 +6908,16 @@
       currentDistributorFilter = 'Tutti';
       currentExpiryFilter = 'Tutte';
       currentQuantityFilter = 'Tutte';
-      currentMaterialNameFilter = '';
 
       const expiryFilterSelect = document.getElementById('expiryFilterSelect');
       const quantityFilterSelect = document.getElementById('quantityFilterSelect');
       const companyFilterSelectEl = document.getElementById('companyFilterSelect');
       const distributorFilterSelectEl = document.getElementById('distributorFilterSelect');
-      const materialNameFilterInputEl = document.getElementById('materialNameFilterInput');
 
       if (expiryFilterSelect) expiryFilterSelect.value = 'Tutte';
       if (quantityFilterSelect) quantityFilterSelect.value = 'Tutte';
       if (companyFilterSelectEl) companyFilterSelectEl.value = 'Tutte';
       if (distributorFilterSelectEl) distributorFilterSelectEl.value = 'Tutti';
-      if (materialNameFilterInputEl) materialNameFilterInputEl.value = '';
 
       updateCategoryFilters();
       renderFilteredMaterials();
@@ -7136,7 +6935,6 @@
       setupMaterialCustomFields();
       refreshMatNameSuggestions('');
     }
-    window.openMaterialModal = openMaterialModal;
 
     function closeMaterialModal() {
       const modal = document.getElementById('materialModal');
@@ -8248,5 +8046,6 @@
     });
 
   </script>
-</body>
+  <script src="script.js"></script>
+  </body>
 </html>
