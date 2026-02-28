@@ -12,6 +12,25 @@
 // Funzioni per backup, esportazione, importazione
 
 // --- Filtri e Tabelle ---
+// Filtro ricerca materiale registro entrate
+document.addEventListener('DOMContentLoaded', function() {
+	const incomingMaterialSearchInput = document.getElementById('incomingMaterialSearchInput');
+	if (incomingMaterialSearchInput) {
+		incomingMaterialSearchInput.addEventListener('input', function() {
+			updateIncomingRegisterData();
+		});
+	}
+});
+
+// Filtro ricerca materiale registro uscite
+document.addEventListener('DOMContentLoaded', function() {
+	const outgoingMaterialSearchInput = document.getElementById('outgoingMaterialSearchInput');
+	if (outgoingMaterialSearchInput) {
+		outgoingMaterialSearchInput.addEventListener('input', function() {
+			updateOutgoingRegisterData();
+		});
+	}
+});
 // Filtro ricerca materiale magazzino
 document.addEventListener('DOMContentLoaded', function() {
 	const materialSearchInput = document.getElementById('materialSearchInput');
