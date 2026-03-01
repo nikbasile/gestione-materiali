@@ -444,15 +444,30 @@
       .filters-reset-btn{width:100%;padding:10px 14px;font-size:12px}
       .dashboard-warehouse-group .implants-btn-main,.dashboard-tools-group > div,.dashboard-toggle-label{max-width:none}
 
-      table{border:none;box-shadow:none;background:transparent}
-      thead{display:none}
-      tbody{display:block}
-      tbody tr{display:block;background:#fff;border:1px solid #e8ecf1;border-radius:8px;margin-bottom:10px;padding:8px;box-shadow:0 1px 3px rgba(0,0,0,0.06)}
-      td{display:flex;justify-content:space-between;align-items:center;gap:12px;border-bottom:1px solid #eef2f6;padding:9px 8px;font-size:13px;text-align:right}
-      td::before{content:attr(data-label);font-weight:600;color:#003d7a;text-align:left}
-      td:last-child{border-bottom:none}
-      td[data-label="Azioni"]{justify-content:flex-end}
-      td[data-label="Azioni"]::before{margin-right:auto}
+      #reportModal,#implantsReportModal,#incomingRegisterModal,#outgoingRegisterModal,#implantsIncomingRegisterModal,#implantsOutgoingRegisterModal,#activeImplantsUsageModal,#alertsReportModal,#consumptionModal,#materialModal,#orderModal,#pdfImportModal,#implantOrderModal,#implantMaterialModal,#implantPdfImportModal,#implantAddSelectionModal,#addSelectionModal{padding:8px !important}
+      .report-modal-content,.order-modal-content,.material-modal-content,.pdf-import-content,.implant-order-content,.implant-material-content,.selection-modal-content,.consumption-modal-content{margin:0 !important;width:100% !important;max-height:96vh}
+      .report-header,.order-header,.material-header,.pdf-import-header,.implant-order-header,.implant-material-header,.selection-header,.consumption-header{padding:14px}
+      .report-header h2,.order-header h2,.material-header h2,.pdf-import-header h2,.implant-order-header h2,.implant-material-header h2,.selection-header h2,.consumption-header h2{font-size:18px}
+      .report-body,.order-body,.material-body,.pdf-import-body,.implant-order-body,.implant-material-body,.selection-body,.consumption-body{padding:14px}
+      .report-filters{padding:12px;gap:10px}
+      .report-filter-group{width:100%}
+      .report-filter-group select,.report-filter-group input{width:100%}
+      .report-stats{grid-template-columns:1fr 1fr;gap:10px}
+      .report-stat{padding:12px}
+      .report-stat-value{font-size:20px}
+      .report-chart-container{height:260px}
+      .order-buttons{flex-direction:column;padding:12px 14px;gap:10px}
+      .order-btn,.pdf-import-btn,.consumption-btn{width:100%}
+
+      .table-wrapper > table{border:none;box-shadow:none;background:transparent}
+      .table-wrapper > table thead{display:none}
+      .table-wrapper > table tbody{display:block}
+      .table-wrapper > table tbody tr{display:block;background:#fff;border:1px solid #e8ecf1;border-radius:8px;margin-bottom:10px;padding:8px;box-shadow:0 1px 3px rgba(0,0,0,0.06)}
+      .table-wrapper > table td{display:flex;justify-content:space-between;align-items:center;gap:12px;border-bottom:1px solid #eef2f6;padding:9px 8px;font-size:13px;text-align:right}
+      .table-wrapper > table td::before{content:attr(data-label);font-weight:600;color:#003d7a;text-align:left}
+      .table-wrapper > table td:last-child{border-bottom:none}
+      .table-wrapper > table td[data-label="Azioni"]{justify-content:flex-end}
+      .table-wrapper > table td[data-label="Azioni"]::before{margin-right:auto}
       .btn-action{width:34px;height:34px}
     }
 
@@ -471,6 +486,16 @@
       .filter-label{font-size:12px}
       .filter-select{font-size:12px;padding:8px 9px}
       .alert{padding:10px 12px;font-size:13px}
+    }
+
+    @media (min-width:701px){
+      .table-wrapper > table{border-collapse:collapse;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.08)}
+      .table-wrapper > table thead{display:table-header-group}
+      .table-wrapper > table tbody{display:table-row-group}
+      .table-wrapper > table tbody tr{display:table-row;background:transparent;border:0;margin:0;padding:0;box-shadow:none}
+      .table-wrapper > table td{display:table-cell;text-align:left;gap:0;padding:12px;border-bottom:1px solid #e8ecf1}
+      .table-wrapper > table td::before{content:none}
+      #reportModal,#implantsReportModal,#incomingRegisterModal,#outgoingRegisterModal,#implantsIncomingRegisterModal,#implantsOutgoingRegisterModal,#activeImplantsUsageModal,#alertsReportModal,#consumptionModal,#materialModal,#orderModal,#pdfImportModal,#implantOrderModal,#implantMaterialModal,#implantPdfImportModal,#implantAddSelectionModal,#addSelectionModal{padding:20px}
     }
   </style>
 </head>
